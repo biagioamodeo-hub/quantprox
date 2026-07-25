@@ -55,3 +55,11 @@ and tests for each pull request.
 
 Release 0.1.0 establishes the backend foundation. Trading, portfolio, risk, and
 decision-engine features follow in later releases.
+
+## Market data API
+
+Release 0.2.0 introduces provider-neutral storage for instruments and OHLCV
+candles. The endpoints are available under `/api/v1/market-data`:
+
+- `POST` and `GET` `/instruments`
+- `POST` and `GET` `/candles`
