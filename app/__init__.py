@@ -1,0 +1,1 @@
+"""QuantProX application package."""
