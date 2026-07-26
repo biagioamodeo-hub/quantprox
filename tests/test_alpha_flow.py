@@ -74,9 +74,29 @@ def test_alpha_decision_to_execution_flow() -> None:
         assert order.status_code == 201
         assert order.json()["status"] == "accepted"
 
+        first_fill = client.post(
+            f"/api/v1/executions/orders/{order.json()['id']}",
+            json={"quantity": "4"},
+        )
+        assert first_fill.status_code == 201
+        assert Decimal(first_fill.json()["notional"]) == Decimal("480")
+
+        partially_filled = client.get(
+            "/api/v1/orders", params={"portfolio_id": portfolio["id"]}
+        ).json()[0]
+        assert partially_filled["status"] == "partially_filled"
+        assert Decimal(partially_filled["filled_quantity"]) == Decimal("4")
+        assert Decimal(partially_filled["remaining_quantity"]) == Decimal("6")
+
+        excessive_fill = client.post(
+            f"/api/v1/executions/orders/{order.json()['id']}",
+            json={"quantity": "7"},
+        )
+        assert excessive_fill.status_code == 422
+
         execution = client.post(f"/api/v1/executions/orders/{order.json()['id']}")
         assert execution.status_code == 201
-        assert Decimal(execution.json()["notional"]) == Decimal("1200")
+        assert Decimal(execution.json()["notional"]) == Decimal("720")
 
         orders = client.get(
             "/api/v1/orders", params={"portfolio_id": portfolio["id"]}
@@ -96,6 +116,10 @@ def test_alpha_decision_to_execution_flow() -> None:
         )
         assert executions.status_code == 200
         assert executions.json()[0]["order_id"] == order.json()["id"]
+        assert [Decimal(item["quantity"]) for item in executions.json()[:2]] == [
+            Decimal("4"),
+            Decimal("6"),
+        ]
 
         duplicate = client.post(f"/api/v1/executions/orders/{order.json()['id']}")
         assert duplicate.status_code == 409

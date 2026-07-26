@@ -24,11 +24,6 @@ class ExecutionRepository:
             )
         )
 
-    def get_for_order(self, order_id: int) -> Execution | None:
-        return self.session.scalar(
-            select(Execution).where(Execution.order_id == order_id)
-        )
-
     def add_position(self, position: Position) -> None:
         self.session.add(position)
 

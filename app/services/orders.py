@@ -42,8 +42,8 @@ class OrderService:
         order = self.repository.get(order_id)
         if order is None:
             raise NotFoundError("Order not found.")
-        if order.status != "accepted":
-            raise ConflictError("Only accepted orders can be cancelled.")
+        if order.status not in {"accepted", "partially_filled"}:
+            raise ConflictError("Only open orders can be cancelled.")
         order.status = "cancelled"
         order.cancelled_at = datetime.now(UTC)
         return OrderRead.model_validate(self.repository.commit(order))

@@ -2,7 +2,7 @@
 
 QuantProX is a quantitative trading framework with a FastAPI service foundation.
 
-The current release is **1.0.0-alpha.3**. It is intended for local development
+The current release is **1.0.0-alpha.4**. It is intended for local development
 and paper-trading workflows; it must not be connected to live brokerage
 execution.
 
@@ -121,6 +121,10 @@ database transaction:
 
 - `POST` `/api/v1/executions/orders/{order_id}`
 - `GET` `/api/v1/executions?portfolio_id={portfolio_id}`
+
+The execution request may include `{"quantity": "..."}` for a partial fill.
+Omitting the body fills the entire remaining quantity. Each fill is recorded
+separately, while the order exposes filled and remaining quantities.
 
 Rejected orders, hold decisions, insufficient cash, insufficient position
 quantity, and repeated execution attempts are never executed.
