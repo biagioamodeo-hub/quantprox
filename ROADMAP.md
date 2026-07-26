@@ -12,6 +12,7 @@
 - 1.0.0-alpha.2: mark-to-market valuation, P&L, and side-aware exposure.
 - 1.0.0-alpha.3: auditable cancellation of accepted orders.
 - 1.0.0-alpha.4: multiple partial fills with remaining-quantity tracking.
+- 1.0.0-alpha.5: Docker Compose and pgAdmin startup hardening.
 
 ## Before beta
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0-alpha.5
+
+- Restore pgAdmin startup compatibility with its email validation.
+- Verify the complete Docker Compose stack and alpha web endpoints.
+
 ## 1.0.0-alpha.4
 
 - Allow multiple partial fills for an open order.
