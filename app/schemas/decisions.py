@@ -28,3 +28,8 @@ class DecisionRead(DecisionEvaluate):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DecisionOrderCreate(BaseModel):
+    quantity: Decimal = Field(gt=0)
+    limit_price: Decimal = Field(gt=0)

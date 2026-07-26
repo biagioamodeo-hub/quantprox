@@ -2,6 +2,10 @@
 
 QuantProX is a quantitative trading framework with a FastAPI service foundation.
 
+The current release is **1.0.0-alpha.1**. It is intended for local development
+and paper-trading workflows; it must not be connected to live brokerage
+execution.
+
 ## Requirements
 
 - Python 3.11 or newer
@@ -96,3 +100,26 @@ produce `buy`, `sell`, or `hold` signals without submitting orders:
 
 - `POST` `/api/v1/decisions/evaluate`
 - `GET` `/api/v1/decisions?portfolio_id={portfolio_id}`
+- `POST` `/api/v1/decisions/{decision_id}/orders`
+
+## Paper execution API
+
+The alpha release completes the auditable paper-trading path. Accepted orders
+can be filled at their limit price, updating portfolio cash and positions in one
+database transaction:
+
+- `POST` `/api/v1/executions/orders/{order_id}`
+- `GET` `/api/v1/executions?portfolio_id={portfolio_id}`
+
+Rejected orders, hold decisions, insufficient cash, insufficient position
+quantity, and repeated execution attempts are never executed.
+
+## Alpha workflow
+
+1. Create an instrument and load OHLCV candles.
+2. Create a portfolio with a paper cash balance.
+3. Configure portfolio risk limits.
+4. Evaluate a decision.
+5. Create an order from a `buy` or `sell` decision.
+6. Execute an accepted order through the paper execution endpoint.
+7. Inspect orders, executions, positions, and cash balance.

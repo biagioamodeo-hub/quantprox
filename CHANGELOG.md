@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0-alpha.1
+
+- Complete the auditable market-data-to-paper-execution workflow.
+- Add one-time paper fills that update cash and positions transactionally.
+- Allow `buy` and `sell` decisions to create risk-gated orders explicitly.
+- Add consistent domain and database-conflict API responses.
+- Document alpha scope, architecture, risk assumptions, and verification.
+
 ## 0.6.0
 
 - Add an SMA-based `buy`, `sell`, and `hold` decision engine.

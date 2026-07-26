@@ -15,7 +15,7 @@ class OrderCreate(BaseModel):
 
 class OrderRead(OrderCreate):
     id: int
-    status: Literal["accepted", "rejected"]
+    status: Literal["accepted", "rejected", "filled"]
     rejection_reason: str | None
     created_at: datetime
 
