@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0-beta.5
+
+- Add request IDs, structured access logs, and defensive HTTP headers.
+- Add authenticated Prometheus text metrics and database readiness checks.
+- Add configurable fixed-window rate limiting for versioned API requests.
+- Add API container health monitoring and operational documentation.
+
 ## 1.0.0-beta.4
 
 - Add provider-neutral broker and market-data adapter contracts.
