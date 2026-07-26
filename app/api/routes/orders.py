@@ -28,3 +28,11 @@ def list_orders(
     service: OrderService = Depends(get_order_service),
 ) -> list[OrderRead]:
     return service.list_for_portfolio(portfolio_id)
+
+
+@router.post("/{order_id}/cancel", response_model=OrderRead)
+def cancel_order(
+    order_id: int,
+    service: OrderService = Depends(get_order_service),
+) -> OrderRead:
+    return service.cancel(order_id)

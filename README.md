@@ -2,7 +2,7 @@
 
 QuantProX is a quantitative trading framework with a FastAPI service foundation.
 
-The current release is **1.0.0-alpha.2**. It is intended for local development
+The current release is **1.0.0-alpha.3**. It is intended for local development
 and paper-trading workflows; it must not be connected to live brokerage
 execution.
 
@@ -99,6 +99,10 @@ accepted and rejected orders:
 
 - `POST` `/api/v1/orders`
 - `GET` `/api/v1/orders?portfolio_id={portfolio_id}`
+- `POST` `/api/v1/orders/{order_id}/cancel`
+
+Accepted orders may be cancelled before execution. Cancellation is timestamped
+and terminal; rejected, filled, and already-cancelled orders cannot be cancelled.
 
 ## Decision API
 

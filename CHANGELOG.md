@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-alpha.3
+
+- Add timestamped cancellation for accepted orders.
+- Prevent cancelled orders from being executed or cancelled repeatedly.
+- Expose cancellation as an optional branch in Alpha Lab.
+
 ## 1.0.0-alpha.2
 
 - Add portfolio mark-to-market valuation using the latest timeframe close.

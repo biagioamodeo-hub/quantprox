@@ -18,6 +18,7 @@ class Order(Base):
     limit_price: Mapped[Decimal] = mapped_column(Numeric(20, 8))
     status: Mapped[str] = mapped_column(String(16), index=True)
     rejection_reason: Mapped[str | None] = mapped_column(String(256))
+    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
     )

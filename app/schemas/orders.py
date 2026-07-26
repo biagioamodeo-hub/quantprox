@@ -15,8 +15,9 @@ class OrderCreate(BaseModel):
 
 class OrderRead(OrderCreate):
     id: int
-    status: Literal["accepted", "rejected", "filled"]
+    status: Literal["accepted", "rejected", "filled", "cancelled"]
     rejection_reason: str | None
+    cancelled_at: datetime | None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

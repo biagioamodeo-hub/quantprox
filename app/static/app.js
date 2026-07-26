@@ -5,6 +5,7 @@ const state = {
   decision: null,
   order: null,
   valuation: null,
+  cancelled: false,
   events: [],
 };
 
@@ -36,6 +37,7 @@ const orderStatusLabels = {
   accepted: "accettato",
   rejected: "rifiutato",
   filled: "eseguito",
+  cancelled: "annullato",
 };
 
 const rationaleLabels = {
@@ -126,7 +128,15 @@ function render() {
   $("#action-title").textContent = actions[0];
   $("#action-copy").textContent = actions[1];
   $("#action-button").textContent = actions[2];
-  $("#action-button").disabled = actions[3];
+  $("#action-button").disabled = actions[3] || state.cancelled;
+  $("#cancel-button").hidden =
+    state.step !== 3 || state.order?.status !== "accepted";
+  if (state.cancelled) {
+    $("#action-title").textContent = "Ordine annullato";
+    $("#action-copy").textContent =
+      "L’ordine non può più essere eseguito. Prepara un nuovo scenario per continuare.";
+    $("#action-button").textContent = "Scenario concluso";
+  }
   $("#stage-title").textContent =
     ["Inizia dal mercato", "Mercato pronto", "Decisione calcolata", "Ordine controllato", "Esecuzione completata", "Portafoglio valutato"][state.step];
 
@@ -267,10 +277,33 @@ function resetView() {
     decision: null,
     order: null,
     valuation: null,
+    cancelled: false,
     events: [],
   });
   setStep(0);
   render();
+}
+
+async function cancelOrder() {
+  const button = $("#cancel-button");
+  button.disabled = true;
+  try {
+    state.order = await api(`/api/v1/orders/${state.order.id}/cancel`, {
+      method: "POST",
+    });
+    state.cancelled = true;
+    addEvent(
+      "Ordine annullato",
+      "Cancellazione registrata; l’ordine non è più eseguibile.",
+      "ANNULLATO",
+    );
+    toast("Ordine annullato");
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    button.disabled = false;
+    render();
+  }
 }
 
 async function checkHealth() {
@@ -288,5 +321,6 @@ async function checkHealth() {
 $("#seed-button").addEventListener("click", seedScenario);
 $("#action-button").addEventListener("click", nextAction);
 $("#reset-button").addEventListener("click", resetView);
+$("#cancel-button").addEventListener("click", cancelOrder);
 checkHealth();
 render();

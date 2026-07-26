@@ -329,6 +329,16 @@ h2 {
   background: var(--mint);
 }
 
+.action-buttons {
+  display: grid;
+  gap: 10px;
+}
+
+.danger {
+  color: #9b382f;
+  border-color: rgba(155, 56, 47, 0.3);
+}
+
 .action-panel p:last-child {
   max-width: 620px;
   margin: 10px 0 0;

@@ -1,5 +1,8 @@
+from datetime import UTC, datetime
+
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import ConflictError, NotFoundError
 from app.models.orders import Order
 from app.repositories.orders import OrderRepository
 from app.schemas.orders import OrderCreate, OrderRead
@@ -34,3 +37,13 @@ class OrderService:
             OrderRead.model_validate(order)
             for order in self.repository.list_for_portfolio(portfolio_id)
         ]
+
+    def cancel(self, order_id: int) -> OrderRead:
+        order = self.repository.get(order_id)
+        if order is None:
+            raise NotFoundError("Order not found.")
+        if order.status != "accepted":
+            raise ConflictError("Only accepted orders can be cancelled.")
+        order.status = "cancelled"
+        order.cancelled_at = datetime.now(UTC)
+        return OrderRead.model_validate(self.repository.commit(order))
