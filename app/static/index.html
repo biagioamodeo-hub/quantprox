@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="QuantProX Alpha Lab: prova il flusso paper-trading in modo guidato."
+    />
+    <title>QuantProX · Alpha Lab</title>
+    <link rel="stylesheet" href="/lab/styles.css" />
+    <script src="/lab/app.js" defer></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <a class="brand" href="/lab/" aria-label="QuantProX Alpha Lab">
+          <span class="brand-mark">Q</span>
+          <span>QuantProX</span>
+        </a>
+        <div class="status" id="api-status">
+          <span class="status-dot"></span>
+          <span>Verifica API…</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div>
+            <p class="eyebrow">1.0.0 · Alpha Lab</p>
+            <h1>Dal mercato al P&amp;L,<br />un passo alla volta.</h1>
+            <p class="hero-copy">
+              Un banco di prova semplice per esplorare il motore decisionale,
+              i controlli rischio e l’esecuzione paper di QuantProX.
+            </p>
+          </div>
+          <div class="hero-card">
+            <div class="pulse">
+              <span>Ambiente</span>
+              <strong>Paper trading</strong>
+            </div>
+            <p>Nessun ordine reale. Dati dimostrativi, risultati verificabili.</p>
+            <button class="primary" id="seed-button">Prepara scenario demo</button>
+          </div>
+        </section>
+
+        <section class="workspace" aria-label="Flusso alpha">
+          <aside class="steps">
+            <p class="section-label">Percorso guidato</p>
+            <ol>
+              <li class="active" data-step="1">
+                <span>01</span>
+                <div><strong>Scenario</strong><small>Dati e limiti</small></div>
+              </li>
+              <li data-step="2">
+                <span>02</span>
+                <div><strong>Decisione</strong><small>Segnale SMA</small></div>
+              </li>
+              <li data-step="3">
+                <span>03</span>
+                <div><strong>Ordine</strong><small>Controllo rischio</small></div>
+              </li>
+              <li data-step="4">
+                <span>04</span>
+                <div><strong>Esecuzione</strong><small>Fill paper</small></div>
+              </li>
+              <li data-step="5">
+                <span>05</span>
+                <div><strong>Valutazione</strong><small>Equity e P&amp;L</small></div>
+              </li>
+            </ol>
+          </aside>
+
+          <div class="stage">
+            <div class="stage-head">
+              <div>
+                <p class="section-label">Sessione corrente</p>
+                <h2 id="stage-title">Inizia dal mercato</h2>
+              </div>
+              <button class="ghost" id="reset-button">Azzera vista</button>
+            </div>
+
+            <div class="metric-grid">
+              <article>
+                <span>Strumento</span>
+                <strong id="metric-symbol">—</strong>
+                <small id="metric-price">Nessun dato</small>
+              </article>
+              <article>
+                <span>Segnale</span>
+                <strong id="metric-signal">—</strong>
+                <small id="metric-rationale">In attesa</small>
+              </article>
+              <article>
+                <span>Ordine</span>
+                <strong id="metric-order">—</strong>
+                <small id="metric-risk">Non valutato</small>
+              </article>
+              <article class="accent-card">
+                <span>Equity</span>
+                <strong id="metric-equity">—</strong>
+                <small id="metric-pnl">P&amp;L —</small>
+              </article>
+            </div>
+
+            <div class="action-panel">
+              <div>
+                <p class="section-label">Prossima azione</p>
+                <h3 id="action-title">Crea un ambiente dimostrativo</h3>
+                <p id="action-copy">
+                  Genereremo uno strumento, tre candele crescenti, un portafoglio
+                  da 10.000 USD e limiti rischio prudenti.
+                </p>
+              </div>
+              <button class="primary" id="action-button" disabled>
+                Attendo lo scenario
+              </button>
+            </div>
+
+            <div class="ledger">
+              <div class="ledger-head">
+                <div>
+                  <p class="section-label">Registro attività</p>
+                  <h3>Ogni passaggio resta visibile</h3>
+                </div>
+                <span id="event-count">0 eventi</span>
+              </div>
+              <div class="empty-log" id="empty-log">
+                Il registro si popolerà mentre provi il flusso.
+              </div>
+              <ul id="event-log" aria-live="polite"></ul>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

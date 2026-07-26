@@ -23,6 +23,8 @@ uvicorn app.main:app --reload
 The API is available at `http://localhost:8000`; interactive documentation is at
 `http://localhost:8000/docs`.
 
+The guided Alpha Lab interface is available at `http://localhost:8000/lab/`.
+
 ## Docker
 
 ```bash
