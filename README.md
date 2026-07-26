@@ -2,7 +2,7 @@
 
 QuantProX is a quantitative trading framework with a FastAPI service foundation.
 
-The current release is **1.0.0-alpha.1**. It is intended for local development
+The current release is **1.0.0-alpha.2**. It is intended for local development
 and paper-trading workflows; it must not be connected to live brokerage
 execution.
 
@@ -76,6 +76,11 @@ under `/api/v1/portfolios`:
 - `POST` and `GET` `/`
 - `POST` `/positions`
 - `GET` `/{portfolio_id}/positions`
+- `GET` `/{portfolio_id}/valuation?timeframe=1d`
+
+Portfolio valuations use the latest close for the selected timeframe and report
+market value, gross exposure, equity, and realized and unrealized P&L. Positions
+without a matching candle explicitly report `cost_basis` as their price source.
 
 ## Risk API
 

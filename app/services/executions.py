@@ -45,6 +45,9 @@ class ExecutionService:
         else:
             if position is None or position.quantity < order.quantity:
                 raise UnprocessableError("Insufficient position quantity.")
+            position.realized_pnl += order.quantity * (
+                order.limit_price - position.average_price
+            )
             position.quantity -= order.quantity
             portfolio.cash_balance += notional
 

@@ -28,3 +28,4 @@ class Position(Base):
     instrument_id: Mapped[int] = mapped_column(ForeignKey("instruments.id"), index=True)
     quantity: Mapped[Decimal] = mapped_column(Numeric(24, 8))
     average_price: Mapped[Decimal] = mapped_column(Numeric(20, 8))
+    realized_pnl: Mapped[Decimal] = mapped_column(Numeric(24, 8), default=0)

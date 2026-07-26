@@ -16,6 +16,8 @@ class OrderService:
         risk_result = self.risk_service.check_order(
             PreTradeCheck(
                 portfolio_id=payload.portfolio_id,
+                instrument_id=payload.instrument_id,
+                side=payload.side,
                 quantity=payload.quantity,
                 price=payload.limit_price,
             )

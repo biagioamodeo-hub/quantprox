@@ -107,7 +107,7 @@ def test_alpha_decision_to_execution_flow() -> None:
                 "instrument_id": instrument["id"],
                 "side": "sell",
                 "quantity": "4",
-                "limit_price": "120",
+                "limit_price": "130",
             },
         ).json()
         sell_execution = client.post(f"/api/v1/executions/orders/{sell_order['id']}")
@@ -115,9 +115,10 @@ def test_alpha_decision_to_execution_flow() -> None:
 
         positions = client.get(f"/api/v1/portfolios/{portfolio['id']}/positions").json()
         assert Decimal(positions[0]["quantity"]) == Decimal("6")
+        assert Decimal(positions[0]["realized_pnl"]) == Decimal("40")
         portfolios = client.get("/api/v1/portfolios").json()
         alpha = next(item for item in portfolios if item["id"] == portfolio["id"])
-        assert Decimal(alpha["cash_balance"]) == Decimal("9280")
+        assert Decimal(alpha["cash_balance"]) == Decimal("9320")
 
         oversized_sell = client.post(
             "/api/v1/orders",

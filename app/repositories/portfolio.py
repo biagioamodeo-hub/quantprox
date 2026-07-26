@@ -1,6 +1,9 @@
+from decimal import Decimal
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.models.market_data import Candle
 from app.models.portfolio import Portfolio, Position
 
 
@@ -30,3 +33,18 @@ class PortfolioRepository:
             .order_by(Position.instrument_id)
         )
         return list(self.session.scalars(statement))
+
+    def get_portfolio(self, portfolio_id: int) -> Portfolio | None:
+        return self.session.get(Portfolio, portfolio_id)
+
+    def latest_close(self, instrument_id: int, timeframe: str) -> Decimal | None:
+        statement = (
+            select(Candle.close)
+            .where(
+                Candle.instrument_id == instrument_id,
+                Candle.timeframe == timeframe,
+            )
+            .order_by(Candle.open_time.desc(), Candle.id.desc())
+            .limit(1)
+        )
+        return self.session.scalar(statement)

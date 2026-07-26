@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-alpha.2
+
+- Add portfolio mark-to-market valuation using the latest timeframe close.
+- Track realized P&L on sell executions and report unrealized P&L.
+- Make projected exposure sensitive to order side and instrument.
+
 ## 1.0.0-alpha.1
 
 - Complete the auditable market-data-to-paper-execution workflow.
