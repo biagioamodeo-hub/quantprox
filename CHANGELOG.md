@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- Add per-portfolio order-notional and total-exposure limits.
+- Add deterministic pre-trade order checks.
+- Add the risk-limit database migration and API tests.
+
 ## 0.3.0
 
 - Add portfolio and position persistence.
