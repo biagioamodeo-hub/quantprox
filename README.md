@@ -80,3 +80,11 @@ checks based on current cost-basis exposure:
 
 - `PUT` and `GET` `/api/v1/risk/limits/{portfolio_id}`
 - `POST` `/api/v1/risk/checks/orders`
+
+## Orders API
+
+Release 0.5.0 adds risk-gated limit-order submission and an audit trail for both
+accepted and rejected orders:
+
+- `POST` `/api/v1/orders`
+- `GET` `/api/v1/orders?portfolio_id={portfolio_id}`
