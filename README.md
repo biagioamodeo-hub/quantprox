@@ -2,7 +2,7 @@
 
 QuantProX is a quantitative trading framework with a FastAPI service foundation.
 
-The current release is **1.0.0-beta.1**. It is intended for local development
+The current release is **1.0.0-beta.2**. It is intended for local development
 and paper-trading workflows; it must not be connected to live brokerage
 execution.
 
@@ -43,6 +43,18 @@ authentication.
 
 Alpha Lab includes a password-style field for the tenant key and sends it only
 as the `X-API-Key` request header.
+
+## Idempotent mutations
+
+Order creation, decision-to-order creation, and paper execution accept an
+optional `Idempotency-Key` header of up to 128 characters. Retrying the same
+operation with the same key and payload returns the original resource without
+duplicating an order, fill, cash movement, or position update. Reusing a key
+with a different payload returns `409 Conflict`.
+
+Keys are scoped to a portfolio for orders and to an order for executions.
+Clients should generate a new opaque key for each logical operation and retain
+it until that operation has completed.
 
 ## Docker
 
