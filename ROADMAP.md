@@ -17,11 +17,12 @@
 - 1.0.0-beta.2: idempotent order and paper-execution mutations.
 - 1.0.0-beta.3: persistent background jobs and asynchronous decisions.
 - 1.0.0-beta.4: provider contracts and persistent sandbox broker submissions.
+- 1.0.0-beta.5: operational metrics, readiness, rate limiting, and HTTP hardening.
 
 ## Beta roadmap
 
 - fees and slippage;
-- production observability, rate limiting, and security review.
+- distributed rate limiting, tracing, and production security review.
 
 ## Before stable
 

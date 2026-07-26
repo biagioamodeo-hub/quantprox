@@ -5,12 +5,15 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "QuantProX"
-    app_version: str = "1.0.0-beta.4"
+    app_version: str = "1.0.0-beta.5"
     environment: str = "local"
     debug: bool = False
     tenant_api_keys: dict[str, str] = {"demo": "dev-api-key"}
     job_poll_interval_seconds: float = 1.0
     broker_provider: str = "sandbox"
+    rate_limit_enabled: bool = True
+    rate_limit_requests: int = 120
+    rate_limit_window_seconds: int = 60
     database_url: str = (
         "postgresql+psycopg://quantprox:quantprox@localhost:5432/quantprox"
     )

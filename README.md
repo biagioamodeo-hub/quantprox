@@ -2,7 +2,7 @@
 
 QuantProX is a quantitative trading framework with a FastAPI service foundation.
 
-The current release is **1.0.0-beta.4**. It is intended for local development
+The current release is **1.0.0-beta.5**. It is intended for local development
 and paper-trading workflows; it must not be connected to live brokerage
 execution.
 
@@ -84,6 +84,26 @@ Rejected, filled, partially filled, or cancelled orders cannot be submitted.
 The sandbox adapter is explicitly marked non-live and performs no network or
 brokerage operation.
 
+## Operations and security
+
+- `GET /health` reports process liveness.
+- `GET /ready` verifies that PostgreSQL is reachable.
+- `GET /api/v1/metrics` exposes authenticated Prometheus text metrics.
+
+Every response includes a validated or generated `X-Request-ID`, defensive
+browser headers, and a structured JSON access-log entry. Alpha Lab also receives
+a restrictive Content Security Policy.
+
+Versioned API requests are rate limited by API key (or client address when no
+key is supplied). Configure the fixed window with `RATE_LIMIT_ENABLED`,
+`RATE_LIMIT_REQUESTS`, and `RATE_LIMIT_WINDOW_SECONDS`. Responses include
+`X-RateLimit-Limit` and `X-RateLimit-Remaining`; exhausted clients receive
+`429 Too Many Requests` and `Retry-After`.
+
+The limiter and metrics registry are intentionally in-memory for this beta.
+Deployments with multiple API processes need a shared limiter and metrics
+aggregation before production use.
+
 ## Docker
 
 ```bash
@@ -91,7 +111,7 @@ docker compose up --build
 ```
 
 This runs migrations and starts the API, PostgreSQL, a persistent background
-worker, and pgAdmin (`http://localhost:5050`).
+worker, and pgAdmin (`http://localhost:5050`). Docker also checks API liveness.
 
 ## Database migrations
 
