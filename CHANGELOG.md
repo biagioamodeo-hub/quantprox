@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+- Add an SMA-based `buy`, `sell`, and `hold` decision engine.
+- Persist decision inputs, calculated averages, actions, and rationales.
+- Add decision query endpoints, migration, and API tests.
+
 ## 0.5.0
 
 - Add risk-gated limit-order submission.

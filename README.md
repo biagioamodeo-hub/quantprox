@@ -88,3 +88,11 @@ accepted and rejected orders:
 
 - `POST` `/api/v1/orders`
 - `GET` `/api/v1/orders?portfolio_id={portfolio_id}`
+
+## Decision API
+
+Release 0.6.0 adds an auditable moving-average decision engine. Evaluations
+produce `buy`, `sell`, or `hold` signals without submitting orders:
+
+- `POST` `/api/v1/decisions/evaluate`
+- `GET` `/api/v1/decisions?portfolio_id={portfolio_id}`
