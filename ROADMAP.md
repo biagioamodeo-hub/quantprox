@@ -15,11 +15,11 @@
 - 1.0.0-alpha.5: Docker Compose and pgAdmin startup hardening.
 - 1.0.0-beta.1: API-key authentication and tenant-isolated portfolios.
 - 1.0.0-beta.2: idempotent order and paper-execution mutations.
+- 1.0.0-beta.3: persistent background jobs and asynchronous decisions.
 
 ## Beta roadmap
 
 - fees and slippage;
-- background jobs;
 - broker/provider adapter interfaces and sandbox integration;
 - production observability, rate limiting, and security review.
 

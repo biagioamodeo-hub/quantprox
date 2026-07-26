@@ -2,7 +2,7 @@
 
 QuantProX is a quantitative trading framework with a FastAPI service foundation.
 
-The current release is **1.0.0-beta.2**. It is intended for local development
+The current release is **1.0.0-beta.3**. It is intended for local development
 and paper-trading workflows; it must not be connected to live brokerage
 execution.
 
@@ -56,13 +56,27 @@ Keys are scoped to a portfolio for orders and to an order for executions.
 Clients should generate a new opaque key for each logical operation and retain
 it until that operation has completed.
 
+## Background jobs
+
+Decision evaluation can run asynchronously:
+
+- `POST /api/v1/jobs/decisions/evaluate` returns a queued job with HTTP 202.
+- `GET /api/v1/jobs/{job_id}` reports tenant-isolated state and result.
+
+Jobs are persisted in PostgreSQL and claimed by the worker using row locks with
+`SKIP LOCKED`, allowing multiple workers without duplicate claims. Failed jobs
+are retried up to their configured limit. Decision jobs are linked uniquely to
+their result, so a worker restart after evaluation cannot create a duplicate
+decision. Job submission also supports `Idempotency-Key`.
+
 ## Docker
 
 ```bash
 docker compose up --build
 ```
 
-This starts the API, PostgreSQL, and pgAdmin (`http://localhost:5050`).
+This runs migrations and starts the API, PostgreSQL, a persistent background
+worker, and pgAdmin (`http://localhost:5050`).
 
 ## Database migrations
 

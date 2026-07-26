@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0-beta.3
+
+- Add persistent, tenant-isolated background jobs.
+- Add asynchronous decision evaluation with queryable results.
+- Add a Docker worker, automatic migrations, safe concurrent claims, and retries.
+- Make decision job results restart-safe and job submission idempotent.
+
 ## 1.0.0-beta.2
 
 - Add optional `Idempotency-Key` support to order and execution mutations.
