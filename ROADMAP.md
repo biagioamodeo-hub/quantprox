@@ -16,11 +16,11 @@
 - 1.0.0-beta.1: API-key authentication and tenant-isolated portfolios.
 - 1.0.0-beta.2: idempotent order and paper-execution mutations.
 - 1.0.0-beta.3: persistent background jobs and asynchronous decisions.
+- 1.0.0-beta.4: provider contracts and persistent sandbox broker submissions.
 
 ## Beta roadmap
 
 - fees and slippage;
-- broker/provider adapter interfaces and sandbox integration;
 - production observability, rate limiting, and security review.
 
 ## Before stable
