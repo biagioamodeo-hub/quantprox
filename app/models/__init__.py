@@ -9,6 +9,7 @@ from app.models.portfolio import Portfolio, Position
 from app.models.risk import RiskLimit
 
 __all__ = [
+    "BrokerSubmission",
     "Candle",
     "Decision",
     "Execution",
@@ -19,3 +20,4 @@ __all__ = [
     "Position",
     "RiskLimit",
 ]
+from app.models.brokers import BrokerSubmission
