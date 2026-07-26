@@ -1,0 +1,34 @@
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.orm import Session
+
+from app.db.session import get_db_session
+from app.schemas.executions import ExecutionRead
+from app.services.executions import ExecutionService
+
+router = APIRouter()
+
+
+def get_execution_service(
+    session: Session = Depends(get_db_session),
+) -> ExecutionService:
+    return ExecutionService(session)
+
+
+@router.post(
+    "/orders/{order_id}",
+    response_model=ExecutionRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def execute_order(
+    order_id: int,
+    service: ExecutionService = Depends(get_execution_service),
+) -> ExecutionRead:
+    return service.execute(order_id)
+
+
+@router.get("", response_model=list[ExecutionRead])
+def list_executions(
+    portfolio_id: int,
+    service: ExecutionService = Depends(get_execution_service),
+) -> list[ExecutionRead]:
+    return service.list_for_portfolio(portfolio_id)

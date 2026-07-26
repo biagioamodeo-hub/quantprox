@@ -1,15 +1,20 @@
 from decimal import Decimal
+from typing import Literal, cast
 
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import ConflictError, NotFoundError
 from app.models.decisions import Decision
 from app.repositories.decisions import DecisionRepository
-from app.schemas.decisions import DecisionEvaluate, DecisionRead
+from app.schemas.decisions import DecisionEvaluate, DecisionOrderCreate, DecisionRead
+from app.schemas.orders import OrderCreate, OrderRead
+from app.services.orders import OrderService
 
 
 class DecisionService:
     def __init__(self, session: Session) -> None:
         self.repository = DecisionRepository(session)
+        self.order_service = OrderService(session)
 
     def evaluate(self, payload: DecisionEvaluate) -> DecisionRead:
         candles = self.repository.recent_candles(
@@ -62,3 +67,20 @@ class DecisionService:
             DecisionRead.model_validate(decision)
             for decision in self.repository.list_for_portfolio(portfolio_id)
         ]
+
+    def create_order(self, decision_id: int, payload: DecisionOrderCreate) -> OrderRead:
+        decision = self.repository.get(decision_id)
+        if decision is None:
+            raise NotFoundError("Decision not found.")
+        if decision.action not in {"buy", "sell"}:
+            raise ConflictError("Hold decisions cannot create orders.")
+        side = cast(Literal["buy", "sell"], decision.action)
+        return self.order_service.submit(
+            OrderCreate(
+                portfolio_id=decision.portfolio_id,
+                instrument_id=decision.instrument_id,
+                side=side,
+                quantity=payload.quantity,
+                limit_price=payload.limit_price,
+            )
+        )

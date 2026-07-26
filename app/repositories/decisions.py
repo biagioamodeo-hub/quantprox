@@ -29,6 +29,9 @@ class DecisionRepository:
         self.session.refresh(decision)
         return decision
 
+    def get(self, decision_id: int) -> Decision | None:
+        return self.session.get(Decision, decision_id)
+
     def list_for_portfolio(self, portfolio_id: int) -> list[Decision]:
         statement = (
             select(Decision)
