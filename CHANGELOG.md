@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+- Add risk-gated limit-order submission.
+- Persist accepted and rejected orders with rejection reasons.
+- Add order query endpoints, migration, and API tests.
+
 ## 0.4.0
 
 - Add per-portfolio order-notional and total-exposure limits.
