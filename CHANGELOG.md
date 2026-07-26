@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-beta.2
+
+- Add optional `Idempotency-Key` support to order and execution mutations.
+- Replay successful resources without duplicate financial side effects.
+- Reject reuse of an idempotency key with a different request payload.
+
 ## 1.0.0-beta.1
 
 - Require configurable API keys for all versioned API endpoints.

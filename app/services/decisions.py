@@ -72,7 +72,12 @@ class DecisionService:
             for decision in self.repository.list_for_portfolio(portfolio_id)
         ]
 
-    def create_order(self, decision_id: int, payload: DecisionOrderCreate) -> OrderRead:
+    def create_order(
+        self,
+        decision_id: int,
+        payload: DecisionOrderCreate,
+        idempotency_key: str | None = None,
+    ) -> OrderRead:
         decision = self.repository.get(decision_id)
         if decision is None:
             raise NotFoundError("Decision not found.")
@@ -87,5 +92,6 @@ class DecisionService:
                 side=side,
                 quantity=payload.quantity,
                 limit_price=payload.limit_price,
-            )
+            ),
+            idempotency_key,
         )

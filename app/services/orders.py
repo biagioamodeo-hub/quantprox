@@ -9,6 +9,7 @@ from app.schemas.orders import OrderCreate, OrderRead
 from app.schemas.risk import PreTradeCheck
 from app.services.access import TenantAccess
 from app.services.risk import RiskService
+from app.utils.idempotency import request_fingerprint
 
 
 class OrderService:
@@ -17,7 +18,21 @@ class OrderService:
         self.risk_service = RiskService(session, tenant_id)
         self.access = TenantAccess(session, tenant_id)
 
-    def submit(self, payload: OrderCreate) -> OrderRead:
+    def submit(
+        self, payload: OrderCreate, idempotency_key: str | None = None
+    ) -> OrderRead:
+        self.access.require_portfolio(payload.portfolio_id)
+        fingerprint = request_fingerprint(payload)
+        if idempotency_key is not None:
+            existing = self.repository.get_by_idempotency_key(
+                payload.portfolio_id, idempotency_key
+            )
+            if existing is not None:
+                if existing.request_fingerprint != fingerprint:
+                    raise ConflictError(
+                        "Idempotency-Key was already used with a different payload."
+                    )
+                return OrderRead.model_validate(existing)
         risk_result = self.risk_service.check_order(
             PreTradeCheck(
                 portfolio_id=payload.portfolio_id,
@@ -31,6 +46,8 @@ class OrderService:
             **payload.model_dump(),
             status="accepted" if risk_result.accepted else "rejected",
             rejection_reason=risk_result.reason,
+            idempotency_key=idempotency_key,
+            request_fingerprint=fingerprint if idempotency_key else None,
         )
         return OrderRead.model_validate(self.repository.add(order))
 

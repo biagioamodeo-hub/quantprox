@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Header, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
@@ -19,9 +19,12 @@ def get_order_service(
 @router.post("", response_model=OrderRead, status_code=status.HTTP_201_CREATED)
 def submit_order(
     payload: OrderCreate,
+    idempotency_key: str | None = Header(
+        default=None, alias="Idempotency-Key", min_length=1, max_length=128
+    ),
     service: OrderService = Depends(get_order_service),
 ) -> OrderRead:
-    return service.submit(payload)
+    return service.submit(payload, idempotency_key)
 
 
 @router.get("", response_model=list[OrderRead])

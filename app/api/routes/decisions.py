@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Header, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
@@ -47,6 +47,9 @@ def list_decisions(
 def create_order_from_decision(
     decision_id: int,
     payload: DecisionOrderCreate,
+    idempotency_key: str | None = Header(
+        default=None, alias="Idempotency-Key", min_length=1, max_length=128
+    ),
     service: DecisionService = Depends(get_decision_service),
 ) -> OrderRead:
-    return service.create_order(decision_id, payload)
+    return service.create_order(decision_id, payload, idempotency_key)

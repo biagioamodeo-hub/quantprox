@@ -6,6 +6,7 @@ from app.models.portfolio import Position
 from app.repositories.executions import ExecutionRepository
 from app.schemas.executions import ExecutionCreate, ExecutionRead
 from app.services.access import TenantAccess
+from app.utils.idempotency import request_fingerprint
 
 
 class ExecutionService:
@@ -14,12 +15,24 @@ class ExecutionService:
         self.access = TenantAccess(session, tenant_id)
 
     def execute(
-        self, order_id: int, payload: ExecutionCreate | None = None
+        self,
+        order_id: int,
+        payload: ExecutionCreate | None = None,
+        idempotency_key: str | None = None,
     ) -> ExecutionRead:
         order = self.repository.get_order(order_id)
         if order is None:
             raise NotFoundError("Order not found.")
         self.access.require_portfolio(order.portfolio_id)
+        fingerprint = request_fingerprint(payload)
+        if idempotency_key is not None:
+            existing = self.repository.get_by_idempotency_key(order_id, idempotency_key)
+            if existing is not None:
+                if existing.request_fingerprint != fingerprint:
+                    raise ConflictError(
+                        "Idempotency-Key was already used with a different payload."
+                    )
+                return ExecutionRead.model_validate(existing)
         if order.status not in {"accepted", "partially_filled"}:
             raise ConflictError("Only open orders can be executed.")
 
@@ -72,6 +85,8 @@ class ExecutionService:
             quantity=fill_quantity,
             price=order.limit_price,
             notional=notional,
+            idempotency_key=idempotency_key,
+            request_fingerprint=fingerprint if idempotency_key else None,
         )
         return ExecutionRead.model_validate(self.repository.commit(execution))
 

@@ -14,11 +14,12 @@
 - 1.0.0-alpha.4: multiple partial fills with remaining-quantity tracking.
 - 1.0.0-alpha.5: Docker Compose and pgAdmin startup hardening.
 - 1.0.0-beta.1: API-key authentication and tenant-isolated portfolios.
+- 1.0.0-beta.2: idempotent order and paper-execution mutations.
 
 ## Beta roadmap
 
 - fees and slippage;
-- background jobs and idempotency keys;
+- background jobs;
 - broker/provider adapter interfaces and sandbox integration;
 - production observability, rate limiting, and security review.
 
