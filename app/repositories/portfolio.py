@@ -17,8 +17,14 @@ class PortfolioRepository:
         self.session.refresh(portfolio)
         return portfolio
 
-    def list_portfolios(self) -> list[Portfolio]:
-        return list(self.session.scalars(select(Portfolio).order_by(Portfolio.name)))
+    def list_portfolios(self, tenant_id: str) -> list[Portfolio]:
+        return list(
+            self.session.scalars(
+                select(Portfolio)
+                .where(Portfolio.tenant_id == tenant_id)
+                .order_by(Portfolio.name)
+            )
+        )
 
     def add_position(self, position: Position) -> Position:
         self.session.add(position)
@@ -34,8 +40,13 @@ class PortfolioRepository:
         )
         return list(self.session.scalars(statement))
 
-    def get_portfolio(self, portfolio_id: int) -> Portfolio | None:
-        return self.session.get(Portfolio, portfolio_id)
+    def get_portfolio(self, portfolio_id: int, tenant_id: str) -> Portfolio | None:
+        return self.session.scalar(
+            select(Portfolio).where(
+                Portfolio.id == portfolio_id,
+                Portfolio.tenant_id == tenant_id,
+            )
+        )
 
     def latest_close(self, instrument_id: int, timeframe: str) -> Decimal | None:
         statement = (

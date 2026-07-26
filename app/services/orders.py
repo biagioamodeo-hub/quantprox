@@ -7,13 +7,15 @@ from app.models.orders import Order
 from app.repositories.orders import OrderRepository
 from app.schemas.orders import OrderCreate, OrderRead
 from app.schemas.risk import PreTradeCheck
+from app.services.access import TenantAccess
 from app.services.risk import RiskService
 
 
 class OrderService:
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: Session, tenant_id: str) -> None:
         self.repository = OrderRepository(session)
-        self.risk_service = RiskService(session)
+        self.risk_service = RiskService(session, tenant_id)
+        self.access = TenantAccess(session, tenant_id)
 
     def submit(self, payload: OrderCreate) -> OrderRead:
         risk_result = self.risk_service.check_order(
@@ -33,6 +35,7 @@ class OrderService:
         return OrderRead.model_validate(self.repository.add(order))
 
     def list_for_portfolio(self, portfolio_id: int) -> list[OrderRead]:
+        self.access.require_portfolio(portfolio_id)
         return [
             OrderRead.model_validate(order)
             for order in self.repository.list_for_portfolio(portfolio_id)
@@ -42,6 +45,7 @@ class OrderService:
         order = self.repository.get(order_id)
         if order is None:
             raise NotFoundError("Order not found.")
+        self.access.require_portfolio(order.portfolio_id)
         if order.status not in {"accepted", "partially_filled"}:
             raise ConflictError("Only open orders can be cancelled.")
         order.status = "cancelled"

@@ -8,9 +8,13 @@ from app.db.base import Base
 
 class Portfolio(Base):
     __tablename__ = "portfolios"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "name", name="uq_portfolio_tenant_name"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    tenant_id: Mapped[str] = mapped_column(String(64), index=True)
+    name: Mapped[str] = mapped_column(String(128), index=True)
     base_currency: Mapped[str] = mapped_column(String(3), default="USD")
     cash_balance: Mapped[Decimal] = mapped_column(Numeric(24, 8), default=0)
 

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
+from app.dependencies.auth import get_current_tenant
 from app.schemas.decisions import (
     DecisionEvaluate,
     DecisionOrderCreate,
@@ -15,8 +16,9 @@ router = APIRouter()
 
 def get_decision_service(
     session: Session = Depends(get_db_session),
+    tenant_id: str = Depends(get_current_tenant),
 ) -> DecisionService:
-    return DecisionService(session)
+    return DecisionService(session, tenant_id)
 
 
 @router.post(

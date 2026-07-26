@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
+from app.dependencies.auth import get_current_tenant
 from app.schemas.risk import (
     PreTradeCheck,
     PreTradeCheckResult,
@@ -13,8 +14,11 @@ from app.services.risk import RiskService
 router = APIRouter()
 
 
-def get_risk_service(session: Session = Depends(get_db_session)) -> RiskService:
-    return RiskService(session)
+def get_risk_service(
+    session: Session = Depends(get_db_session),
+    tenant_id: str = Depends(get_current_tenant),
+) -> RiskService:
+    return RiskService(session, tenant_id)
 
 
 @router.put("/limits/{portfolio_id}", response_model=RiskLimitRead)

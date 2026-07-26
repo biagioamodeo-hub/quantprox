@@ -5,11 +5,13 @@ from app.models.executions import Execution
 from app.models.portfolio import Position
 from app.repositories.executions import ExecutionRepository
 from app.schemas.executions import ExecutionCreate, ExecutionRead
+from app.services.access import TenantAccess
 
 
 class ExecutionService:
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: Session, tenant_id: str) -> None:
         self.repository = ExecutionRepository(session)
+        self.access = TenantAccess(session, tenant_id)
 
     def execute(
         self, order_id: int, payload: ExecutionCreate | None = None
@@ -17,6 +19,7 @@ class ExecutionService:
         order = self.repository.get_order(order_id)
         if order is None:
             raise NotFoundError("Order not found.")
+        self.access.require_portfolio(order.portfolio_id)
         if order.status not in {"accepted", "partially_filled"}:
             raise ConflictError("Only open orders can be executed.")
 
@@ -73,6 +76,7 @@ class ExecutionService:
         return ExecutionRead.model_validate(self.repository.commit(execution))
 
     def list_for_portfolio(self, portfolio_id: int) -> list[ExecutionRead]:
+        self.access.require_portfolio(portfolio_id)
         return [
             ExecutionRead.model_validate(execution)
             for execution in self.repository.list_for_portfolio(portfolio_id)

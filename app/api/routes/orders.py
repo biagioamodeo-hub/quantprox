@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
+from app.dependencies.auth import get_current_tenant
 from app.schemas.orders import OrderCreate, OrderRead
 from app.services.orders import OrderService
 
@@ -10,8 +11,9 @@ router = APIRouter()
 
 def get_order_service(
     session: Session = Depends(get_db_session),
+    tenant_id: str = Depends(get_current_tenant),
 ) -> OrderService:
-    return OrderService(session)
+    return OrderService(session, tenant_id)
 
 
 @router.post("", response_model=OrderRead, status_code=status.HTTP_201_CREATED)

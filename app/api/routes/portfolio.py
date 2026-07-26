@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
+from app.dependencies.auth import get_current_tenant
 from app.schemas.portfolio import (
     PortfolioCreate,
     PortfolioRead,
@@ -16,8 +17,9 @@ router = APIRouter()
 
 def get_portfolio_service(
     session: Session = Depends(get_db_session),
+    tenant_id: str = Depends(get_current_tenant),
 ) -> PortfolioService:
-    return PortfolioService(session)
+    return PortfolioService(session, tenant_id)
 
 
 @router.post("", response_model=PortfolioRead, status_code=status.HTTP_201_CREATED)

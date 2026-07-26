@@ -9,24 +9,29 @@ from app.schemas.risk import (
     RiskLimitRead,
     RiskLimitWrite,
 )
+from app.services.access import TenantAccess
 
 
 class RiskService:
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: Session, tenant_id: str) -> None:
         self.repository = RiskRepository(session)
+        self.access = TenantAccess(session, tenant_id)
 
     def get_limit(self, portfolio_id: int) -> RiskLimitRead | None:
+        self.access.require_portfolio(portfolio_id)
         risk_limit = self.repository.get_limit(portfolio_id)
         if risk_limit is None:
             return None
         return RiskLimitRead.model_validate(risk_limit)
 
     def set_limit(self, portfolio_id: int, payload: RiskLimitWrite) -> RiskLimitRead:
+        self.access.require_portfolio(portfolio_id)
         return RiskLimitRead.model_validate(
             self.repository.set_limit(portfolio_id, payload)
         )
 
     def check_order(self, payload: PreTradeCheck) -> PreTradeCheckResult:
+        self.access.require_portfolio(payload.portfolio_id)
         risk_limit = self.repository.get_limit(payload.portfolio_id)
         order_notional = abs(payload.quantity * payload.price)
         positions = self.repository.positions(payload.portfolio_id)
