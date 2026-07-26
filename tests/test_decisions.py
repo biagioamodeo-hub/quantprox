@@ -22,7 +22,7 @@ def test_moving_average_decisions_are_audited() -> None:
             yield session
 
     app.dependency_overrides[get_db_session] = override_session
-    client = TestClient(app)
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
     try:
         instrument = client.post(
             "/api/v1/market-data/instruments", json={"symbol": "AAPL"}

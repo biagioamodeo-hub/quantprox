@@ -16,31 +16,34 @@ from app.schemas.portfolio import (
 
 
 class PortfolioService:
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: Session, tenant_id: str) -> None:
         self.repository = PortfolioRepository(session)
+        self.tenant_id = tenant_id
 
     def create_portfolio(self, payload: PortfolioCreate) -> PortfolioRead:
-        portfolio = Portfolio(**payload.model_dump())
+        portfolio = Portfolio(tenant_id=self.tenant_id, **payload.model_dump())
         return PortfolioRead.model_validate(self.repository.add_portfolio(portfolio))
 
     def list_portfolios(self) -> list[PortfolioRead]:
         return [
             PortfolioRead.model_validate(portfolio)
-            for portfolio in self.repository.list_portfolios()
+            for portfolio in self.repository.list_portfolios(self.tenant_id)
         ]
 
     def create_position(self, payload: PositionCreate) -> PositionRead:
+        self._require_portfolio(payload.portfolio_id)
         position = Position(**payload.model_dump())
         return PositionRead.model_validate(self.repository.add_position(position))
 
     def list_positions(self, portfolio_id: int) -> list[PositionRead]:
+        self._require_portfolio(portfolio_id)
         return [
             PositionRead.model_validate(position)
             for position in self.repository.list_positions(portfolio_id)
         ]
 
     def value_portfolio(self, portfolio_id: int, timeframe: str) -> PortfolioValuation:
-        portfolio = self.repository.get_portfolio(portfolio_id)
+        portfolio = self.repository.get_portfolio(portfolio_id, self.tenant_id)
         if portfolio is None:
             raise NotFoundError("Portfolio not found.")
 
@@ -86,3 +89,9 @@ class PortfolioService:
             realized_pnl=realized_pnl,
             positions=valuations,
         )
+
+    def _require_portfolio(self, portfolio_id: int) -> Portfolio:
+        portfolio = self.repository.get_portfolio(portfolio_id, self.tenant_id)
+        if portfolio is None:
+            raise NotFoundError("Portfolio not found.")
+        return portfolio

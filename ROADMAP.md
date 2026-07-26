@@ -13,11 +13,11 @@
 - 1.0.0-alpha.3: auditable cancellation of accepted orders.
 - 1.0.0-alpha.4: multiple partial fills with remaining-quantity tracking.
 - 1.0.0-alpha.5: Docker Compose and pgAdmin startup hardening.
+- 1.0.0-beta.1: API-key authentication and tenant-isolated portfolios.
 
-## Before beta
+## Beta roadmap
 
 - fees and slippage;
-- authentication, authorization, and multi-tenant ownership;
 - background jobs and idempotency keys;
 - broker/provider adapter interfaces and sandbox integration;
 - production observability, rate limiting, and security review.

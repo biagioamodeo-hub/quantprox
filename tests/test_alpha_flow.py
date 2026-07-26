@@ -23,7 +23,7 @@ def test_alpha_decision_to_execution_flow() -> None:
             yield session
 
     app.dependency_overrides[get_db_session] = override_session
-    client = TestClient(app)
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
     try:
         instrument = client.post(
             "/api/v1/market-data/instruments", json={"symbol": "ALPHA"}
@@ -192,7 +192,7 @@ def test_alpha_rejects_invalid_execution_paths() -> None:
             yield session
 
     app.dependency_overrides[get_db_session] = override_session
-    client = TestClient(app)
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
     try:
         instrument = client.post(
             "/api/v1/market-data/instruments", json={"symbol": "CASH"}

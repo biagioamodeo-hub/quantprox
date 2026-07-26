@@ -2,7 +2,7 @@
 
 QuantProX is a quantitative trading framework with a FastAPI service foundation.
 
-The current release is **1.0.0-alpha.5**. It is intended for local development
+The current release is **1.0.0-beta.1**. It is intended for local development
 and paper-trading workflows; it must not be connected to live brokerage
 execution.
 
@@ -24,6 +24,25 @@ The API is available at `http://localhost:8000`; interactive documentation is at
 `http://localhost:8000/docs`.
 
 The guided Alpha Lab interface is available at `http://localhost:8000/lab/`.
+
+## Authentication and tenant isolation
+
+Every `/api/v1` request requires an `X-API-Key` header. Configure tenant keys
+through `TENANT_API_KEYS`, a JSON object mapping stable tenant identifiers to
+secrets:
+
+```bash
+TENANT_API_KEYS={"demo":"replace-with-a-long-random-secret"}
+```
+
+Portfolios and every portfolio-derived risk check, decision, order, position,
+valuation, and execution are isolated by tenant. Unknown keys receive `401`;
+resources owned by another tenant are returned as `404` to avoid leaking their
+existence. Market-data resources are shared across tenants but still require
+authentication.
+
+Alpha Lab includes a password-style field for the tenant key and sends it only
+as the `X-API-Key` request header.
 
 ## Docker
 

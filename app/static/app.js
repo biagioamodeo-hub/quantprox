@@ -11,8 +11,13 @@ const state = {
 
 const $ = (selector) => document.querySelector(selector);
 const api = async (path, options = {}) => {
+  const apiKey = $("#api-key")?.value.trim();
   const response = await fetch(path, {
-    headers: { "Content-Type": "application/json", ...options.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...(apiKey && path.startsWith("/api/") ? { "X-API-Key": apiKey } : {}),
+      ...options.headers,
+    },
     ...options,
   });
   const body = await response.json().catch(() => ({}));
@@ -162,6 +167,9 @@ async function seedScenario() {
   button.disabled = true;
   button.textContent = "Preparazione…";
   try {
+    if (!$("#api-key").value.trim()) {
+      throw new Error("Inserisci la chiave API del tenant.");
+    }
     const suffix = String(Date.now()).slice(-6);
     state.instrument = await api("/api/v1/market-data/instruments", {
       method: "POST",
