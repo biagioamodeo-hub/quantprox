@@ -63,3 +63,12 @@ candles. The endpoints are available under `/api/v1/market-data`:
 
 - `POST` and `GET` `/instruments`
 - `POST` and `GET` `/candles`
+
+## Portfolio API
+
+Release 0.3.0 adds portfolio and position tracking. The endpoints are available
+under `/api/v1/portfolios`:
+
+- `POST` and `GET` `/`
+- `POST` `/positions`
+- `GET` `/{portfolio_id}/positions`
