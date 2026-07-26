@@ -6,6 +6,8 @@ const state = {
   order: null,
   valuation: null,
   cancelled: false,
+  orderKey: null,
+  executionKey: null,
   events: [],
 };
 
@@ -240,8 +242,10 @@ async function nextAction() {
         signalLabels[state.decision.action],
       );
     } else if (state.step === 2) {
+      state.orderKey ||= crypto.randomUUID();
       state.order = await api(`/api/v1/decisions/${state.decision.id}/orders`, {
         method: "POST",
+        headers: { "Idempotency-Key": state.orderKey },
         body: JSON.stringify({ quantity: "10", limit_price: "120" }),
       });
       setStep(3);
@@ -253,8 +257,10 @@ async function nextAction() {
         `#${state.order.id}`,
       );
     } else if (state.step === 3) {
+      state.executionKey ||= crypto.randomUUID();
       const execution = await api(`/api/v1/executions/orders/${state.order.id}`, {
         method: "POST",
+        headers: { "Idempotency-Key": state.executionKey },
       });
       state.order.status = "filled";
       setStep(4);
@@ -287,6 +293,8 @@ function resetView() {
     order: null,
     valuation: null,
     cancelled: false,
+    orderKey: null,
+    executionKey: null,
     events: [],
   });
   setStep(0);

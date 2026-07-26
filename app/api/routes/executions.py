@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Header, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
@@ -24,9 +24,12 @@ def get_execution_service(
 def execute_order(
     order_id: int,
     payload: ExecutionCreate | None = None,
+    idempotency_key: str | None = Header(
+        default=None, alias="Idempotency-Key", min_length=1, max_length=128
+    ),
     service: ExecutionService = Depends(get_execution_service),
 ) -> ExecutionRead:
-    return service.execute(order_id, payload)
+    return service.execute(order_id, payload, idempotency_key)
 
 
 @router.get("", response_model=list[ExecutionRead])

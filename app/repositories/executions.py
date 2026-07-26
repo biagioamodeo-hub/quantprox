@@ -11,7 +11,17 @@ class ExecutionRepository:
         self.session = session
 
     def get_order(self, order_id: int) -> Order | None:
-        return self.session.get(Order, order_id)
+        return self.session.get(Order, order_id, with_for_update=True)
+
+    def get_by_idempotency_key(
+        self, order_id: int, idempotency_key: str
+    ) -> Execution | None:
+        return self.session.scalar(
+            select(Execution).where(
+                Execution.order_id == order_id,
+                Execution.idempotency_key == idempotency_key,
+            )
+        )
 
     def get_portfolio(self, portfolio_id: int) -> Portfolio | None:
         return self.session.get(Portfolio, portfolio_id)
