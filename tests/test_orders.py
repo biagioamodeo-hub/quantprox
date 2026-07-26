@@ -79,7 +79,7 @@ def test_order_submission_uses_risk_controls() -> None:
 
         repeated = client.post(f"/api/v1/orders/{accepted.json()['id']}/cancel")
         assert repeated.status_code == 409
-        assert repeated.json()["detail"] == ("Only accepted orders can be cancelled.")
+        assert repeated.json()["detail"] == ("Only open orders can be cancelled.")
 
         rejected_cancel = client.post(f"/api/v1/orders/{rejected.json()['id']}/cancel")
         assert rejected_cancel.status_code == 409

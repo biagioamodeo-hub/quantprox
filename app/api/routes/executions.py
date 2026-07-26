@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
-from app.schemas.executions import ExecutionRead
+from app.schemas.executions import ExecutionCreate, ExecutionRead
 from app.services.executions import ExecutionService
 
 router = APIRouter()
@@ -21,9 +21,10 @@ def get_execution_service(
 )
 def execute_order(
     order_id: int,
+    payload: ExecutionCreate | None = None,
     service: ExecutionService = Depends(get_execution_service),
 ) -> ExecutionRead:
-    return service.execute(order_id)
+    return service.execute(order_id, payload)
 
 
 @router.get("", response_model=list[ExecutionRead])

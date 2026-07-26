@@ -15,6 +15,7 @@ class Order(Base):
     instrument_id: Mapped[int] = mapped_column(ForeignKey("instruments.id"), index=True)
     side: Mapped[str] = mapped_column(String(4))
     quantity: Mapped[Decimal] = mapped_column(Numeric(24, 8))
+    filled_quantity: Mapped[Decimal] = mapped_column(Numeric(24, 8), default=0)
     limit_price: Mapped[Decimal] = mapped_column(Numeric(20, 8))
     status: Mapped[str] = mapped_column(String(16), index=True)
     rejection_reason: Mapped[str | None] = mapped_column(String(256))
@@ -22,3 +23,7 @@ class Order(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
     )
+
+    @property
+    def remaining_quantity(self) -> Decimal:
+        return self.quantity - self.filled_quantity

@@ -15,7 +15,9 @@ class OrderCreate(BaseModel):
 
 class OrderRead(OrderCreate):
     id: int
-    status: Literal["accepted", "rejected", "filled", "cancelled"]
+    status: Literal["accepted", "rejected", "partially_filled", "filled", "cancelled"]
+    filled_quantity: Decimal
+    remaining_quantity: Decimal
     rejection_reason: str | None
     cancelled_at: datetime | None
     created_at: datetime

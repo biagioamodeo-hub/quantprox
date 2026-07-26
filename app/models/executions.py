@@ -11,9 +11,7 @@ class Execution(Base):
     __tablename__ = "executions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    order_id: Mapped[int] = mapped_column(
-        ForeignKey("orders.id"), unique=True, index=True
-    )
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), index=True)
     quantity: Mapped[Decimal] = mapped_column(Numeric(24, 8))
     price: Mapped[Decimal] = mapped_column(Numeric(20, 8))
     notional: Mapped[Decimal] = mapped_column(Numeric(24, 8))

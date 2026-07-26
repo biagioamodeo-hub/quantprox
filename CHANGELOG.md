@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-alpha.4
+
+- Allow multiple partial fills for an open order.
+- Track filled and remaining order quantities.
+- Keep partially filled orders cancellable and reject overfills.
+
 ## 1.0.0-alpha.3
 
 - Add timestamped cancellation for accepted orders.

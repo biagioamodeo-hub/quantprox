@@ -1,7 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class ExecutionCreate(BaseModel):
+    quantity: Decimal | None = Field(default=None, gt=0)
 
 
 class ExecutionRead(BaseModel):

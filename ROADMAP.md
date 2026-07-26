@@ -11,10 +11,11 @@
 - 1.0.0-alpha.1: end-to-end paper execution and alpha hardening.
 - 1.0.0-alpha.2: mark-to-market valuation, P&L, and side-aware exposure.
 - 1.0.0-alpha.3: auditable cancellation of accepted orders.
+- 1.0.0-alpha.4: multiple partial fills with remaining-quantity tracking.
 
 ## Before beta
 
-- partial fills, fees, and slippage;
+- fees and slippage;
 - authentication, authorization, and multi-tenant ownership;
 - background jobs and idempotency keys;
 - broker/provider adapter interfaces and sandbox integration;

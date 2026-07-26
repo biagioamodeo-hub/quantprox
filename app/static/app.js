@@ -36,6 +36,7 @@ const signalLabels = {
 const orderStatusLabels = {
   accepted: "accettato",
   rejected: "rifiutato",
+  partially_filled: "parzialmente eseguito",
   filled: "eseguito",
   cancelled: "annullato",
 };
