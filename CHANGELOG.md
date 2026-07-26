@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0-beta.4
+
+- Add provider-neutral broker and market-data adapter contracts.
+- Add a deterministic, non-live broker sandbox.
+- Persist replay-safe external submissions and tenant-isolated status.
+- Synchronize sandbox cancellation with the local open order.
+
 ## 1.0.0-beta.3
 
 - Add persistent, tenant-isolated background jobs.

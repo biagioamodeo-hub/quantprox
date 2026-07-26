@@ -2,7 +2,7 @@
 
 QuantProX is a quantitative trading framework with a FastAPI service foundation.
 
-The current release is **1.0.0-beta.3**. It is intended for local development
+The current release is **1.0.0-beta.4**. It is intended for local development
 and paper-trading workflows; it must not be connected to live brokerage
 execution.
 
@@ -68,6 +68,21 @@ Jobs are persisted in PostgreSQL and claimed by the worker using row locks with
 are retried up to their configured limit. Decision jobs are linked uniquely to
 their result, so a worker restart after evaluation cannot create a duplicate
 decision. Job submission also supports `Idempotency-Key`.
+
+## Broker sandbox
+
+Provider-neutral protocols define the broker order and market-data boundaries.
+The first broker implementation is a deterministic local sandbox:
+
+- `POST /api/v1/brokers/sandbox/orders/{order_id}` submits an accepted order.
+- `GET /api/v1/brokers/sandbox/orders/{order_id}` returns external state.
+- `POST /api/v1/brokers/sandbox/orders/{order_id}/cancel` cancels both the
+  sandbox submission and the corresponding local open order.
+
+Submission is replay-safe: an order has at most one external submission.
+Rejected, filled, partially filled, or cancelled orders cannot be submitted.
+The sandbox adapter is explicitly marked non-live and performs no network or
+brokerage operation.
 
 ## Docker
 
