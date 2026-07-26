@@ -32,6 +32,9 @@ class DecisionRepository:
     def get(self, decision_id: int) -> Decision | None:
         return self.session.get(Decision, decision_id)
 
+    def get_by_job(self, job_id: int) -> Decision | None:
+        return self.session.scalar(select(Decision).where(Decision.job_id == job_id))
+
     def list_for_portfolio(self, portfolio_id: int) -> list[Decision]:
         statement = (
             select(Decision)

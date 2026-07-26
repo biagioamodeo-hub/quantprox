@@ -18,8 +18,14 @@ class DecisionService:
         self.order_service = OrderService(session, tenant_id)
         self.access = TenantAccess(session, tenant_id)
 
-    def evaluate(self, payload: DecisionEvaluate) -> DecisionRead:
+    def evaluate(
+        self, payload: DecisionEvaluate, job_id: int | None = None
+    ) -> DecisionRead:
         self.access.require_portfolio(payload.portfolio_id)
+        if job_id is not None:
+            existing = self.repository.get_by_job(job_id)
+            if existing is not None:
+                return DecisionRead.model_validate(existing)
         candles = self.repository.recent_candles(
             payload.instrument_id, payload.timeframe, payload.long_window
         )
@@ -58,6 +64,7 @@ class DecisionService:
 
         decision = Decision(
             **payload.model_dump(),
+            job_id=job_id,
             short_average=short_average,
             long_average=long_average,
             action=action,
