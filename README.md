@@ -72,3 +72,11 @@ under `/api/v1/portfolios`:
 - `POST` and `GET` `/`
 - `POST` `/positions`
 - `GET` `/{portfolio_id}/positions`
+
+## Risk API
+
+Release 0.4.0 introduces portfolio risk limits and deterministic pre-trade
+checks based on current cost-basis exposure:
+
+- `PUT` and `GET` `/api/v1/risk/limits/{portfolio_id}`
+- `POST` `/api/v1/risk/checks/orders`
