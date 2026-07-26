@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0-beta.1
+
+- Require configurable API keys for all versioned API endpoints.
+- Isolate portfolios and portfolio-derived resources by tenant.
+- Return uniform authorization failures without leaking cross-tenant resources.
+- Add tenant-key support to Alpha Lab and migration existing data to `demo`.
+
 ## 1.0.0-alpha.5
 
 - Restore pgAdmin startup compatibility with its email validation.
