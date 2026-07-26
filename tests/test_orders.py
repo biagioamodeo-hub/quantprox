@@ -47,6 +47,7 @@ def test_order_submission_uses_risk_controls() -> None:
         assert accepted.status_code == 201
         assert accepted.json()["status"] == "accepted"
         assert accepted.json()["rejection_reason"] is None
+        assert accepted.json()["cancelled_at"] is None
 
         rejected = client.post(
             "/api/v1/orders",
@@ -70,5 +71,25 @@ def test_order_submission_uses_risk_controls() -> None:
             "accepted",
             "rejected",
         ]
+
+        cancelled = client.post(f"/api/v1/orders/{accepted.json()['id']}/cancel")
+        assert cancelled.status_code == 200
+        assert cancelled.json()["status"] == "cancelled"
+        assert cancelled.json()["cancelled_at"] is not None
+
+        repeated = client.post(f"/api/v1/orders/{accepted.json()['id']}/cancel")
+        assert repeated.status_code == 409
+        assert repeated.json()["detail"] == ("Only accepted orders can be cancelled.")
+
+        rejected_cancel = client.post(f"/api/v1/orders/{rejected.json()['id']}/cancel")
+        assert rejected_cancel.status_code == 409
+
+        missing = client.post("/api/v1/orders/99999/cancel")
+        assert missing.status_code == 404
+
+        cancelled_execution = client.post(
+            f"/api/v1/executions/orders/{accepted.json()['id']}"
+        )
+        assert cancelled_execution.status_code == 409
     finally:
         app.dependency_overrides.clear()

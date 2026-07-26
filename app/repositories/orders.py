@@ -14,6 +14,14 @@ class OrderRepository:
         self.session.refresh(order)
         return order
 
+    def get(self, order_id: int) -> Order | None:
+        return self.session.get(Order, order_id)
+
+    def commit(self, order: Order) -> Order:
+        self.session.commit()
+        self.session.refresh(order)
+        return order
+
     def list_for_portfolio(self, portfolio_id: int) -> list[Order]:
         statement = (
             select(Order)
