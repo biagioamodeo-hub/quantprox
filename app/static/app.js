@@ -26,6 +26,38 @@ const money = (value) =>
     maximumFractionDigits: 2,
   }).format(Number(value));
 
+const signalLabels = {
+  buy: "ACQUISTO",
+  sell: "VENDITA",
+  hold: "ATTESA",
+};
+
+const orderStatusLabels = {
+  accepted: "accettato",
+  rejected: "rifiutato",
+  filled: "eseguito",
+};
+
+const rationaleLabels = {
+  "Short moving average is above the long moving average.":
+    "La media mobile breve è sopra quella lunga.",
+  "Short moving average is below the long moving average.":
+    "La media mobile breve è sotto quella lunga.",
+  "Short and long moving averages are equal.":
+    "Le medie mobili breve e lunga coincidono.",
+};
+
+function translateRationale(rationale) {
+  if (!rationale) return "In attesa";
+  if (rationale.startsWith("Insufficient data:")) {
+    const numbers = rationale.match(/\d+/g) || [];
+    return `Dati insufficienti: disponibili ${numbers[0] || "0"} periodi su ${
+      numbers[1] || "quelli richiesti"
+    }.`;
+  }
+  return rationaleLabels[rationale] || rationale;
+}
+
 function toast(message) {
   const element = $("#toast");
   element.textContent = message;
@@ -59,11 +91,15 @@ function setStep(step) {
 function render() {
   $("#metric-symbol").textContent = state.instrument?.symbol || "—";
   $("#metric-price").textContent = state.instrument ? "Ultimo close · $120" : "Nessun dato";
-  $("#metric-signal").textContent = state.decision?.action?.toUpperCase() || "—";
-  $("#metric-rationale").textContent =
-    state.decision?.rationale || "In attesa";
+  $("#metric-signal").textContent =
+    signalLabels[state.decision?.action] || "—";
+  $("#metric-rationale").textContent = translateRationale(
+    state.decision?.rationale,
+  );
   $("#metric-order").textContent = state.order
-    ? `#${state.order.id} · ${state.order.status}`
+    ? `#${state.order.id} · ${
+        orderStatusLabels[state.order.status] || state.order.status
+      }`
     : "—";
   $("#metric-risk").textContent = state.order
     ? state.order.rejection_reason || "Controllo superato"
@@ -118,7 +154,11 @@ async function seedScenario() {
     const suffix = String(Date.now()).slice(-6);
     state.instrument = await api("/api/v1/market-data/instruments", {
       method: "POST",
-      body: JSON.stringify({ symbol: `QPX${suffix}`, exchange: "DEMO", currency: "USD" }),
+      body: JSON.stringify({
+        symbol: `ALPHA-${suffix}`,
+        exchange: "DEMO",
+        currency: "USD",
+      }),
     });
     state.portfolio = await api("/api/v1/portfolios", {
       method: "POST",
@@ -175,21 +215,35 @@ async function nextAction() {
         }),
       });
       setStep(2);
-      addEvent("Decisione valutata", state.decision.rationale, state.decision.action.toUpperCase());
+      addEvent(
+        "Decisione valutata",
+        translateRationale(state.decision.rationale),
+        signalLabels[state.decision.action],
+      );
     } else if (state.step === 2) {
       state.order = await api(`/api/v1/decisions/${state.decision.id}/orders`, {
         method: "POST",
         body: JSON.stringify({ quantity: "10", limit_price: "120" }),
       });
       setStep(3);
-      addEvent("Ordine creato", `10 quote a 120 USD · rischio ${state.order.status}`, `#${state.order.id}`);
+      addEvent(
+        "Ordine creato",
+        `10 quote a 120 USD · ordine ${
+          orderStatusLabels[state.order.status] || state.order.status
+        }`,
+        `#${state.order.id}`,
+      );
     } else if (state.step === 3) {
       const execution = await api(`/api/v1/executions/orders/${state.order.id}`, {
         method: "POST",
       });
       state.order.status = "filled";
       setStep(4);
-      addEvent("Ordine eseguito", `Fill paper · nozionale ${money(execution.notional)}`, "FILLED");
+      addEvent(
+        "Ordine eseguito",
+        `Esecuzione paper · controvalore ${money(execution.notional)}`,
+        "ESEGUITO",
+      );
     } else {
       state.valuation = await api(
         `/api/v1/portfolios/${state.portfolio.id}/valuation?timeframe=1d`,
