@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -17,7 +18,9 @@ class RiskLimitRead(RiskLimitWrite):
 
 class PreTradeCheck(BaseModel):
     portfolio_id: int = Field(gt=0)
-    quantity: Decimal
+    instrument_id: int = Field(gt=0)
+    side: Literal["buy", "sell"]
+    quantity: Decimal = Field(gt=0)
     price: Decimal = Field(gt=0)
 
 

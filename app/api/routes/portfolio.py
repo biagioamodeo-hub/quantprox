@@ -5,6 +5,7 @@ from app.db.session import get_db_session
 from app.schemas.portfolio import (
     PortfolioCreate,
     PortfolioRead,
+    PortfolioValuation,
     PositionCreate,
     PositionRead,
 )
@@ -50,3 +51,12 @@ def list_positions(
     service: PortfolioService = Depends(get_portfolio_service),
 ) -> list[PositionRead]:
     return service.list_positions(portfolio_id)
+
+
+@router.get("/{portfolio_id}/valuation", response_model=PortfolioValuation)
+def value_portfolio(
+    portfolio_id: int,
+    timeframe: str = "1d",
+    service: PortfolioService = Depends(get_portfolio_service),
+) -> PortfolioValuation:
+    return service.value_portfolio(portfolio_id, timeframe)

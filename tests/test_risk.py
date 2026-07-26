@@ -63,7 +63,13 @@ def test_pre_trade_risk_checks() -> None:
 
         accepted = client.post(
             "/api/v1/risk/checks/orders",
-            json={"portfolio_id": portfolio["id"], "quantity": "2", "price": "100"},
+            json={
+                "portfolio_id": portfolio["id"],
+                "instrument_id": instrument["id"],
+                "side": "buy",
+                "quantity": "2",
+                "price": "100",
+            },
         )
         assert accepted.status_code == 200
         assert accepted.json()["accepted"] is True
@@ -71,7 +77,13 @@ def test_pre_trade_risk_checks() -> None:
 
         exposure_rejected = client.post(
             "/api/v1/risk/checks/orders",
-            json={"portfolio_id": portfolio["id"], "quantity": "5", "price": "100"},
+            json={
+                "portfolio_id": portfolio["id"],
+                "instrument_id": instrument["id"],
+                "side": "buy",
+                "quantity": "5",
+                "price": "100",
+            },
         )
         assert exposure_rejected.status_code == 200
         assert exposure_rejected.json()["accepted"] is False
@@ -81,7 +93,13 @@ def test_pre_trade_risk_checks() -> None:
 
         order_rejected = client.post(
             "/api/v1/risk/checks/orders",
-            json={"portfolio_id": portfolio["id"], "quantity": "6", "price": "100"},
+            json={
+                "portfolio_id": portfolio["id"],
+                "instrument_id": instrument["id"],
+                "side": "buy",
+                "quantity": "6",
+                "price": "100",
+            },
         )
         assert order_rejected.json()["reason"] == (
             "Order notional exceeds the configured limit."
@@ -94,6 +112,8 @@ def test_pre_trade_risk_checks() -> None:
             "/api/v1/risk/checks/orders",
             json={
                 "portfolio_id": unconfigured_portfolio["id"],
+                "instrument_id": instrument["id"],
+                "side": "buy",
                 "quantity": "1",
                 "price": "100",
             },
@@ -102,5 +122,18 @@ def test_pre_trade_risk_checks() -> None:
         assert unconfigured.json()["reason"] == (
             "Risk limits are not configured for this portfolio."
         )
+
+        reducing_sell = client.post(
+            "/api/v1/risk/checks/orders",
+            json={
+                "portfolio_id": portfolio["id"],
+                "instrument_id": instrument["id"],
+                "side": "sell",
+                "quantity": "2",
+                "price": "100",
+            },
+        )
+        assert reducing_sell.json()["accepted"] is True
+        assert Decimal(reducing_sell.json()["projected_exposure"]) == Decimal("800")
     finally:
         app.dependency_overrides.clear()

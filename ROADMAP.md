@@ -9,10 +9,10 @@
 - 0.5.0: persistent, risk-gated orders.
 - 0.6.0: auditable moving-average decisions.
 - 1.0.0-alpha.1: end-to-end paper execution and alpha hardening.
+- 1.0.0-alpha.2: mark-to-market valuation, P&L, and side-aware exposure.
 
 ## Before beta
 
-- side-aware mark-to-market exposure and realized/unrealized P&L;
 - order cancellation, partial fills, fees, and slippage;
 - authentication, authorization, and multi-tenant ownership;
 - background jobs and idempotency keys;

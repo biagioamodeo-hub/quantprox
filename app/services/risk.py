@@ -29,8 +29,28 @@ class RiskService:
     def check_order(self, payload: PreTradeCheck) -> PreTradeCheckResult:
         risk_limit = self.repository.get_limit(payload.portfolio_id)
         order_notional = abs(payload.quantity * payload.price)
-        current_exposure = self.repository.current_exposure(payload.portfolio_id)
-        projected_exposure = current_exposure + order_notional
+        positions = self.repository.positions(payload.portfolio_id)
+        current_exposure = Decimal("0")
+        target_quantity = Decimal("0")
+        target_exposure = Decimal("0")
+        for position in positions:
+            mark_price = (
+                self.repository.latest_close(position.instrument_id)
+                or position.average_price
+            )
+            exposure = abs(position.quantity * mark_price)
+            current_exposure += exposure
+            if position.instrument_id == payload.instrument_id:
+                target_quantity = position.quantity
+                target_exposure = exposure
+
+        quantity_change = (
+            payload.quantity if payload.side == "buy" else -payload.quantity
+        )
+        projected_quantity = target_quantity + quantity_change
+        projected_exposure = (
+            current_exposure - target_exposure + abs(projected_quantity * payload.price)
+        )
 
         reason: str | None = None
         if risk_limit is None:

@@ -1,3 +1,6 @@
+from datetime import UTC, datetime
+from decimal import Decimal
+
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -54,5 +57,24 @@ def test_portfolio_endpoints() -> None:
         positions = client.get(f"/api/v1/portfolios/{portfolio.json()['id']}/positions")
         assert positions.status_code == 200
         assert positions.json()[0]["quantity"] == "10.00000000"
+
+        client.post(
+            "/api/v1/market-data/candles",
+            json={
+                "instrument_id": instrument.json()["id"],
+                "timeframe": "1d",
+                "open_time": datetime(2026, 1, 1, tzinfo=UTC).isoformat(),
+                "open": "160",
+                "high": "160",
+                "low": "160",
+                "close": "160",
+                "volume": "1000",
+            },
+        )
+        valuation = client.get(f"/api/v1/portfolios/{portfolio.json()['id']}/valuation")
+        assert valuation.status_code == 200
+        assert Decimal(valuation.json()["positions_value"]) == Decimal("1600")
+        assert Decimal(valuation.json()["unrealized_pnl"]) == Decimal("97.5")
+        assert valuation.json()["positions"][0]["price_source"] == "market"
     finally:
         app.dependency_overrides.clear()

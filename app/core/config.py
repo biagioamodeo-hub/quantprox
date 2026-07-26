@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "QuantProX"
-    app_version: str = "1.0.0-alpha.1"
+    app_version: str = "1.0.0-alpha.2"
     environment: str = "local"
     debug: bool = False
     database_url: str = (
