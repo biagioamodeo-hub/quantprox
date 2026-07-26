@@ -11,6 +11,9 @@ class Decision(Base):
     __tablename__ = "decisions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    job_id: Mapped[int | None] = mapped_column(
+        ForeignKey("jobs.id"), unique=True, index=True
+    )
     portfolio_id: Mapped[int] = mapped_column(ForeignKey("portfolios.id"), index=True)
     instrument_id: Mapped[int] = mapped_column(ForeignKey("instruments.id"), index=True)
     timeframe: Mapped[str] = mapped_column(String(8))
