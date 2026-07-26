@@ -61,6 +61,7 @@ Thumbs.db
 # Environment files
 .env
 .env.*
+!.env.example
 
 # Local cache and data
 cache/
