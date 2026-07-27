@@ -17,4 +17,4 @@ def test_alpha_lab_is_served() -> None:
 
     assert response.status_code == 200
     assert "QuantProX · Alpha Lab" in response.text
-    assert client.get("/lab/app.js").status_code == 200
+    assert client.get("/lab/app-purchase.js").status_code == 200
