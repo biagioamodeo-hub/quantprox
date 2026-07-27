@@ -321,6 +321,34 @@ h1 {
   width: 100%;
 }
 
+.exchange-rate {
+  display: grid;
+  gap: 5px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--line);
+}
+
+.exchange-rate span,
+.exchange-rate small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.exchange-rate strong {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.exchange-rate.loading strong {
+  color: var(--muted);
+}
+
+.exchange-rate.error strong {
+  color: #9b382f;
+}
+
 .steps ol {
   display: grid;
   gap: 7px;

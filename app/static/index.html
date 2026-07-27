@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0-rc.1-sidebar" />
-    <script src="/lab/app.js?v=1.0.0-rc.1-sidebar" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0-rc.1-fx" />
+    <script src="/lab/app.js?v=1.0.0-rc.1-fx" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -84,6 +84,11 @@
                   <option value="CHF">Franco svizzero (CHF)</option>
                 </select>
               </label>
+              <div class="exchange-rate" aria-live="polite">
+                <span>Cambio di riferimento</span>
+                <strong id="exchange-rate-value">Accedi per visualizzarlo</strong>
+                <small id="exchange-rate-meta">Ultimo dato disponibile</small>
+              </div>
             </div>
             <p class="section-label">Percorso guidato</p>
             <ol>

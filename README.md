@@ -24,6 +24,10 @@ The API is available at `http://localhost:8000`; interactive documentation is at
 `http://localhost:8000/docs`.
 
 The guided Alpha Lab interface is available at `http://localhost:8000/lab/`.
+Its currency selector supports EUR, USD, GBP, and CHF and shows the latest
+available reference rate supplied by
+[Frankfurter](https://frankfurter.dev/). Reference rates are cached for 15
+minutes and are not intended to represent tick-by-tick market prices.
 
 ## Authentication and tenant isolation
 

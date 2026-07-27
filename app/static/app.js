@@ -21,6 +21,8 @@ const $ = (selector) => document.querySelector(selector);
 
 const apiMessageLabels = {
   "Invalid profile or password.": "Nome profilo o password non validi.",
+  "Exchange-rate data is temporarily unavailable.":
+    "Cambio temporaneamente non disponibile.",
   "A valid X-API-Key header is required.":
     "È necessaria una chiave API valida.",
   "Portfolio not found.": "Portafoglio non trovato.",
@@ -444,6 +446,7 @@ async function checkSession() {
     state.profile = null;
   }
   render();
+  await refreshExchangeRate();
 }
 
 async function login(event) {
@@ -462,6 +465,7 @@ async function login(event) {
     state.authenticated = session.authenticated;
     state.profile = session.profile;
     $("#login-password").value = "";
+    await refreshExchangeRate();
     toast(`Accesso eseguito come ${session.profile}.`);
   } catch (error) {
     toast(error.message);
@@ -477,14 +481,58 @@ async function logout() {
   resetView();
   state.authenticated = false;
   state.profile = null;
+  showExchangeRate(null);
   render();
   toast("Sessione terminata.");
 }
 
-function selectCurrency(event) {
+async function selectCurrency(event) {
   state.currency = event.target.value;
   render();
   toast(`Valuta impostata su ${state.currency}.`);
+  await refreshExchangeRate();
+}
+
+function showExchangeRate(rate, error = null) {
+  const container = $(".exchange-rate");
+  container.classList.toggle("loading", rate === "loading");
+  container.classList.toggle("error", Boolean(error));
+  if (!state.authenticated) {
+    $("#exchange-rate-value").textContent = "Accedi per visualizzarlo";
+    $("#exchange-rate-meta").textContent = "Ultimo dato disponibile";
+  } else if (rate === "loading") {
+    $("#exchange-rate-value").textContent = "Aggiornamento…";
+    $("#exchange-rate-meta").textContent = "Connessione alla fonte";
+  } else if (error) {
+    $("#exchange-rate-value").textContent = error;
+    $("#exchange-rate-meta").textContent = "Riprova tra poco";
+  } else {
+    $("#exchange-rate-value").textContent =
+      `1 ${rate.base} = ${Number(rate.rate).toLocaleString("it-IT", {
+        minimumFractionDigits: 4,
+        maximumFractionDigits: 4,
+      })} ${rate.quote}`;
+    $("#exchange-rate-meta").textContent =
+      `${rate.source} · dato del ${new Date(`${rate.rate_date}T00:00:00`).toLocaleDateString("it-IT")}`;
+  }
+}
+
+async function refreshExchangeRate() {
+  if (!state.authenticated) {
+    showExchangeRate(null);
+    return;
+  }
+  const base = state.currency === "EUR" ? "EUR" : state.currency;
+  const quote = state.currency === "EUR" ? "USD" : "EUR";
+  showExchangeRate("loading");
+  try {
+    const rate = await api(
+      `/api/v1/market-data/exchange-rate?base=${base}&quote=${quote}`,
+    );
+    showExchangeRate(rate);
+  } catch (error) {
+    showExchangeRate(null, error.message);
+  }
 }
 
 $("#seed-button").addEventListener("click", seedScenario);

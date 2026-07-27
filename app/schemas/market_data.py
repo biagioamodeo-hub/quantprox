@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -31,3 +31,12 @@ class CandleRead(CandleCreate):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ExchangeRateRead(BaseModel):
+    base: str
+    quote: str
+    rate: Decimal
+    rate_date: date
+    fetched_at: datetime
+    source: str
