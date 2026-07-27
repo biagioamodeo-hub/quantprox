@@ -48,6 +48,11 @@ Beginner requests are never assigned the dynamic profile. Results are
 educational simulations, not personalized financial advice, and do not
 guarantee future performance.
 
+The sticky Alpha Lab navigation links directly to the overview, guided plan,
+simulation, activity results, and safety explanation. The current section is
+highlighted automatically, and the menu remains horizontally accessible on
+small screens.
+
 ## Authentication and tenant isolation
 
 Every `/api/v1` request requires an `X-API-Key` header. Configure tenant keys

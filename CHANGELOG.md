@@ -11,6 +11,8 @@
 - Explain drawdown, costs, exposure, limits, methodology, and warnings in Italian.
 - Apply the resulting capital, strategy windows, position size, and risk limits
   directly to the guided paper-trading scenario.
+- Add a sticky, responsive navigation menu for overview, guided planning,
+  simulation, results, and safety.
 
 ## 1.0.0
 
