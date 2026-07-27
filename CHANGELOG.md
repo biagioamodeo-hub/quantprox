@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.0-rc.1
+
+- Add a four-answer prudential assistant designed for inexperienced users.
+- Select cautious or balanced beginner profiles automatically from goal,
+  horizon, and acceptable-loss inputs.
+- Backtest the suggested moving-average configuration with fees and slippage.
+- Compare rising, falling, and sideways market conditions and expose positive
+  trade rate, risk score, and sample confidence.
+- Explain drawdown, costs, exposure, limits, methodology, and warnings in Italian.
+- Apply the resulting capital, strategy windows, position size, and risk limits
+  directly to the guided paper-trading scenario.
+
 ## 1.0.0
 
 - Add a non-persistent endpoint for `buy`, `sell`, and `hold` recommendations.

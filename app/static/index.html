@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0" />
-    <script src="/lab/app.js?v=1.0.0" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-guide" />
+    <script src="/lab/app.js?v=1.1.0-guide" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -27,7 +27,7 @@
       <main>
         <section class="hero">
           <div>
-            <p class="eyebrow">1.0.0 · Alpha Lab</p>
+            <p class="eyebrow">1.1.0-rc.1 · Alpha Lab</p>
             <h1>Dal mercato al risultato,<br />un passo alla volta.</h1>
             <p class="hero-copy">
               Un banco di prova semplice per esplorare il motore decisionale,
@@ -64,6 +64,89 @@
             <button class="primary" id="seed-button" disabled>
               Accedi per iniziare
             </button>
+          </div>
+        </section>
+
+        <section class="guide" aria-labelledby="guide-title">
+          <div class="guide-intro">
+            <p class="section-label">Assistente prudenziale</p>
+            <h2 id="guide-title">Un piano simulato in quattro risposte.</h2>
+            <p>
+              Indica soltanto capitale, obiettivo, orizzonte e perdita massima
+              accettabile. QuantProX seleziona automaticamente un profilo,
+              applica costi realistici e verifica il rischio su dati dimostrativi.
+            </p>
+            <div class="safety-note">
+              <strong>Prima la comprensione, poi la simulazione.</strong>
+              <span>
+                Nessun risultato è garantito e nessun ordine viene inviato a un
+                intermediario reale.
+              </span>
+            </div>
+          </div>
+          <form class="guide-form" id="guide-form">
+            <label>
+              <span>Capitale da simulare</span>
+              <input id="guide-capital" type="number" min="1000" max="1000000"
+                step="500" value="10000" required />
+            </label>
+            <label>
+              <span>Obiettivo principale</span>
+              <select id="guide-goal">
+                <option value="preservation">Proteggere il capitale</option>
+                <option value="balanced" selected>Crescita equilibrata</option>
+                <option value="growth">Crescita nel lungo periodo</option>
+              </select>
+            </label>
+            <label>
+              <span>Tra quanti anni potrebbe servire il denaro?</span>
+              <select id="guide-horizon">
+                <option value="2">Entro 3 anni</option>
+                <option value="5" selected>Tra 4 e 7 anni</option>
+                <option value="10">Tra 8 e 15 anni</option>
+                <option value="20">Oltre 15 anni</option>
+              </select>
+            </label>
+            <label>
+              <span>Perdita temporanea massima tollerabile</span>
+              <select id="guide-loss">
+                <option value="5">5% · molto contenuta</option>
+                <option value="10" selected>10% · contenuta</option>
+                <option value="20">20% · significativa</option>
+                <option value="30">30% · elevata</option>
+              </select>
+            </label>
+            <button class="primary" id="guide-button" type="submit" disabled>
+              Accedi per creare il piano
+            </button>
+          </form>
+          <div class="guide-result" id="guide-result" hidden>
+            <div class="guide-result-head">
+              <div>
+                <span>Profilo simulato suggerito</span>
+                <h3 id="guide-profile">—</h3>
+              </div>
+              <span class="guide-verdict" id="guide-verdict">—</span>
+            </div>
+            <p id="guide-summary"></p>
+            <div class="guide-metrics">
+              <div><span>Risultato test</span><strong id="guide-return">—</strong></div>
+              <div><span>Operazioni positive</span><strong id="guide-success">—</strong></div>
+              <div><span>Perdita massima</span><strong id="guide-drawdown">—</strong></div>
+              <div><span>Rischio stimato</span><strong id="guide-risk-score">—</strong></div>
+              <div><span>Costi inclusi</span><strong id="guide-costs">—</strong></div>
+              <div><span>Esposizione massima</span><strong id="guide-exposure">—</strong></div>
+              <div><span>Affidabilità campione</span><strong id="guide-confidence">—</strong></div>
+            </div>
+            <details>
+              <summary>Come è stato calcolato?</summary>
+              <p id="guide-method"></p>
+              <ul id="guide-warnings"></ul>
+            </details>
+            <button class="primary" id="apply-guide-button" type="button">
+              Usa il piano e avvia la simulazione
+            </button>
+            <small class="guide-disclaimer" id="guide-disclaimer"></small>
           </div>
         </section>
 

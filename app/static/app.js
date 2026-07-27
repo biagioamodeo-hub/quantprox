@@ -2,6 +2,12 @@ const state = {
   authenticated: false,
   profile: null,
   currency: "USD",
+  guidedPlan: null,
+  startingCapital: 10000,
+  shortWindow: 2,
+  longWindow: 3,
+  maxOrderNotional: 5000,
+  maxTotalExposure: 10000,
   step: 0,
   instrument: null,
   portfolio: null,
@@ -85,6 +91,12 @@ const money = (value) =>
     maximumFractionDigits: 2,
   }).format(Number(value));
 
+const percent = (value) =>
+  `${Number(value).toLocaleString("it-IT", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}%`;
+
 const signalLabels = {
   buy: "ACQUISTO",
   sell: "VENDITA",
@@ -167,6 +179,10 @@ function render() {
       ? "Prepara scenario demo"
       : "Prepara nuovo scenario"
     : "Accedi per iniziare";
+  $("#guide-button").disabled = !state.authenticated;
+  $("#guide-button").textContent = state.authenticated
+    ? "Crea il piano automatico"
+    : "Accedi per creare il piano";
   const signal = state.decision?.action || "pending";
   $("#signal-card").dataset.signal = signal;
   $("#signal-status").textContent = signalStatusLabels[signal] || "In attesa";
@@ -199,7 +215,7 @@ function render() {
 
   const actions = [
     ["Crea un ambiente dimostrativo", "Prepara dati, portafoglio e limiti per iniziare il percorso guidato.", "Prepara scenario demo", false],
-    ["Calcola il segnale", "Il motore confronta medie mobili a 2 e 3 periodi sulle candele demo.", "Valuta decisione", false],
+    ["Calcola il segnale", `Il motore confronta medie mobili a ${state.shortWindow} e ${state.longWindow} periodi sulle candele demo.`, "Valuta decisione", false],
     ["Trasforma il segnale in ordine", `Quantità ${state.quantity}, prezzo limite ${money(state.orderPrice)}. Il rischio viene controllato prima del salvataggio.`, "Crea ordine", false],
     ["Esegui in modalità simulata", "L’ordine accettato viene eseguito una sola volta e aggiorna liquidità e posizione.", "Esegui ordine", false],
     ["Leggi la valutazione", "Calcola valore del portafoglio, esposizione e risultato usando l’ultima chiusura disponibile.", "Aggiorna valutazione", false],
@@ -260,17 +276,27 @@ async function seedScenario() {
       body: JSON.stringify({
         name: `Alpha Lab ${suffix}`,
         base_currency: state.currency,
-        cash_balance: "10000",
+        cash_balance: String(state.startingCapital),
       }),
     });
     await api(`/api/v1/risk/limits/${state.portfolio.id}`, {
       method: "PUT",
       body: JSON.stringify({
-        max_order_notional: "5000",
-        max_total_exposure: "10000",
+        max_order_notional: String(state.maxOrderNotional),
+        max_total_exposure: String(state.maxTotalExposure),
       }),
     });
-    const prices = [118.42, 119.15, 120.37];
+    const prices =
+      state.longWindow === 3
+        ? [118.42, 119.15, 120.37]
+        : Array.from({ length: state.longWindow }, (_, index) =>
+            Number(
+              (
+                118.42 +
+                (1.95 * index) / (state.longWindow - 1)
+              ).toFixed(2),
+            ),
+          );
     for (const [index, price] of prices.entries()) {
       const date = new Date(Date.UTC(2026, 0, index + 1)).toISOString();
       await api("/api/v1/market-data/candles", {
@@ -289,7 +315,11 @@ async function seedScenario() {
     }
     state.lastPrice = prices[prices.length - 1];
     setStep(1);
-    addEvent("Scenario creato", `${state.instrument.symbol} · portafoglio ${state.portfolio.name}`, "PRONTO");
+    addEvent(
+      "Scenario creato",
+      `${state.instrument.symbol} · ${state.guidedPlan?.profile.label || "profilo demo"} · ${money(state.startingCapital)}`,
+      "PRONTO",
+    );
     toast("Scenario demo pronto");
   } catch (error) {
     toast(error.message);
@@ -311,8 +341,8 @@ async function nextAction() {
           portfolio_id: state.portfolio.id,
           instrument_id: state.instrument.id,
           timeframe: "1d",
-          short_window: 2,
-          long_window: 3,
+          short_window: state.shortWindow,
+          long_window: state.longWindow,
         }),
       });
       setStep(2);
@@ -346,14 +376,17 @@ async function nextAction() {
         headers: { "Idempotency-Key": state.executionKey },
       });
       state.order.status = "filled";
+      const previousPrice = state.lastPrice;
       state.lastPrice = 123.2;
       await api("/api/v1/market-data/candles", {
         method: "POST",
         body: JSON.stringify({
           instrument_id: state.instrument.id,
           timeframe: "1d",
-          open_time: new Date(Date.UTC(2026, 0, 4)).toISOString(),
-          open: "120.37",
+          open_time: new Date(
+            Date.UTC(2026, 0, state.longWindow + 1),
+          ).toISOString(),
+          open: String(previousPrice),
           high: "124.10",
           low: "120.05",
           close: String(state.lastPrice),
@@ -392,7 +425,9 @@ function resetView() {
     cancelled: false,
     orderKey: null,
     executionKey: null,
-    quantity: 10,
+    quantity: state.guidedPlan
+      ? Number(state.guidedPlan.suggested_quantity)
+      : 10,
     orderPrice: 120.5,
     lastPrice: null,
     events: [],
@@ -400,6 +435,85 @@ function resetView() {
   setStep(0);
   render();
   toast("Vista azzerata. Puoi preparare un nuovo scenario.");
+}
+
+function renderGuidedPlan(plan) {
+  $("#guide-result").hidden = false;
+  $("#guide-profile").textContent = plan.profile.label;
+  $("#guide-verdict").textContent =
+    plan.verdict === "compatible" ? "Coerente nel test" : "Da rivedere";
+  $("#guide-verdict").classList.toggle("review", plan.verdict !== "compatible");
+  $("#guide-summary").textContent = plan.summary;
+  $("#guide-return").textContent = percent(plan.backtest.net_return_percent);
+  $("#guide-success").textContent = percent(
+    plan.backtest.success_rate_percent,
+  );
+  $("#guide-drawdown").textContent = percent(
+    plan.backtest.maximum_drawdown_percent,
+  );
+  $("#guide-risk-score").textContent = `${plan.backtest.risk_score}/100`;
+  $("#guide-costs").textContent = money(plan.backtest.costs_paid);
+  $("#guide-exposure").textContent = percent(
+    plan.profile.allocation_percent,
+  );
+  $("#guide-confidence").textContent =
+    `${plan.backtest.confidence_score}/100`;
+  $("#guide-method").textContent =
+    `${plan.strategy.name}. Medie a ${plan.strategy.short_window} e ` +
+    `${plan.strategy.long_window} periodi; commissioni ${percent(
+      plan.strategy.fee_percent,
+    )} e slippage ${percent(plan.strategy.slippage_percent)} inclusi. ` +
+    `Analizzate ${plan.backtest.observations} osservazioni in ` +
+    `${plan.backtest.market_scenarios} condizioni di mercato. Nel punteggio ` +
+    `di rischio, 0 indica rischio inferiore e 100 rischio superiore.`;
+  $("#guide-warnings").innerHTML = plan.warnings
+    .map((warning) => `<li>${warning}</li>`)
+    .join("");
+  $("#guide-disclaimer").textContent = plan.disclaimer;
+}
+
+async function createGuidedPlan(event) {
+  event.preventDefault();
+  const button = $("#guide-button");
+  button.disabled = true;
+  button.textContent = "Analisi in corso…";
+  try {
+    const plan = await api("/api/v1/guidance/plan", {
+      method: "POST",
+      body: JSON.stringify({
+        starting_capital: $("#guide-capital").value,
+        goal: $("#guide-goal").value,
+        horizon_years: Number($("#guide-horizon").value),
+        maximum_acceptable_loss_percent: $("#guide-loss").value,
+      }),
+    });
+    state.guidedPlan = plan;
+    renderGuidedPlan(plan);
+    toast("Piano simulato creato e verificato.");
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    render();
+  }
+}
+
+async function applyGuidedPlan() {
+  const plan = state.guidedPlan;
+  if (!plan) return;
+  resetView();
+  state.startingCapital = Number(plan.backtest.starting_capital);
+  state.shortWindow = plan.strategy.short_window;
+  state.longWindow = plan.strategy.long_window;
+  state.maxOrderNotional = Number(plan.max_order_notional);
+  state.maxTotalExposure = Number(plan.max_total_exposure);
+  state.quantity = Number(plan.suggested_quantity);
+  state.orderPrice = 120.5;
+  render();
+  document.querySelector(".workspace").scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+  await seedScenario();
 }
 
 async function cancelOrder() {
@@ -542,5 +656,7 @@ $("#cancel-button").addEventListener("click", cancelOrder);
 $("#login-form").addEventListener("submit", login);
 $("#logout-button").addEventListener("click", logout);
 $("#simulation-currency").addEventListener("change", selectCurrency);
+$("#guide-form").addEventListener("submit", createGuidedPlan);
+$("#apply-guide-button").addEventListener("click", applyGuidedPlan);
 checkHealth();
 checkSession();
