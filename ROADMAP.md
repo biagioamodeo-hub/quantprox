@@ -20,13 +20,15 @@
 - 1.0.0-beta.5: operational metrics, readiness, rate limiting, and HTTP hardening.
 - 1.0.0-rc.1: non-persistent trading recommendations and release-candidate
   consolidation for paper trading.
+- 1.0.0: stable, authenticated, localized paper-trading workflow with selectable
+  currencies and reference exchange rates.
 
-## Beta roadmap
+## Post-1.0 roadmap
 
 - fees and slippage;
 - distributed rate limiting, tracing, and production security review.
 
-## Before stable
+## Before production trading
 
 - reproducible backtesting and strategy versioning;
 - portfolio reconciliation and corporate actions;
