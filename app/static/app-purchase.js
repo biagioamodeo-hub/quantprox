@@ -174,6 +174,93 @@ function setStep(step) {
   });
 }
 
+function renderInvestmentDashboard() {
+  const hasPosition = state.order?.status === "filled";
+  const entryPrice = Number(state.orderPrice);
+  const currentPrice = Number(state.lastPrice || entryPrice);
+  const positionResult = hasPosition
+    ? (currentPrice - entryPrice) * state.quantity
+    : 0;
+  const returnRate =
+    hasPosition && entryPrice > 0
+      ? ((currentPrice - entryPrice) / entryPrice) * 100
+      : 0;
+  const currentEquity = state.valuation
+    ? Number(state.valuation.equity)
+    : state.startingCapital + positionResult;
+
+  $("#chart-equity").textContent = state.portfolio
+    ? money(currentEquity)
+    : "—";
+  $("#chart-return").textContent = state.portfolio
+    ? `${positionResult >= 0 ? "+" : ""}${money(positionResult)} (${percent(returnRate)})`
+    : "Scenario non avviato";
+
+  const series = state.portfolio
+    ? hasPosition
+      ? [
+          state.startingCapital,
+          state.startingCapital - 4,
+          state.startingCapital + positionResult * 0.35,
+          currentEquity,
+        ]
+      : [state.startingCapital, state.startingCapital, state.startingCapital]
+    : [0, 0];
+  const minimum = Math.min(...series);
+  const maximum = Math.max(...series);
+  const spread = Math.max(maximum - minimum, state.startingCapital * 0.005, 1);
+  const points = series.map((value, index) => {
+    const x = 20 + (index * 600) / Math.max(series.length - 1, 1);
+    const y = 160 - ((value - minimum) / spread) * 120;
+    return [x, y];
+  });
+  const pointString = points.map(([x, y]) => `${x},${y}`).join(" ");
+  $("#portfolio-chart-line").setAttribute("points", pointString);
+  $("#portfolio-chart-area").setAttribute(
+    "d",
+    `M${points[0][0]} 160 L${pointString.replaceAll(" ", " L")} L${points.at(-1)[0]} 160 Z`,
+  );
+  $("#portfolio-chart-desc").textContent = state.portfolio
+    ? `Il valore stimato del portafoglio è ${money(currentEquity)}, con un risultato della posizione di ${money(positionResult)}.`
+    : "Prepara lo scenario per visualizzare l’andamento.";
+
+  $("#position-symbol").textContent = hasPosition
+    ? state.instrument?.symbol || "Strumento"
+    : "Nessuna posizione";
+  $("#position-quantity").textContent = hasPosition ? state.quantity : "—";
+  $("#position-price").textContent = hasPosition ? money(currentPrice) : "—";
+  $("#position-result").textContent = hasPosition
+    ? `${positionResult >= 0 ? "+" : ""}${money(positionResult)}`
+    : "—";
+  $("#position-status").textContent = hasPosition ? "Monitorata" : "In attesa";
+
+  const sellSignal = state.decision?.action === "sell";
+  const lossAlert = hasPosition && returnRate <= -5;
+  const warning = hasPosition && (sellSignal || lossAlert);
+  $("#sell-alert").dataset.level = state.portfolio
+    ? warning
+      ? "warning"
+      : "clear"
+    : "idle";
+  $("#sell-alert-title").textContent = warning
+    ? "Valuta una possibile vendita"
+    : state.portfolio
+      ? "Nessun alert attivo"
+      : "Monitoraggio in attesa";
+  $("#sell-alert-copy").textContent = warning
+    ? sellSignal
+      ? "La tendenza di mercato è negativa. Rivedi la posizione prima di prendere una decisione."
+      : "La perdita della posizione ha raggiunto la soglia prudenziale del 5%."
+    : state.portfolio
+      ? "Il sistema continua a controllare segnale di mercato e perdita della posizione."
+      : "Gli alert si attivano dopo la creazione del portafoglio simulato.";
+  $("#sell-alert-signal").textContent =
+    signalLabels[state.decision?.action] || "In attesa";
+  $("#sell-alert-return").textContent = hasPosition
+    ? percent(returnRate)
+    : "Nessuna posizione";
+}
+
 function render() {
   $("#login-form").hidden = state.authenticated;
   $("#session-panel").hidden = !state.authenticated;
@@ -227,6 +314,7 @@ function render() {
     : "Dati non disponibili";
   $("#refresh-advice-button").disabled =
     !state.portfolio || !state.instrument;
+  renderInvestmentDashboard();
   if (!state.portfolioAdvice) {
     $("#automatic-advice-empty").hidden = false;
     $("#action-advisor-result").hidden = true;
