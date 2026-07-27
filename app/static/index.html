@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.7.0-cinematic" />
-    <script src="/lab/app-purchase.js?v=2.2.0" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.8.0-activity" />
+    <script src="/lab/app-purchase.js?v=2.3.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -20,7 +20,7 @@
         </a>
         <nav class="topnav" aria-label="Azioni principali">
           <a href="#simulazione">Simulazione</a>
-          <a href="#attivita">Registro attività</a>
+          <a class="activity-trigger" href="#attivita">Registro attività</a>
           <a href="#acquisto">Scegli investimento</a>
           <a href="#segnale">Segnale</a>
         </nav>
@@ -471,7 +471,7 @@
               <a href="#acquisto" data-nav="acquisto">Acquisto guidato</a>
               <a href="#segnale" data-nav="segnale">Segnale operativo</a>
               <a href="#simulazione" data-nav="simulazione">Simulazione</a>
-              <a href="#attivita" data-nav="attivita">Risultati</a>
+              <a class="activity-trigger" href="#attivita">Risultati</a>
               <a href="#sicurezza" data-nav="sicurezza">Sicurezza</a>
             </nav>
             <div class="sidebar-settings">
@@ -685,20 +685,6 @@
               </div>
             </section>
 
-            <div class="ledger navigation-section" id="attivita"
-              data-navigation-section="attivita">
-              <div class="ledger-head">
-                <div>
-                  <p class="section-label">Registro attività</p>
-                  <h3>Ogni passaggio resta visibile</h3>
-                </div>
-                <span id="event-count">0 eventi</span>
-              </div>
-              <div class="empty-log" id="empty-log">
-                Il registro si popolerà mentre provi il flusso.
-              </div>
-              <ul id="event-log" aria-live="polite"></ul>
-            </div>
           </div>
         </section>
       </main>
@@ -778,6 +764,27 @@
           </button>
         </div>
       </form>
+    </dialog>
+
+    <dialog class="activity-dialog" id="activity-dialog"
+      aria-labelledby="activity-dialog-title">
+      <div class="ledger" id="attivita">
+        <div class="ledger-head">
+          <div>
+            <p class="section-label">Registro attività</p>
+            <h2 id="activity-dialog-title">Ogni passaggio resta visibile</h2>
+          </div>
+          <div class="activity-dialog-actions">
+            <span id="event-count">0 eventi</span>
+            <button class="dialog-close" id="close-activity-button" type="button"
+              aria-label="Chiudi registro attività">×</button>
+          </div>
+        </div>
+        <div class="empty-log" id="empty-log">
+          Il registro si popolerà mentre provi il flusso.
+        </div>
+        <ul id="event-log" aria-live="polite"></ul>
+      </div>
     </dialog>
 
     <nav class="mobile-scroll-controls" aria-label="Scorri tra le sezioni">

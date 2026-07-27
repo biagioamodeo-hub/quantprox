@@ -1113,6 +1113,15 @@ function closeRegistration() {
   $("#account-dialog").close();
 }
 
+function openActivityLog(event) {
+  event.preventDefault();
+  $("#activity-dialog").showModal();
+}
+
+function closeActivityLog() {
+  $("#activity-dialog").close();
+}
+
 async function registerAccount(event) {
   event.preventDefault();
   const password = $("#register-password").value;
@@ -1316,6 +1325,10 @@ $("#open-register-button").addEventListener("click", () =>
 $("#close-register-button").addEventListener("click", closeRegistration);
 $("#cancel-register-button").addEventListener("click", closeRegistration);
 $("#register-form").addEventListener("submit", registerAccount);
+document
+  .querySelectorAll(".activity-trigger")
+  .forEach((trigger) => trigger.addEventListener("click", openActivityLog));
+$("#close-activity-button").addEventListener("click", closeActivityLog);
 $("#logout-button").addEventListener("click", logout);
 $("#simulation-currency").addEventListener("change", selectCurrency);
 $("#guide-form").addEventListener("submit", createGuidedPlan);
