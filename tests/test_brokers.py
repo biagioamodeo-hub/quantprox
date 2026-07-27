@@ -90,3 +90,59 @@ def test_sandbox_broker_submission_is_safe_and_tenant_isolated() -> None:
     finally:
         settings.tenant_api_keys = previous_keys
         app.dependency_overrides.clear()
+
+
+def test_revolut_demo_purchase_never_uses_real_money() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/brokers/revolut-demo/purchases",
+        json={
+            "asset_type": "etf",
+            "asset_label": "ETF",
+            "virtual_balance": "10000",
+            "amount": "2500",
+            "currency": "EUR",
+        },
+    )
+    assert response.status_code == 201
+    receipt = response.json()
+    assert receipt["provider"] == "revolut_demo"
+    assert receipt["status"] == "completed"
+    assert receipt["simulated_fee"] == "6.25"
+    assert receipt["total_debit"] == "2506.25"
+    assert receipt["remaining_balance"] == "7493.75"
+    assert "esclusivamente virtuale" in receipt["disclaimer"]
+
+
+def test_revolut_demo_rejects_insufficient_virtual_balance() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/brokers/revolut-demo/purchases",
+        json={
+            "asset_type": "stock",
+            "asset_label": "Azioni",
+            "virtual_balance": "1000",
+            "amount": "1000",
+            "currency": "EUR",
+        },
+    )
+    assert response.status_code == 409
+
+
+def test_revolut_demo_card_is_linked_without_real_card_data() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/brokers/revolut-demo/cards",
+        json={
+            "account_label": "Revolut Demo",
+            "virtual_balance": "10000",
+            "currency": "EUR",
+        },
+    )
+    assert response.status_code == 201
+    card = response.json()
+    assert card["linked"] is True
+    assert card["network"] == "VISA"
+    assert card["masked_number"].startswith("•••• •••• •••• ")
+    assert card["spending_limit"] == "10000.00"
+    assert "non è una carta Revolut reale" in card["disclaimer"]

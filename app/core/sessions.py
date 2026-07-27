@@ -35,6 +35,6 @@ def read_session_token(token: str) -> str | None:
         if int(payload["expires_at"]) <= int(time.time()):
             return None
         tenant_id = str(payload["tenant_id"])
-        return tenant_id if tenant_id in settings.tenant_api_keys else None
+        return tenant_id
     except (ValueError, KeyError, TypeError, json.JSONDecodeError):
         return None

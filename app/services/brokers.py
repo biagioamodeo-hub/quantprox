@@ -1,5 +1,7 @@
 from datetime import UTC, datetime
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Literal, cast
+from uuid import NAMESPACE_URL, uuid5
 
 from sqlalchemy.orm import Session
 
@@ -9,7 +11,13 @@ from app.core.config import settings
 from app.core.exceptions import ConflictError, NotFoundError
 from app.models.brokers import BrokerSubmission
 from app.repositories.brokers import BrokerRepository
-from app.schemas.brokers import BrokerSubmissionRead
+from app.schemas.brokers import (
+    BrokerSubmissionRead,
+    RevolutDemoCardCreate,
+    RevolutDemoCardRead,
+    RevolutDemoPurchaseCreate,
+    RevolutDemoPurchaseRead,
+)
 from app.services.access import TenantAccess
 
 
@@ -17,6 +25,52 @@ def get_broker_adapter() -> BrokerAdapter:
     if settings.broker_provider == "sandbox":
         return SandboxBrokerAdapter()
     raise RuntimeError(f"Unsupported broker provider: {settings.broker_provider}")
+
+
+def create_revolut_demo_purchase(
+    payload: RevolutDemoPurchaseCreate,
+) -> RevolutDemoPurchaseRead:
+    fee = (payload.amount * Decimal("0.0025")).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+    total = payload.amount + fee
+    if total > payload.virtual_balance:
+        raise ConflictError(
+            "Insufficient virtual balance for amount and simulated fee."
+        )
+    fingerprint = (
+        f"{payload.asset_type}:{payload.amount}:{payload.virtual_balance}:"
+        f"{payload.currency.upper()}"
+    )
+    return RevolutDemoPurchaseRead(
+        reference=f"RVD-{str(uuid5(NAMESPACE_URL, fingerprint))[:8].upper()}",
+        asset_type=payload.asset_type,
+        asset_label=payload.asset_label,
+        gross_amount=payload.amount.quantize(Decimal("0.01")),
+        simulated_fee=fee,
+        total_debit=total.quantize(Decimal("0.01")),
+        remaining_balance=(payload.virtual_balance - total).quantize(Decimal("0.01")),
+        currency=payload.currency.upper(),
+        executed_at=datetime.now(UTC),
+    )
+
+
+def create_revolut_demo_card(
+    payload: RevolutDemoCardCreate,
+) -> RevolutDemoCardRead:
+    fingerprint = (
+        f"{payload.account_label}:{payload.virtual_balance}:"
+        f"{payload.currency.upper()}"
+    )
+    card_uuid = uuid5(NAMESPACE_URL, f"quantprox:revolut-demo-card:{fingerprint}")
+    digits = str(card_uuid.int).zfill(16)[-4:]
+    return RevolutDemoCardRead(
+        card_id=f"RVC-{str(card_uuid)[:8].upper()}",
+        account_label=payload.account_label,
+        masked_number=f"•••• •••• •••• {digits}",
+        spending_limit=payload.virtual_balance.quantize(Decimal("0.01")),
+        currency=payload.currency.upper(),
+    )
 
 
 class BrokerService:

@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-menu" />
-    <script src="/lab/app.js?v=1.1.0-menu" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.9.0-autopilot" />
+    <script src="/lab/app-purchase.js?v=2.4.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -18,12 +18,12 @@
           <span class="brand-mark">Q</span>
           <span>QuantProX</span>
         </a>
-        <nav class="main-navigation" aria-label="Strumenti QuantProX">
-          <a href="#panoramica" data-nav="panoramica">Inizio</a>
-          <a href="#assistente" data-nav="assistente">Piano guidato</a>
-          <a href="#simulazione" data-nav="simulazione">Simulazione</a>
-          <a href="#attivita" data-nav="attivita">Risultati</a>
-          <a href="#sicurezza" data-nav="sicurezza">Sicurezza</a>
+        <nav class="topnav" aria-label="Azioni principali">
+          <a href="#simulazione">Oggi</a>
+          <a href="#investimenti">Portafoglio</a>
+          <a href="#acquisto">Investi</a>
+          <a class="activity-trigger" href="#attivita">Attività</a>
+          <a href="#account">Account</a>
         </nav>
         <div class="status" id="api-status">
           <span class="status-dot"></span>
@@ -35,14 +35,31 @@
         <section class="hero navigation-section" id="panoramica"
           data-navigation-section="panoramica">
           <div>
-            <p class="eyebrow">1.1.0-rc.1 · Alpha Lab</p>
-            <h1>Dal mercato al risultato,<br />un passo alla volta.</h1>
+            <p class="eyebrow">QuantProX · Simulazione guidata</p>
+            <h1>Investire, più semplice.</h1>
             <p class="hero-copy">
-              Un banco di prova semplice per esplorare il motore decisionale,
-              i controlli rischio e l’esecuzione simulata di QuantProX.
+              Scegli un obiettivo, controlla il rischio e prova ogni decisione
+              senza usare denaro reale.
             </p>
+            <div class="hero-actions" aria-label="Inizia da qui">
+              <a class="quick-action featured" href="#assistente">
+                <span>01</span>
+                <strong>Avvia l’autopilota</strong>
+                <small>Dal capitale al portafoglio simulato</small>
+              </a>
+              <a class="quick-action" href="#segnale">
+                <span>02</span>
+                <strong>Acquista, mantieni o vendi</strong>
+                <small>Segnale spiegato in modo chiaro</small>
+              </a>
+              <a class="quick-action" href="#acquisto">
+                <span>03</span>
+                <strong>Trova un investimento</strong>
+                <small>Confronto guidato e prudenziale</small>
+              </a>
+            </div>
           </div>
-          <div class="hero-card">
+          <div class="hero-card" id="account">
             <div class="pulse">
               <span>Ambiente</span>
               <strong>Simulazione di trading</strong>
@@ -61,6 +78,9 @@
                   placeholder="Inserisci la password" required />
               </label>
               <button class="primary" id="login-button" type="submit">Accedi</button>
+              <button class="account-link" id="open-register-button" type="button">
+                Crea un nuovo account
+              </button>
             </form>
             <div class="session-panel" id="session-panel" hidden>
               <div>
@@ -78,12 +98,12 @@
         <section class="guide navigation-section" id="assistente"
           data-navigation-section="assistente" aria-labelledby="guide-title">
           <div class="guide-intro">
-            <p class="section-label">Assistente prudenziale</p>
-            <h2 id="guide-title">Un piano simulato in quattro risposte.</h2>
+            <p class="section-label">Autopilota simulato</p>
+            <h2 id="guide-title">Tu scegli l’obiettivo. QuantProX fa il resto.</h2>
             <p>
-              Indica soltanto capitale, obiettivo, orizzonte e perdita massima
-              accettabile. QuantProX seleziona automaticamente un profilo,
-              applica costi realistici e verifica il rischio su dati dimostrativi.
+              Indica capitale, obiettivo, orizzonte e perdita massima accettabile.
+              QuantProX crea il profilo, configura il rischio, sceglie la strategia
+              e completa automaticamente una simulazione verificabile.
             </p>
             <div class="safety-note navigation-section" id="sicurezza"
               data-navigation-section="sicurezza">
@@ -127,7 +147,7 @@
               </select>
             </label>
             <button class="primary" id="guide-button" type="submit" disabled>
-              Accedi per creare il piano
+              Accedi per avviare l’autopilota
             </button>
           </form>
           <div class="guide-result" id="guide-result" hidden>
@@ -153,10 +173,289 @@
               <p id="guide-method"></p>
               <ul id="guide-warnings"></ul>
             </details>
-            <button class="primary" id="apply-guide-button" type="button">
-              Usa il piano e avvia la simulazione
-            </button>
             <small class="guide-disclaimer" id="guide-disclaimer"></small>
+          </div>
+        </section>
+
+        <section class="purchase-guide navigation-section" id="acquisto"
+          data-navigation-section="acquisto" aria-labelledby="purchase-title">
+          <div class="purchase-heading">
+            <div>
+              <p class="section-label">Acquisto prudenziale</p>
+              <h2 id="purchase-title">Prima controlla, poi simula.</h2>
+            </div>
+            <p>
+              Confronta automaticamente azioni, obbligazioni, titoli di Stato,
+              crypto, ETF e fondi usando importo, obiettivo, orizzonte, rischio
+              accettato e fase di mercato. Nessuna stima garantisce un rendimento.
+            </p>
+          </div>
+          <form class="purchase-form" id="purchase-form">
+            <ol class="wizard-progress" aria-label="Avanzamento configurazione">
+              <li class="active" data-wizard-indicator="1"><span>1</span>Scelta</li>
+              <li data-wizard-indicator="2"><span>2</span>Configurazione</li>
+              <li data-wizard-indicator="3"><span>3</span>Riepilogo</li>
+            </ol>
+            <section class="wizard-step active" data-wizard-step="1">
+            <fieldset>
+              <legend>Che cosa vuoi valutare?</legend>
+              <div class="asset-options">
+                <label class="assisted-choice">
+                  <input type="radio" name="asset-type" value="auto" checked />
+                  <strong>Scelta assistita</strong>
+                  <span>
+                    Propone automaticamente il miglior equilibrio stimato tra
+                    rischio e rendimento per i dati inseriti
+                  </span>
+                  <small>Consigliata per iniziare</small>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type" value="stock" />
+                  <strong>Azioni</strong>
+                  <span>Più oscillazioni, orizzonte lungo</span>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type" value="bond" />
+                  <strong>Obbligazioni</strong>
+                  <span>Rischio emittente e tassi</span>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type"
+                    value="government_bond" />
+                  <strong>Titoli di Stato</strong>
+                  <span>Rischio Paese, durata e inflazione</span>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type" value="crypto" />
+                  <strong>Crypto</strong>
+                  <span>Oscillazioni e rischio molto elevati</span>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type" value="etf" />
+                  <strong>ETF</strong>
+                  <span>Diversificazione tramite un paniere</span>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type" value="fund" />
+                  <strong>Fondi</strong>
+                  <span>Gestione professionale con costi</span>
+                </label>
+              </div>
+            </fieldset>
+            </section>
+            <section class="wizard-step" data-wizard-step="2" hidden>
+            <div class="purchase-inputs">
+              <label>
+                <span>Capitale disponibile</span>
+                <input id="purchase-capital" type="number" min="100" step="100"
+                  value="10000" required />
+              </label>
+              <label>
+                <span>Importo da valutare</span>
+                <input id="purchase-amount" type="number" min="1" step="100"
+                  value="2500" required />
+              </label>
+              <label>
+                <span>Orizzonte</span>
+                <select id="purchase-horizon">
+                  <option value="1">1 anno</option>
+                  <option value="3">3 anni</option>
+                  <option value="5" selected>5 anni</option>
+                  <option value="10">10 anni o più</option>
+                </select>
+              </label>
+              <label>
+                <span>Perdita massima tollerabile</span>
+                <select id="purchase-loss">
+                  <option value="3">3%</option>
+                  <option value="5">5%</option>
+                  <option value="10" selected>10%</option>
+                  <option value="20">20%</option>
+                </select>
+              </label>
+              <label>
+                <span>Obiettivo</span>
+                <select id="purchase-goal">
+                  <option value="preservation">Protezione del capitale</option>
+                  <option value="income">Entrate periodiche</option>
+                  <option value="growth" selected>Crescita del capitale</option>
+                </select>
+              </label>
+              <label>
+                <span>Fase di mercato osservata</span>
+                <select id="purchase-market">
+                  <option value="bullish">Rialzista</option>
+                  <option value="neutral" selected>Stabile / incerta</option>
+                  <option value="bearish">Ribassista</option>
+                </select>
+              </label>
+            </div>
+            <label class="emergency-check">
+              <input id="purchase-emergency" type="checkbox" checked />
+              <span>Ho già una riserva separata per spese ed emergenze.</span>
+            </label>
+            </section>
+            <section class="wizard-step" data-wizard-step="3" hidden>
+              <div class="wizard-review">
+                <span>Controlla prima di procedere</span>
+                <h3 id="wizard-review-title">—</h3>
+                <dl id="wizard-review-details"></dl>
+                <p>
+                  La verifica confronterà tutte le categorie e applicherà i
+                  limiti prudenziali prima di abilitare il conto virtuale.
+                </p>
+              </div>
+            <button class="primary" id="purchase-button" type="button">
+              Verifica prima dell’acquisto
+            </button>
+            </section>
+            <div class="wizard-actions">
+              <button class="ghost" id="wizard-back" type="button" hidden>
+                Indietro
+              </button>
+              <button class="primary" id="wizard-next" type="button">
+                Continua
+              </button>
+            </div>
+          </form>
+          <div class="purchase-result" id="purchase-result" hidden
+            aria-live="polite">
+            <div class="purchase-result-head">
+              <div>
+                <span>Esito prudenziale</span>
+                <h3 id="purchase-outcome">—</h3>
+              </div>
+              <span class="purchase-risk" id="purchase-risk">—</span>
+            </div>
+            <div class="purchase-metrics">
+              <div><span>Tetto suggerito</span><strong id="purchase-limit">—</strong></div>
+              <div><span>Controlli superati</span><strong id="purchase-checks">—</strong></div>
+            </div>
+            <p class="purchase-warning" id="purchase-warning"></p>
+            <ul id="purchase-reasons"></ul>
+            <div class="recommendation">
+              <span>Scelta suggerita dal confronto</span>
+              <h4 id="purchase-recommendation">—</h4>
+              <p id="purchase-recommendation-summary"></p>
+            </div>
+            <div class="ranking">
+              <div class="ranking-head">
+                <strong>Confronto delle categorie</strong>
+                <span>Stima illustrativa corretta per rischio</span>
+              </div>
+              <ol id="purchase-ranking"></ol>
+            </div>
+            <div class="virtual-account">
+              <div class="virtual-account-head">
+                <div>
+                  <span>Conto virtuale</span>
+                  <h4>Revolut Demo</h4>
+                </div>
+                <span class="demo-badge">SOLO SIMULAZIONE</span>
+              </div>
+              <p>
+                Prova l’acquisto suggerito usando il capitale virtuale. Nessun
+                collegamento a Revolut e nessun movimento di denaro reale.
+              </p>
+              <div class="virtual-card" id="virtual-card">
+                <div>
+                  <span>Carta collegata</span>
+                  <strong id="virtual-card-number">Nessuna carta</strong>
+                  <small id="virtual-card-meta">
+                    Genera una carta demo per abilitare gli acquisti.
+                  </small>
+                </div>
+                <button class="ghost" id="link-card-button" type="button">
+                  Collega carta virtuale
+                </button>
+              </div>
+              <div class="virtual-account-preview">
+                <div><span>Saldo iniziale</span><strong id="virtual-balance">—</strong></div>
+                <div><span>Acquisto</span><strong id="virtual-purchase">—</strong></div>
+                <div><span>Commissione simulata</span><strong>0,25%</strong></div>
+              </div>
+              <label class="confirmation-check">
+                <input id="virtual-confirmation" type="checkbox" />
+                <span>Confermo di aver compreso che l’operazione è virtuale.</span>
+              </label>
+              <button class="primary" id="virtual-buy-button" type="button">
+                Acquista con Revolut Demo
+              </button>
+              <div class="virtual-receipt" id="virtual-receipt" hidden
+                aria-live="polite">
+                <strong>Acquisto virtuale completato</strong>
+                <span id="virtual-reference">—</span>
+                <p id="virtual-summary"></p>
+                <small id="virtual-disclaimer"></small>
+              </div>
+            </div>
+            <details>
+              <summary>Controlli da fare sullo strumento</summary>
+              <ul id="purchase-checklist"></ul>
+            </details>
+            <small id="purchase-disclaimer"></small>
+          </div>
+        </section>
+
+        <section class="action-advisor navigation-section" id="segnale"
+          data-navigation-section="segnale" aria-labelledby="action-advisor-title">
+          <div class="purchase-heading">
+            <div>
+              <p class="section-label">Assistente segnali</p>
+              <h2 id="action-advisor-title">Acquistare, mantenere o vendere?</h2>
+            </div>
+            <p>
+              Il consiglio usa automaticamente il portafoglio collegato e le
+              quotazioni disponibili. Si aggiorna durante la simulazione, senza
+              chiederti di inserire medie o prezzi.
+            </p>
+          </div>
+          <div class="automatic-advice-source">
+            <div>
+              <span>Portafoglio</span>
+              <strong id="advice-portfolio-status">Da preparare</strong>
+            </div>
+            <div>
+              <span>Mercato</span>
+              <strong id="advice-market-status">Dati non disponibili</strong>
+            </div>
+            <div>
+              <span>Aggiornamento</span>
+              <strong>Automatico</strong>
+            </div>
+            <button class="ghost" id="refresh-advice-button" type="button" disabled>
+              Aggiorna analisi
+            </button>
+          </div>
+          <div class="automatic-advice-empty" id="automatic-advice-empty">
+            <strong>Prepara lo scenario per ricevere il consiglio.</strong>
+            <span>
+              QuantProX analizzerà portafoglio, posizione e andamento del mercato.
+            </span>
+          </div>
+          <div class="action-advisor-result" id="action-advisor-result" hidden
+            aria-live="polite">
+            <div class="action-result-summary">
+              <div>
+                <span>Indicazione quantitativa</span>
+                <h3 id="action-signal-label">—</h3>
+              </div>
+              <p id="action-signal-rationale"></p>
+            </div>
+            <dl>
+              <div><dt>Affidabilità tecnica</dt><dd id="action-signal-confidence">—</dd></div>
+              <div><dt>Distanza tra le medie</dt><dd id="action-signal-gap">—</dd></div>
+              <div><dt>Posizione in portafoglio</dt><dd id="action-position-return">—</dd></div>
+            </dl>
+            <div class="action-next-step">
+              <strong>Quando rivalutare</strong>
+              <p id="action-next-condition"></p>
+            </div>
+            <details class="action-warnings">
+              <summary>Limiti e avvertenze</summary>
+              <ul id="action-signal-warnings"></ul>
+            </details>
+            <small id="action-signal-disclaimer"></small>
           </div>
         </section>
 
@@ -191,8 +490,8 @@
                 <div><strong>Scenario</strong><small>Dati e limiti</small></div>
               </li>
               <li data-step="2">
-                <span>02</span>
-                <div><strong>Decisione</strong><small>Medie mobili</small></div>
+                  <span>02</span>
+                  <div><strong>Decisione</strong><small>Analisi mercato</small></div>
               </li>
               <li data-step="3">
                 <span>03</span>
@@ -263,25 +562,229 @@
               </div>
             </div>
 
-            <div class="ledger navigation-section" id="attivita"
-              data-navigation-section="attivita">
-              <div class="ledger-head">
+            <section class="investments-panel" id="investimenti"
+              aria-labelledby="investments-title">
+              <div class="investments-head">
                 <div>
-                  <p class="section-label">Registro attività</p>
-                  <h3>Ogni passaggio resta visibile</h3>
+                  <p class="section-label">I miei investimenti</p>
+                  <h3 id="investments-title">Andamento e avvisi</h3>
                 </div>
-                <span id="event-count">0 eventi</span>
+                <span class="monitoring-badge">Controllo automatico</span>
               </div>
-              <div class="empty-log" id="empty-log">
-                Il registro si popolerà mentre provi il flusso.
+              <form class="daily-advice-form" id="daily-advice-form">
+                <div>
+                  <span class="daily-step">Consiglio del giorno</span>
+                  <strong>Ricevi l’operazione consigliata</strong>
+                  <small>
+                    Il contatto resta nella simulazione corrente e non viene salvato.
+                  </small>
+                </div>
+                <label for="daily-channel">
+                  <span>Canale</span>
+                  <select id="daily-channel" name="channel">
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="email">Email</option>
+                  </select>
+                </label>
+                <label for="daily-contact">
+                  <span id="daily-contact-label">Numero WhatsApp</span>
+                  <input id="daily-contact" name="contact" type="tel"
+                    autocomplete="tel" inputmode="tel"
+                    placeholder="+39 333 123 4567" required />
+                </label>
+                <button class="primary" id="daily-advice-button" type="submit">
+                  Analizza oggi
+                </button>
+              </form>
+              <div class="daily-advice-result" id="daily-advice-result"
+                aria-live="polite" hidden>
+                <div>
+                  <span>Operazione consigliata</span>
+                  <strong id="daily-advice-action">—</strong>
+                </div>
+                <p id="daily-advice-copy"></p>
+                <span class="sms-status" id="daily-notification-status"></span>
               </div>
-              <ul id="event-log" aria-live="polite"></ul>
-            </div>
+              <div class="investment-dashboard">
+                <article class="performance-chart">
+                  <div class="chart-summary">
+                    <div>
+                      <span>Valore stimato</span>
+                      <strong id="chart-equity">—</strong>
+                    </div>
+                    <span id="chart-return">Scenario non avviato</span>
+                  </div>
+                  <svg id="portfolio-chart" viewBox="0 0 640 190"
+                    role="img" aria-labelledby="portfolio-chart-title portfolio-chart-desc">
+                    <title id="portfolio-chart-title">Andamento del portafoglio</title>
+                    <desc id="portfolio-chart-desc">Prepara lo scenario per visualizzare l’andamento.</desc>
+                    <g class="chart-grid" aria-hidden="true">
+                      <line x1="20" y1="30" x2="620" y2="30"></line>
+                      <line x1="20" y1="95" x2="620" y2="95"></line>
+                      <line x1="20" y1="160" x2="620" y2="160"></line>
+                    </g>
+                    <path id="portfolio-chart-area" class="chart-area"
+                      d="M20 160 L620 160 L620 160 L20 160 Z"></path>
+                    <polyline id="portfolio-chart-line" class="chart-line"
+                      points="20,160 620,160"></polyline>
+                  </svg>
+                  <div class="chart-axis" aria-hidden="true">
+                    <span>Inizio</span>
+                    <span>Oggi</span>
+                  </div>
+                </article>
+
+                <article class="sell-alert" id="sell-alert" data-level="idle">
+                  <div class="sell-alert-heading">
+                    <span class="alert-icon" aria-hidden="true">!</span>
+                    <div>
+                      <span>Alert acquisto e vendita</span>
+                      <strong id="sell-alert-title">Monitoraggio in attesa</strong>
+                    </div>
+                  </div>
+                  <p id="sell-alert-copy">
+                    Gli alert si attivano dopo l’analisi del portafoglio e del mercato.
+                  </p>
+                  <dl>
+                    <div><dt>Segnale mercato</dt><dd id="sell-alert-signal">—</dd></div>
+                    <div><dt>Risultato posizione</dt><dd id="sell-alert-return">—</dd></div>
+                  </dl>
+                  <small>
+                    Avviso informativo: verifica sempre costi, fiscalità e obiettivi
+                    prima di acquistare o vendere. Nessun ordine viene inviato
+                    automaticamente.
+                  </small>
+                </article>
+              </div>
+
+              <div class="positions-table" role="region"
+                aria-label="Posizioni del portafoglio">
+                <div class="positions-row positions-header">
+                  <span>Investimento</span><span>Quantità</span><span>Prezzo</span>
+                  <span>Risultato</span><span>Stato</span>
+                </div>
+                <div class="positions-row" id="position-row">
+                  <strong id="position-symbol">Nessuna posizione</strong>
+                  <span id="position-quantity">—</span>
+                  <span id="position-price">—</span>
+                  <strong id="position-result">—</strong>
+                  <span class="position-status" id="position-status">In attesa</span>
+                </div>
+              </div>
+            </section>
+
           </div>
         </section>
       </main>
     </div>
 
+    <dialog class="account-dialog" id="account-dialog"
+      aria-labelledby="account-dialog-title">
+      <form class="account-form" id="register-form">
+        <div class="account-dialog-head">
+          <div>
+            <p class="section-label">Nuovo account</p>
+            <h2 id="account-dialog-title">Crea il tuo profilo</h2>
+          </div>
+          <button class="dialog-close" id="close-register-button" type="button"
+            aria-label="Chiudi registrazione">×</button>
+        </div>
+        <p class="account-intro">
+          Inserisci solo i dati essenziali. Potrai completare le preferenze
+          finanziarie nel percorso guidato.
+        </p>
+        <div class="account-fields">
+          <label>
+            <span>Nome e cognome</span>
+            <input id="register-full-name" autocomplete="name"
+              placeholder="Mario Rossi" required minlength="2" />
+          </label>
+          <label>
+            <span>Nome profilo</span>
+            <input id="register-profile" autocomplete="username"
+              placeholder="mario.rossi" required minlength="3"
+              pattern="[a-zA-Z0-9._-]+" />
+          </label>
+          <label>
+            <span>Email</span>
+            <input id="register-email" type="email" autocomplete="email"
+              placeholder="mario@esempio.it" required />
+          </label>
+          <label>
+            <span>Cellulare <small>facoltativo</small></span>
+            <input id="register-phone" type="tel" autocomplete="tel"
+              inputmode="tel" placeholder="+39 333 123 4567" />
+          </label>
+          <label>
+            <span>Valuta preferita</span>
+            <select id="register-currency">
+              <option value="EUR">Euro (EUR)</option>
+              <option value="USD">Dollaro USA (USD)</option>
+              <option value="GBP">Sterlina britannica (GBP)</option>
+              <option value="CHF">Franco svizzero (CHF)</option>
+            </select>
+          </label>
+          <span class="account-security-note">
+            La password deve contenere almeno 10 caratteri.
+          </span>
+          <label>
+            <span>Password</span>
+            <input id="register-password" type="password"
+              autocomplete="new-password" required minlength="10" />
+          </label>
+          <label>
+            <span>Conferma password</span>
+            <input id="register-password-confirmation" type="password"
+              autocomplete="new-password" required minlength="10" />
+          </label>
+        </div>
+        <label class="account-consent">
+          <input id="register-terms" type="checkbox" required />
+          <span>
+            Accetto termini e informativa privacy e comprendo che QuantProX
+            utilizza dati dimostrativi e non garantisce risultati finanziari.
+          </span>
+        </label>
+        <div class="account-actions">
+          <button class="ghost" id="cancel-register-button" type="button">Annulla</button>
+          <button class="primary" id="register-button" type="submit">
+            Crea account
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="activity-dialog" id="activity-dialog"
+      aria-labelledby="activity-dialog-title">
+      <div class="ledger" id="attivita">
+        <div class="ledger-head">
+          <div>
+            <p class="section-label">Registro attività</p>
+            <h2 id="activity-dialog-title">Ogni passaggio resta visibile</h2>
+          </div>
+          <div class="activity-dialog-actions">
+            <span id="event-count">0 eventi</span>
+            <button class="dialog-close" id="close-activity-button" type="button"
+              aria-label="Chiudi registro attività">×</button>
+          </div>
+        </div>
+        <div class="empty-log" id="empty-log">
+          Il registro si popolerà mentre provi il flusso.
+        </div>
+        <ul id="event-log" aria-live="polite"></ul>
+      </div>
+    </dialog>
+
+    <nav class="mobile-scroll-controls" aria-label="Scorri tra le sezioni">
+      <button id="scroll-up-button" type="button" aria-label="Sezione precedente"
+        title="Sezione precedente">
+        <span aria-hidden="true">↑</span>
+      </button>
+      <button id="scroll-down-button" type="button" aria-label="Sezione successiva"
+        title="Sezione successiva">
+        <span aria-hidden="true">↓</span>
+      </button>
+    </nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </body>
 </html>

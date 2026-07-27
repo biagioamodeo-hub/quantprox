@@ -80,3 +80,48 @@ def test_api_requires_a_valid_key_and_isolates_tenants() -> None:
     finally:
         settings.tenant_api_keys = previous_keys
         app.dependency_overrides.clear()
+
+
+def test_account_registration_creates_an_authenticated_session() -> None:
+    engine = create_engine(
+        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+    )
+    Base.metadata.create_all(engine)
+
+    def override_session() -> Session:
+        with Session(engine) as session:
+            yield session
+
+    app.dependency_overrides[get_db_session] = override_session
+    client = TestClient(app)
+    payload = {
+        "profile": "nuovo.profilo",
+        "full_name": "Mario Rossi",
+        "email": "mario@example.it",
+        "phone": "+39 333 123 4567",
+        "preferred_currency": "EUR",
+        "password": "password-sicura-123",
+        "password_confirmation": "password-sicura-123",
+        "accepted_terms": True,
+    }
+
+    try:
+        registration = client.post("/auth/register", json=payload)
+
+        assert registration.status_code == 201
+        assert registration.json() == {
+            "authenticated": True,
+            "profile": "nuovo.profilo",
+        }
+        assert client.get("/auth/session").json() == registration.json()
+
+        duplicate = TestClient(app).post("/auth/register", json=payload)
+        assert duplicate.status_code == 409
+
+        login = TestClient(app).post(
+            "/auth/login",
+            json={"profile": payload["profile"], "password": payload["password"]},
+        )
+        assert login.status_code == 200
+    finally:
+        app.dependency_overrides.clear()

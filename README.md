@@ -48,10 +48,27 @@ Beginner requests are never assigned the dynamic profile. Results are
 educational simulations, not personalized financial advice, and do not
 guarantee future performance.
 
-The sticky Alpha Lab navigation links directly to the overview, guided plan,
-simulation, activity results, and safety explanation. The current section is
-highlighted automatically, and the menu remains horizontally accessible on
-small screens.
+### Guided investment and automatic signal
+
+The three-step investment wizard compares equities, bonds, government bonds,
+crypto assets, ETFs, and funds. Its assisted mode filters categories against
+the declared horizon, loss tolerance, emergency reserve, goal, and market
+regime before presenting a risk-adjusted illustrative ranking.
+
+After a paper-trading scenario is prepared, the signal assistant reads the
+connected portfolio, current position, latest available candle, and moving
+averages automatically. It displays `buy`, `hold`, or `sell` guidance with the
+trend gap, technical confidence, rationale, and a clear reassessment condition.
+The signal never creates a live order.
+
+The Revolut Demo account and virtual card allow the recommended category to be
+tested with simulated funds. They do not connect to Revolut, request real card
+details, or move real money.
+
+The sticky Alpha Lab navigation is organized around five beginner-friendly
+destinations: Today, Portfolio, Invest, Activity, and Account. The activity log
+opens on demand instead of occupying space in the dashboard. Mobile up/down
+controls move between the main sections.
 
 ## Authentication and tenant isolation
 

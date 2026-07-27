@@ -83,3 +83,195 @@ def test_beginner_plan_never_selects_dynamic_profile() -> None:
 
     assert response.status_code == 200
     assert response.json()["profile"]["code"] == "balanced"
+
+
+def test_purchase_safety_accepts_prudent_government_bond_simulation() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "government_bond",
+            "available_capital": "10000",
+            "requested_amount": "2500",
+            "horizon_years": 5,
+            "maximum_acceptable_loss_percent": "8",
+            "emergency_fund_available": True,
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["outcome"] == "proceed_simulation"
+    assert result["prudent_amount"] == "3000.00"
+    assert result["checks_passed"] == result["checks_total"] == 4
+
+
+def test_purchase_safety_blocks_unsuitable_stock_purchase() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "stock",
+            "available_capital": "10000",
+            "requested_amount": "3000",
+            "horizon_years": 2,
+            "maximum_acceptable_loss_percent": "5",
+            "emergency_fund_available": False,
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["outcome"] == "not_suitable"
+    assert result["risk_level"] == "elevato"
+    assert result["checks_passed"] == 0
+
+
+def test_purchase_safety_recommends_reducing_excess_amount() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "bond",
+            "available_capital": "10000",
+            "requested_amount": "3000",
+            "horizon_years": 5,
+            "maximum_acceptable_loss_percent": "10",
+            "emergency_fund_available": True,
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["outcome"] == "reduce_amount"
+    assert result["prudent_amount"] == "2000.00"
+
+
+def test_purchase_safety_compares_all_six_asset_categories() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "etf",
+            "available_capital": "20000",
+            "requested_amount": "3000",
+            "horizon_years": 10,
+            "maximum_acceptable_loss_percent": "20",
+            "emergency_fund_available": True,
+            "market_regime": "bullish",
+            "goal": "growth",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert len(result["ranking"]) == 6
+    assert {candidate["asset_type"] for candidate in result["ranking"]} == {
+        "stock",
+        "bond",
+        "government_bond",
+        "crypto",
+        "etf",
+        "fund",
+    }
+    assert result["recommended_asset_type"] == "etf"
+    assert result["ranking"][0]["asset_type"] == "etf"
+
+
+def test_purchase_safety_auto_selects_best_suitable_category() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "auto",
+            "available_capital": "20000",
+            "requested_amount": "3000",
+            "horizon_years": 10,
+            "maximum_acceptable_loss_percent": "20",
+            "emergency_fund_available": True,
+            "market_regime": "bullish",
+            "goal": "growth",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["asset_type"] == "etf"
+    assert result["asset_label"] == "ETF"
+    assert result["outcome"] == "proceed_simulation"
+    assert result["recommended_asset_type"] == "etf"
+    assert "scelta assistita" in result["recommendation_summary"].lower()
+
+
+def test_purchase_safety_can_assess_crypto_without_claiming_safety() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "crypto",
+            "available_capital": "10000",
+            "requested_amount": "200",
+            "horizon_years": 10,
+            "maximum_acceptable_loss_percent": "35",
+            "emergency_fund_available": True,
+            "market_regime": "neutral",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["risk_level"] == "molto elevato"
+    assert result["max_allocation_percent"] == "3"
+    assert "non garantisce" in result["disclaimer"]
+
+
+def test_action_signal_recommends_buy_for_confirmed_positive_trend() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/action-signal",
+        json={
+            "owns_instrument": False,
+            "current_price": "105",
+            "short_average": "104",
+            "long_average": "100",
+            "maximum_loss_percent": "10",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["action"] == "buy"
+    assert result["action_label"] == "ACQUISTA"
+    assert result["trend"] == "positive"
+
+
+def test_action_signal_recommends_hold_for_uncertain_trend() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/action-signal",
+        json={
+            "owns_instrument": True,
+            "current_price": "101",
+            "average_purchase_price": "100",
+            "short_average": "100.4",
+            "long_average": "100",
+            "maximum_loss_percent": "10",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["action"] == "hold"
+    assert result["action_label"] == "MANTIENI"
+
+
+def test_action_signal_recommends_sell_when_loss_limit_is_reached() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/action-signal",
+        json={
+            "owns_instrument": True,
+            "current_price": "88",
+            "average_purchase_price": "100",
+            "short_average": "98",
+            "long_average": "100",
+            "maximum_loss_percent": "10",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["action"] == "sell"
+    assert result["action_label"] == "VENDI"
+    assert result["position_return_percent"] == "-12.00"
