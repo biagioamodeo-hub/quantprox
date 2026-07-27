@@ -41,8 +41,12 @@ resources owned by another tenant are returned as `404` to avoid leaking their
 existence. Market-data resources are shared across tenants but still require
 authentication.
 
-Alpha Lab includes a password-style field for the tenant key and sends it only
-as the `X-API-Key` request header.
+Alpha Lab provides a profile-and-password login form that submits credentials
+only to the same-origin login endpoint. A successful login creates a signed,
+expiring `HttpOnly` session cookie; the credential is not stored by JavaScript.
+Configure `SESSION_SECRET` with a long random value and enable
+`SESSION_SECURE_COOKIE` when serving over HTTPS. API clients may continue to use
+the `X-API-Key` header directly.
 
 ## Idempotent mutations
 

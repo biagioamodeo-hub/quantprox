@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0-rc.1-italian" />
-    <script src="/lab/app.js?v=1.0.0-rc.1-italian" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0-rc.1-login" />
+    <script src="/lab/app.js?v=1.0.0-rc.1-login" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -40,17 +40,30 @@
               <strong>Simulazione di trading</strong>
             </div>
             <p>Nessun ordine reale. Dati dimostrativi, risultati verificabili.</p>
-            <label class="api-key-field" for="api-key">
-              <span>Chiave API del profilo</span>
-              <input
-                id="api-key"
-                name="api-key"
-                type="password"
-                autocomplete="off"
-                placeholder="X-API-Key"
-              />
-            </label>
-            <button class="primary" id="seed-button">Prepara scenario demo</button>
+            <form class="login-form" id="login-form">
+              <label for="login-profile">
+                <span>Nome profilo</span>
+                <input id="login-profile" name="profile" autocomplete="username"
+                  placeholder="es. demo" required />
+              </label>
+              <label for="login-password">
+                <span>Password</span>
+                <input id="login-password" name="password" type="password"
+                  autocomplete="current-password"
+                  placeholder="Inserisci la password" required />
+              </label>
+              <button class="primary" id="login-button" type="submit">Accedi</button>
+            </form>
+            <div class="session-panel" id="session-panel" hidden>
+              <div>
+                <span>Profilo connesso</span>
+                <strong id="session-profile">—</strong>
+              </div>
+              <button class="ghost" id="logout-button" type="button">Esci</button>
+            </div>
+            <button class="primary" id="seed-button" disabled>
+              Accedi per iniziare
+            </button>
           </div>
         </section>
 

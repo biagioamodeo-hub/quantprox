@@ -1,4 +1,6 @@
 const state = {
+  authenticated: false,
+  profile: null,
   step: 0,
   instrument: null,
   portfolio: null,
@@ -14,6 +16,7 @@ const state = {
 const $ = (selector) => document.querySelector(selector);
 
 const apiMessageLabels = {
+  "Invalid profile or password.": "Nome profilo o password non validi.",
   "A valid X-API-Key header is required.":
     "È necessaria una chiave API valida.",
   "Portfolio not found.": "Portafoglio non trovato.",
@@ -51,12 +54,11 @@ function translateApiMessage(message) {
 }
 
 const api = async (path, options = {}) => {
-  const apiKey = $("#api-key")?.value.trim();
   const response = await fetch(path, {
+    credentials: "same-origin",
     ...options,
     headers: {
       "Content-Type": "application/json",
-      ...(apiKey && path.startsWith("/api/") ? { "X-API-Key": apiKey } : {}),
       ...options.headers,
     },
   });
@@ -148,6 +150,15 @@ function setStep(step) {
 }
 
 function render() {
+  $("#login-form").hidden = state.authenticated;
+  $("#session-panel").hidden = !state.authenticated;
+  $("#session-profile").textContent = state.profile || "—";
+  $("#seed-button").disabled = !state.authenticated;
+  $("#seed-button").textContent = state.authenticated
+    ? state.step === 0
+      ? "Prepara scenario demo"
+      : "Prepara nuovo scenario"
+    : "Accedi per iniziare";
   const signal = state.decision?.action || "pending";
   $("#signal-card").dataset.signal = signal;
   $("#signal-status").textContent = signalStatusLabels[signal] || "In attesa";
@@ -190,7 +201,8 @@ function render() {
   $("#action-title").textContent = actions[0];
   $("#action-copy").textContent = actions[1];
   $("#action-button").textContent = actions[2];
-  $("#action-button").disabled = actions[3] || state.cancelled;
+  $("#action-button").disabled =
+    actions[3] || state.cancelled || !state.authenticated;
   $("#cancel-button").hidden =
     state.step !== 3 || state.order?.status !== "accepted";
   if (state.cancelled) {
@@ -223,8 +235,8 @@ async function seedScenario() {
   button.disabled = true;
   button.textContent = "Preparazione…";
   try {
-    if (!$("#api-key").value.trim()) {
-      throw new Error("Inserisci la chiave API del profilo.");
+    if (!state.authenticated) {
+      throw new Error("Accedi prima di preparare uno scenario.");
     }
     const suffix = String(Date.now()).slice(-6);
     state.instrument = await api("/api/v1/market-data/instruments", {
@@ -269,8 +281,7 @@ async function seedScenario() {
   } catch (error) {
     toast(error.message);
   } finally {
-    button.disabled = false;
-    button.textContent = "Prepara nuovo scenario";
+    render();
   }
 }
 
@@ -353,7 +364,6 @@ function resetView() {
     executionKey: null,
     events: [],
   });
-  $("#seed-button").textContent = "Prepara scenario demo";
   setStep(0);
   render();
   toast("Vista azzerata. Puoi preparare un nuovo scenario.");
@@ -393,9 +403,58 @@ async function checkHealth() {
   }
 }
 
+async function checkSession() {
+  try {
+    const session = await api("/auth/session");
+    state.authenticated = session.authenticated;
+    state.profile = session.profile;
+  } catch {
+    state.authenticated = false;
+    state.profile = null;
+  }
+  render();
+}
+
+async function login(event) {
+  event.preventDefault();
+  const button = $("#login-button");
+  button.disabled = true;
+  button.textContent = "Accesso…";
+  try {
+    const session = await api("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        profile: $("#login-profile").value.trim(),
+        password: $("#login-password").value,
+      }),
+    });
+    state.authenticated = session.authenticated;
+    state.profile = session.profile;
+    $("#login-password").value = "";
+    toast(`Accesso eseguito come ${session.profile}.`);
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Accedi";
+    render();
+  }
+}
+
+async function logout() {
+  await api("/auth/logout", { method: "POST" });
+  resetView();
+  state.authenticated = false;
+  state.profile = null;
+  render();
+  toast("Sessione terminata.");
+}
+
 $("#seed-button").addEventListener("click", seedScenario);
 $("#action-button").addEventListener("click", nextAction);
 $("#reset-button").addEventListener("click", resetView);
 $("#cancel-button").addEventListener("click", cancelOrder);
+$("#login-form").addEventListener("submit", login);
+$("#logout-button").addEventListener("click", logout);
 checkHealth();
-render();
+checkSession();

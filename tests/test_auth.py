@@ -40,6 +40,24 @@ def test_api_requires_a_valid_key_and_isolates_tenants() -> None:
             ).status_code
             == 401
         )
+        invalid_login = anonymous.post(
+            "/auth/login",
+            json={"profile": "demo", "password": "wrong-password"},
+        )
+        assert invalid_login.status_code == 401
+
+        login = anonymous.post(
+            "/auth/login",
+            json={"profile": "demo", "password": "dev-api-key"},
+        )
+        assert login.status_code == 200
+        assert login.json() == {"authenticated": True, "profile": "demo"}
+        assert anonymous.get("/auth/session").json() == login.json()
+        assert anonymous.get("/api/v1/portfolios").status_code == 200
+
+        logout = anonymous.post("/auth/logout")
+        assert logout.status_code == 204
+        assert anonymous.get("/auth/session").status_code == 401
 
         demo_portfolio = demo.post(
             "/api/v1/portfolios",
