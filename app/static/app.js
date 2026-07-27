@@ -125,7 +125,7 @@ function render() {
     : "P&L —";
 
   const actions = [
-    ["Crea un ambiente dimostrativo", "Usa il pulsante in alto per preparare dati, portafoglio e limiti.", "Attendo lo scenario", true],
+    ["Crea un ambiente dimostrativo", "Prepara dati, portafoglio e limiti per iniziare il percorso guidato.", "Prepara scenario demo", false],
     ["Calcola il segnale", "Il motore confronta medie mobili a 2 e 3 periodi sulle candele demo.", "Valuta decisione", false],
     ["Trasforma il segnale in ordine", "Quantità 10, prezzo limite 120 USD. Il rischio viene controllato prima del salvataggio.", "Crea ordine", false],
     ["Esegui in modalità paper", "L’ordine accettato viene riempito una sola volta e aggiorna cassa e posizione.", "Esegui ordine", false],
@@ -224,7 +224,9 @@ async function nextAction() {
   const button = $("#action-button");
   button.disabled = true;
   try {
-    if (state.step === 1) {
+    if (state.step === 0) {
+      await seedScenario();
+    } else if (state.step === 1) {
       state.decision = await api("/api/v1/decisions/evaluate", {
         method: "POST",
         body: JSON.stringify({
@@ -297,8 +299,10 @@ function resetView() {
     executionKey: null,
     events: [],
   });
+  $("#seed-button").textContent = "Prepara scenario demo";
   setStep(0);
   render();
+  toast("Vista azzerata. Puoi preparare un nuovo scenario.");
 }
 
 async function cancelOrder() {
