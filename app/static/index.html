@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso paper-trading in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css" />
-    <script src="/lab/app.js?v=1.0.0-rc.1-reset-fix" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0-rc.1-signal-card" />
+    <script src="/lab/app.js?v=1.0.0-rc.1-signal-card" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -96,8 +96,11 @@
                 <strong id="metric-symbol">—</strong>
                 <small id="metric-price">Nessun dato</small>
               </article>
-              <article>
-                <span>Segnale</span>
+              <article class="signal-card" id="signal-card" data-signal="pending">
+                <div class="metric-heading">
+                  <span>Segnale</span>
+                  <span class="signal-status" id="signal-status">In attesa</span>
+                </div>
                 <strong id="metric-signal">—</strong>
                 <small id="metric-rationale">In attesa</small>
               </article>

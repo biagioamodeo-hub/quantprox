@@ -40,6 +40,12 @@ const signalLabels = {
   hold: "ATTESA",
 };
 
+const signalStatusLabels = {
+  buy: "Trend positivo",
+  sell: "Trend negativo",
+  hold: "Trend neutrale",
+};
+
 const orderStatusLabels = {
   accepted: "accettato",
   rejected: "rifiutato",
@@ -99,6 +105,9 @@ function setStep(step) {
 }
 
 function render() {
+  const signal = state.decision?.action || "pending";
+  $("#signal-card").dataset.signal = signal;
+  $("#signal-status").textContent = signalStatusLabels[signal] || "In attesa";
   $("#metric-symbol").textContent = state.instrument?.symbol || "—";
   $("#metric-price").textContent = state.instrument ? "Ultimo close · $120" : "Nessun dato";
   $("#metric-signal").textContent =
