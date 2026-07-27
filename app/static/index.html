@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.2.0-simple" />
-    <script src="/lab/app-purchase.js?v=1.7.0" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.2.1-mobile" />
+    <script src="/lab/app-purchase.js?v=1.8.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -597,6 +597,16 @@
       </main>
     </div>
 
+    <nav class="mobile-scroll-controls" aria-label="Scorri tra le sezioni">
+      <button id="scroll-up-button" type="button" aria-label="Sezione precedente"
+        title="Sezione precedente">
+        <span aria-hidden="true">↑</span>
+      </button>
+      <button id="scroll-down-button" type="button" aria-label="Sezione successiva"
+        title="Sezione successiva">
+        <span aria-hidden="true">↓</span>
+      </button>
+    </nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </body>
 </html>

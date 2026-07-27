@@ -990,6 +990,42 @@ function initializeNavigation() {
   );
 }
 
+function initializeMobileScrollControls() {
+  const sections = [
+    ...document.querySelectorAll("main > .navigation-section"),
+  ];
+  const upButton = $("#scroll-up-button");
+  const downButton = $("#scroll-down-button");
+
+  const currentSectionIndex = () => {
+    const marker = window.scrollY + window.innerHeight * 0.35;
+    let current = 0;
+    sections.forEach((section, index) => {
+      if (section.offsetTop <= marker) current = index;
+    });
+    return current;
+  };
+
+  const updateButtons = () => {
+    const current = currentSectionIndex();
+    upButton.disabled = current === 0;
+    downButton.disabled = current === sections.length - 1;
+  };
+
+  const move = (direction) => {
+    const target = Math.max(
+      0,
+      Math.min(sections.length - 1, currentSectionIndex() + direction),
+    );
+    sections[target].scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  upButton.addEventListener("click", () => move(-1));
+  downButton.addEventListener("click", () => move(1));
+  window.addEventListener("scroll", updateButtons, { passive: true });
+  updateButtons();
+}
+
 $("#seed-button").addEventListener("click", seedScenario);
 $("#action-button").addEventListener("click", nextAction);
 $("#reset-button").addEventListener("click", resetView);
@@ -1009,5 +1045,6 @@ $("#action-advisor-form").addEventListener("submit", calculateActionSignal);
 setPurchaseWizardStep(1);
 toggleSignalEntryPrice();
 initializeNavigation();
+initializeMobileScrollControls();
 checkHealth();
 checkSession();
