@@ -31,6 +31,7 @@ const money = (value) =>
   new Intl.NumberFormat("it-IT", {
     style: "currency",
     currency: "USD",
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(Number(value));
 
@@ -109,7 +110,9 @@ function render() {
   $("#signal-card").dataset.signal = signal;
   $("#signal-status").textContent = signalStatusLabels[signal] || "In attesa";
   $("#metric-symbol").textContent = state.instrument?.symbol || "—";
-  $("#metric-price").textContent = state.instrument ? "Ultimo close · $120" : "Nessun dato";
+  $("#metric-price").textContent = state.instrument
+    ? `Ultimo close · ${money(120)}`
+    : "Nessun dato";
   $("#metric-signal").textContent =
     signalLabels[state.decision?.action] || "—";
   $("#metric-rationale").textContent = translateRationale(
@@ -136,7 +139,7 @@ function render() {
   const actions = [
     ["Crea un ambiente dimostrativo", "Prepara dati, portafoglio e limiti per iniziare il percorso guidato.", "Prepara scenario demo", false],
     ["Calcola il segnale", "Il motore confronta medie mobili a 2 e 3 periodi sulle candele demo.", "Valuta decisione", false],
-    ["Trasforma il segnale in ordine", "Quantità 10, prezzo limite 120 USD. Il rischio viene controllato prima del salvataggio.", "Crea ordine", false],
+    ["Trasforma il segnale in ordine", `Quantità 10, prezzo limite ${money(120)}. Il rischio viene controllato prima del salvataggio.`, "Crea ordine", false],
     ["Esegui in modalità paper", "L’ordine accettato viene riempito una sola volta e aggiorna cassa e posizione.", "Esegui ordine", false],
     ["Leggi la valutazione", "Calcola equity, esposizione e P&L usando l’ultimo close disponibile.", "Aggiorna valutazione", false],
     ["Scenario completato", "Puoi aggiornare la valutazione o preparare un nuovo scenario demo.", "Aggiorna valutazione", false],
@@ -262,7 +265,7 @@ async function nextAction() {
       setStep(3);
       addEvent(
         "Ordine creato",
-        `10 quote a 120 USD · ordine ${
+        `10 quote a ${money(120)} · ordine ${
           orderStatusLabels[state.order.status] || state.order.status
         }`,
         `#${state.order.id}`,
