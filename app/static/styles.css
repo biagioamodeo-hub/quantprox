@@ -346,6 +346,9 @@ h2 {
 }
 
 .metric-grid article {
+  display: grid;
+  grid-template-rows: 28px 42px minmax(32px, 1fr);
+  align-items: start;
   min-height: 132px;
   padding: 20px;
   border: 1px solid var(--line);
@@ -362,7 +365,8 @@ h2 {
 .metric-grid strong {
   display: block;
   overflow: hidden;
-  margin: 16px 0 8px;
+  align-self: center;
+  margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 25px;
   font-weight: 500;
@@ -417,7 +421,8 @@ h2 {
 }
 
 .signal-card #metric-signal {
-  margin: 18px 0 7px;
+  align-self: center;
+  margin: 0;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: 22px;
   font-weight: 800;
@@ -425,6 +430,7 @@ h2 {
 }
 
 .signal-card #metric-rationale {
+  align-self: start;
   max-width: 28ch;
   font-size: 12px;
   line-height: 1.45;
