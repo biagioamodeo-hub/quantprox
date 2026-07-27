@@ -1,3 +1,4 @@
+// QuantProX Alpha Lab interaction layer.
 const state = {
   authenticated: false,
   profile: null,
@@ -516,6 +517,57 @@ async function applyGuidedPlan() {
   await seedScenario();
 }
 
+function renderPurchaseSafety(result) {
+  const panel = $("#purchase-result");
+  panel.hidden = false;
+  panel.dataset.outcome = result.outcome;
+  $("#purchase-outcome").textContent = result.outcome_label;
+  $("#purchase-risk").textContent =
+    `Rischio ${result.risk_level} · ${result.asset_label}`;
+  $("#purchase-limit").textContent =
+    `${money(result.prudent_amount)} (${percent(result.max_allocation_percent)})`;
+  $("#purchase-checks").textContent =
+    `${result.checks_passed} su ${result.checks_total}`;
+  $("#purchase-warning").textContent = result.warning;
+  $("#purchase-reasons").innerHTML = result.reasons
+    .map((reason) => `<li>${reason}</li>`)
+    .join("");
+  $("#purchase-checklist").innerHTML = result.checklist
+    .map((item) => `<li>${item}</li>`)
+    .join("");
+  $("#purchase-disclaimer").textContent = result.disclaimer;
+}
+
+async function checkPurchaseSafety(event) {
+  event.preventDefault();
+  const button = $("#purchase-button");
+  button.disabled = true;
+  button.textContent = "Controllo in corso…";
+  try {
+    const assetType = document.querySelector(
+      'input[name="asset-type"]:checked',
+    ).value;
+    const result = await api("/api/v1/guidance/purchase-safety", {
+      method: "POST",
+      body: JSON.stringify({
+        asset_type: assetType,
+        available_capital: $("#purchase-capital").value,
+        requested_amount: $("#purchase-amount").value,
+        horizon_years: Number($("#purchase-horizon").value),
+        maximum_acceptable_loss_percent: $("#purchase-loss").value,
+        emergency_fund_available: $("#purchase-emergency").checked,
+      }),
+    });
+    renderPurchaseSafety(result);
+    toast("Controllo prudenziale completato.");
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Verifica prima dell’acquisto";
+  }
+}
+
 async function cancelOrder() {
   const button = $("#cancel-button");
   button.disabled = true;
@@ -709,6 +761,7 @@ $("#logout-button").addEventListener("click", logout);
 $("#simulation-currency").addEventListener("change", selectCurrency);
 $("#guide-form").addEventListener("submit", createGuidedPlan);
 $("#apply-guide-button").addEventListener("click", applyGuidedPlan);
+$("#purchase-button").addEventListener("click", checkPurchaseSafety);
 initializeNavigation();
 checkHealth();
 checkSession();

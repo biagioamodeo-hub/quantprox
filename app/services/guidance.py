@@ -8,6 +8,8 @@ from app.schemas.guidance import (
     GuidedPlanRead,
     GuidedRiskProfile,
     GuidedStrategy,
+    PurchaseSafetyCreate,
+    PurchaseSafetyRead,
 )
 
 _DEMO_PRICES = tuple(
@@ -437,4 +439,131 @@ def create_guided_plan(payload: GuidedPlanCreate) -> GuidedPlanRead:
             "Il tasso di successo non indica la probabilità certa di guadagno.",
             "Non investire denaro necessario per spese o emergenze.",
         ],
+    )
+
+
+@dataclass(frozen=True)
+class _PurchaseRule:
+    label: str
+    risk: Literal["contenuto", "medio", "elevato"]
+    allocation: Decimal
+    minimum_horizon: int
+    minimum_tolerance: Decimal
+    warning: str
+    checklist: list[str]
+
+
+_PURCHASE_RULES: dict[str, _PurchaseRule] = {
+    "stock": _PurchaseRule(
+        label="Azioni",
+        risk="elevato",
+        allocation=Decimal("10"),
+        minimum_horizon=7,
+        minimum_tolerance=Decimal("15"),
+        warning=(
+            "Il prezzo delle azioni può oscillare molto e il capitale può ridursi "
+            "anche in modo significativo."
+        ),
+        checklist=[
+            "Preferisci strumenti diversificati rispetto a un singolo titolo.",
+            "Controlla costi, liquidità e concentrazione geografica o settoriale.",
+            "Usa soltanto capitale non necessario nel medio-lungo periodo.",
+        ],
+    ),
+    "bond": _PurchaseRule(
+        label="Obbligazioni",
+        risk="medio",
+        allocation=Decimal("20"),
+        minimum_horizon=3,
+        minimum_tolerance=Decimal("8"),
+        warning=(
+            "Le obbligazioni espongono a rischio emittente, tassi d'interesse, "
+            "liquidità e possibile perdita di capitale."
+        ),
+        checklist=[
+            "Verifica affidabilità dell'emittente, scadenza e valuta.",
+            "Diversifica tra emittenti e scadenze.",
+            "Confronta rendimento netto, costi e rischio di rimborso anticipato.",
+        ],
+    ),
+    "government_bond": _PurchaseRule(
+        label="Titoli di Stato",
+        risk="contenuto",
+        allocation=Decimal("30"),
+        minimum_horizon=2,
+        minimum_tolerance=Decimal("5"),
+        warning=(
+            "I titoli di Stato non sono privi di rischio: incidono solvibilità "
+            "del Paese, tassi, inflazione, durata e valuta."
+        ),
+        checklist=[
+            "Abbina la scadenza al momento in cui potrebbe servirti il denaro.",
+            "Valuta rischio Paese, inflazione e tassazione applicabile.",
+            "Diversifica per scadenza e non concentrare tutto su un solo emittente.",
+        ],
+    ),
+}
+
+
+def assess_purchase_safety(payload: PurchaseSafetyCreate) -> PurchaseSafetyRead:
+    rule = _PURCHASE_RULES[payload.asset_type]
+    allocation = rule.allocation
+    prudent_amount = _quantize(payload.available_capital * allocation / Decimal("100"))
+    checks = {
+        "emergency": payload.emergency_fund_available,
+        "horizon": payload.horizon_years >= rule.minimum_horizon,
+        "tolerance": (
+            payload.maximum_acceptable_loss_percent >= rule.minimum_tolerance
+        ),
+        "amount": payload.requested_amount <= prudent_amount,
+    }
+    reasons: list[str] = []
+    if not checks["emergency"]:
+        reasons.append(
+            "Prima dell'investimento è consigliata una riserva per spese ed emergenze."
+        )
+    if not checks["horizon"]:
+        reasons.append(
+            f"Per {rule.label.lower()} è prudente un orizzonte di almeno "
+            f"{rule.minimum_horizon} anni."
+        )
+    if not checks["tolerance"]:
+        reasons.append(
+            "La perdita massima indicata è inferiore alle oscillazioni considerate "
+            "plausibili per questa categoria."
+        )
+    if not checks["amount"]:
+        reasons.append(
+            f"L'importo richiesto supera il tetto prudenziale del {allocation}% "
+            "del capitale disponibile."
+        )
+
+    if not checks["emergency"] or not checks["horizon"] or not checks["tolerance"]:
+        outcome = "not_suitable"
+        outcome_label = "Non adatto ai dati inseriti"
+    elif not checks["amount"]:
+        outcome = "reduce_amount"
+        outcome_label = "Riduci l'importo"
+    else:
+        outcome = "proceed_simulation"
+        outcome_label = "Puoi procedere alla simulazione"
+        reasons.append(
+            "I controlli minimi sono superati; resta necessario valutare lo "
+            "strumento specifico prima di qualsiasi decisione."
+        )
+
+    return PurchaseSafetyRead(
+        asset_type=payload.asset_type,
+        asset_label=rule.label,
+        outcome=outcome,
+        outcome_label=outcome_label,
+        risk_level=rule.risk,
+        max_allocation_percent=allocation,
+        prudent_amount=prudent_amount,
+        requested_amount=_quantize(payload.requested_amount),
+        checks_passed=sum(checks.values()),
+        checks_total=len(checks),
+        reasons=reasons,
+        checklist=rule.checklist,
+        warning=rule.warning,
     )

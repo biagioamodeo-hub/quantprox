@@ -61,3 +61,32 @@ class GuidedPlanRead(BaseModel):
         "Simulazione educativa basata su dati dimostrativi; non costituisce "
         "consulenza finanziaria né garantisce risultati futuri."
     )
+
+
+class PurchaseSafetyCreate(BaseModel):
+    asset_type: Literal["stock", "bond", "government_bond"]
+    available_capital: Decimal = Field(ge=100, le=1000000)
+    requested_amount: Decimal = Field(ge=1, le=1000000)
+    horizon_years: int = Field(ge=1, le=30)
+    maximum_acceptable_loss_percent: Decimal = Field(ge=1, le=40)
+    emergency_fund_available: bool
+
+
+class PurchaseSafetyRead(BaseModel):
+    asset_type: Literal["stock", "bond", "government_bond"]
+    asset_label: str
+    outcome: Literal["proceed_simulation", "reduce_amount", "not_suitable"]
+    outcome_label: str
+    risk_level: Literal["contenuto", "medio", "elevato"]
+    max_allocation_percent: Decimal
+    prudent_amount: Decimal
+    requested_amount: Decimal
+    checks_passed: int
+    checks_total: int
+    reasons: list[str]
+    checklist: list[str]
+    warning: str
+    disclaimer: str = (
+        "Valutazione educativa e prudenziale: non garantisce la sicurezza "
+        "dell'investimento e non sostituisce una consulenza finanziaria autorizzata."
+    )

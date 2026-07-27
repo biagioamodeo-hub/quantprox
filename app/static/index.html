@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-menu" />
-    <script src="/lab/app.js?v=1.1.0-menu" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-purchase" />
+    <script src="/lab/app-purchase.js?v=1.1.1" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -153,6 +153,102 @@
           </div>
         </section>
 
+        <section class="purchase-guide navigation-section" id="acquisto"
+          data-navigation-section="acquisto" aria-labelledby="purchase-title">
+          <div class="purchase-heading">
+            <div>
+              <p class="section-label">Acquisto prudenziale</p>
+              <h2 id="purchase-title">Prima controlla, poi simula.</h2>
+            </div>
+            <p>
+              Valuta automaticamente importo, orizzonte e tolleranza alle perdite
+              per azioni, obbligazioni o titoli di Stato. Il controllo non rende
+              un investimento privo di rischio.
+            </p>
+          </div>
+          <form class="purchase-form" id="purchase-form">
+            <fieldset>
+              <legend>Che cosa vuoi valutare?</legend>
+              <div class="asset-options">
+                <label>
+                  <input type="radio" name="asset-type" value="stock" />
+                  <strong>Azioni</strong>
+                  <span>Più oscillazioni, orizzonte lungo</span>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type" value="bond" />
+                  <strong>Obbligazioni</strong>
+                  <span>Rischio emittente e tassi</span>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type"
+                    value="government_bond" checked />
+                  <strong>Titoli di Stato</strong>
+                  <span>Rischio Paese, durata e inflazione</span>
+                </label>
+              </div>
+            </fieldset>
+            <div class="purchase-inputs">
+              <label>
+                <span>Capitale disponibile</span>
+                <input id="purchase-capital" type="number" min="100" step="100"
+                  value="10000" required />
+              </label>
+              <label>
+                <span>Importo da valutare</span>
+                <input id="purchase-amount" type="number" min="1" step="100"
+                  value="2500" required />
+              </label>
+              <label>
+                <span>Orizzonte</span>
+                <select id="purchase-horizon">
+                  <option value="1">1 anno</option>
+                  <option value="3">3 anni</option>
+                  <option value="5" selected>5 anni</option>
+                  <option value="10">10 anni o più</option>
+                </select>
+              </label>
+              <label>
+                <span>Perdita massima tollerabile</span>
+                <select id="purchase-loss">
+                  <option value="3">3%</option>
+                  <option value="5">5%</option>
+                  <option value="10" selected>10%</option>
+                  <option value="20">20%</option>
+                </select>
+              </label>
+            </div>
+            <label class="emergency-check">
+              <input id="purchase-emergency" type="checkbox" checked />
+              <span>Ho già una riserva separata per spese ed emergenze.</span>
+            </label>
+            <button class="primary" id="purchase-button" type="button">
+              Verifica prima dell’acquisto
+            </button>
+          </form>
+          <div class="purchase-result" id="purchase-result" hidden
+            aria-live="polite">
+            <div class="purchase-result-head">
+              <div>
+                <span>Esito prudenziale</span>
+                <h3 id="purchase-outcome">—</h3>
+              </div>
+              <span class="purchase-risk" id="purchase-risk">—</span>
+            </div>
+            <div class="purchase-metrics">
+              <div><span>Tetto suggerito</span><strong id="purchase-limit">—</strong></div>
+              <div><span>Controlli superati</span><strong id="purchase-checks">—</strong></div>
+            </div>
+            <p class="purchase-warning" id="purchase-warning"></p>
+            <ul id="purchase-reasons"></ul>
+            <details>
+              <summary>Controlli da fare sullo strumento</summary>
+              <ul id="purchase-checklist"></ul>
+            </details>
+            <small id="purchase-disclaimer"></small>
+          </div>
+        </section>
+
         <section class="workspace navigation-section" id="simulazione"
           data-navigation-section="simulazione" aria-label="Flusso alpha">
           <aside class="steps">
@@ -160,6 +256,7 @@
               <p class="section-label">Menu strumenti</p>
               <a href="#panoramica" data-nav="panoramica">Inizio</a>
               <a href="#assistente" data-nav="assistente">Piano guidato</a>
+              <a href="#acquisto" data-nav="acquisto">Acquisto guidato</a>
               <a href="#simulazione" data-nav="simulazione">Simulazione</a>
               <a href="#attivita" data-nav="attivita">Risultati</a>
               <a href="#sicurezza" data-nav="sicurezza">Sicurezza</a>

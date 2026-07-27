@@ -83,3 +83,62 @@ def test_beginner_plan_never_selects_dynamic_profile() -> None:
 
     assert response.status_code == 200
     assert response.json()["profile"]["code"] == "balanced"
+
+
+def test_purchase_safety_accepts_prudent_government_bond_simulation() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "government_bond",
+            "available_capital": "10000",
+            "requested_amount": "2500",
+            "horizon_years": 5,
+            "maximum_acceptable_loss_percent": "8",
+            "emergency_fund_available": True,
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["outcome"] == "proceed_simulation"
+    assert result["prudent_amount"] == "3000.00"
+    assert result["checks_passed"] == result["checks_total"] == 4
+
+
+def test_purchase_safety_blocks_unsuitable_stock_purchase() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "stock",
+            "available_capital": "10000",
+            "requested_amount": "3000",
+            "horizon_years": 2,
+            "maximum_acceptable_loss_percent": "5",
+            "emergency_fund_available": False,
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["outcome"] == "not_suitable"
+    assert result["risk_level"] == "elevato"
+    assert result["checks_passed"] == 0
+
+
+def test_purchase_safety_recommends_reducing_excess_amount() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "bond",
+            "available_capital": "10000",
+            "requested_amount": "3000",
+            "horizon_years": 5,
+            "maximum_acceptable_loss_percent": "10",
+            "emergency_fund_available": True,
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["outcome"] == "reduce_amount"
+    assert result["prudent_amount"] == "2000.00"
