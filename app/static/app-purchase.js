@@ -234,8 +234,10 @@ function renderInvestmentDashboard() {
     : "—";
   $("#position-status").textContent = hasPosition ? "Monitorata" : "In attesa";
 
-  const sellSignal = state.decision?.action === "sell";
-  const buyOpportunity = !hasPosition && state.decision?.action === "buy";
+  const monitoredAction =
+    state.decision?.action || state.portfolioAdvice?.action;
+  const sellSignal = monitoredAction === "sell";
+  const buyOpportunity = !hasPosition && monitoredAction === "buy";
   const lossAlert = hasPosition && returnRate <= -5;
   const warning = hasPosition && (sellSignal || lossAlert);
   $("#sell-alert").dataset.level = state.portfolio
@@ -262,7 +264,7 @@ function renderInvestmentDashboard() {
       ? "Il sistema continua a controllare segnale di mercato e perdita della posizione."
       : "Gli alert si attivano dopo l’analisi del portafoglio e del mercato.";
   $("#sell-alert-signal").textContent =
-    signalLabels[state.decision?.action] || "In attesa";
+    signalLabels[monitoredAction] || "In attesa";
   $("#sell-alert-return").textContent = hasPosition
     ? percent(returnRate)
     : "Nessuna posizione";
@@ -321,6 +323,8 @@ function render() {
     : "Dati non disponibili";
   $("#refresh-advice-button").disabled =
     !state.portfolio || !state.instrument;
+  $("#daily-advice-button").disabled =
+    !state.authenticated || !state.portfolioAdvice;
   renderInvestmentDashboard();
   if (!state.portfolioAdvice) {
     $("#automatic-advice-empty").hidden = false;
@@ -551,6 +555,8 @@ function resetView() {
     lastPrice: null,
     events: [],
   });
+  $("#daily-advice-result").hidden = true;
+  $("#daily-contact").value = "";
   setStep(0);
   render();
   toast("Vista azzerata. Puoi preparare un nuovo scenario.");
@@ -870,6 +876,79 @@ async function updateAutomaticPortfolioAdvice() {
     button.disabled = false;
     button.textContent = "Aggiorna analisi";
   }
+}
+
+function requestDailyAdvice(event) {
+  event.preventDefault();
+  if (!state.authenticated) {
+    toast("Accedi per ricevere il consiglio del giorno.");
+    return;
+  }
+  if (!state.portfolioAdvice) {
+    toast("Prepara prima lo scenario e l’analisi di mercato.");
+    return;
+  }
+  const channel = $("#daily-channel").value;
+  const contact = $("#daily-contact").value.trim();
+  const digits = contact.replace(/\D/g, "");
+  const validWhatsApp =
+    channel === "whatsapp" && digits.length >= 9 && digits.length <= 15;
+  const validEmail =
+    channel === "email" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+  if (!validWhatsApp && !validEmail) {
+    toast(
+      channel === "whatsapp"
+        ? "Inserisci un numero WhatsApp valido."
+        : "Inserisci un indirizzo email valido.",
+    );
+    return;
+  }
+
+  const advice = state.portfolioAdvice;
+  const actionable = advice.action === "buy" || advice.action === "sell";
+  const maskedContact =
+    channel === "whatsapp"
+      ? `${contact.slice(0, Math.min(3, contact.length))}••••${digits.slice(-3)}`
+      : contact.replace(/^(.{2})[^@]*(@.*)$/, "$1••••$2");
+  const channelLabel = channel === "whatsapp" ? "WhatsApp" : "Email";
+  const actionCopy =
+    advice.action === "buy"
+      ? "La tendenza è positiva e lo strumento non è ancora nel portafoglio."
+      : advice.action === "sell"
+        ? "La tendenza è negativa e la posizione richiede una nuova valutazione."
+        : "Oggi non emerge un vantaggio sufficiente per acquistare o vendere.";
+
+  $("#daily-advice-result").hidden = false;
+  $("#daily-advice-action").textContent = advice.actionLabel;
+  $("#daily-advice-copy").textContent =
+    `${actionCopy} Affidabilità tecnica ${advice.confidence}/100.`;
+  $("#daily-notification-status").textContent = actionable
+    ? `${channelLabel} demo ${channel === "email" ? "inviata" : "inviato"} a ${maskedContact}`
+    : `Nessun messaggio ${channelLabel}: attendi`;
+  $("#daily-notification-status").dataset.sent = actionable ? "true" : "false";
+  addEvent(
+    "Consiglio del giorno",
+    `${advice.actionLabel} · profilo ${state.profile}`,
+    actionable ? `${channelLabel.toUpperCase()} DEMO` : "NESSUN ALERT",
+  );
+  toast(
+    actionable
+      ? `Alert ${channelLabel} simulato correttamente.`
+      : "Nessuna operazione conveniente rilevata oggi.",
+  );
+}
+
+function updateDailyContactField() {
+  const email = $("#daily-channel").value === "email";
+  const contact = $("#daily-contact");
+  $("#daily-contact-label").textContent = email
+    ? "Email del profilo"
+    : "Numero WhatsApp";
+  contact.type = email ? "email" : "tel";
+  contact.inputMode = email ? "email" : "tel";
+  contact.autocomplete = email ? "email" : "tel";
+  contact.placeholder = email ? "nome@esempio.it" : "+39 333 123 4567";
+  contact.value = "";
 }
 
 async function buyWithRevolutDemo() {
@@ -1193,6 +1272,8 @@ $("#refresh-advice-button").addEventListener(
   "click",
   updateAutomaticPortfolioAdvice,
 );
+$("#daily-advice-form").addEventListener("submit", requestDailyAdvice);
+$("#daily-channel").addEventListener("change", updateDailyContactField);
 setPurchaseWizardStep(1);
 initializeNavigation();
 initializeMobileScrollControls();

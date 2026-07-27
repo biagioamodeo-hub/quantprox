@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.4.1-investments" />
-    <script src="/lab/app-purchase.js?v=2.0.1" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.5.1-notifications" />
+    <script src="/lab/app-purchase.js?v=2.1.1" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -578,6 +578,40 @@
                   <h3 id="investments-title">Andamento e avvisi</h3>
                 </div>
                 <span class="monitoring-badge">Controllo automatico</span>
+              </div>
+              <form class="daily-advice-form" id="daily-advice-form">
+                <div>
+                  <span class="daily-step">Consiglio del giorno</span>
+                  <strong>Ricevi l’operazione consigliata</strong>
+                  <small>
+                    Il contatto resta nella simulazione corrente e non viene salvato.
+                  </small>
+                </div>
+                <label for="daily-channel">
+                  <span>Canale</span>
+                  <select id="daily-channel" name="channel">
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="email">Email</option>
+                  </select>
+                </label>
+                <label for="daily-contact">
+                  <span id="daily-contact-label">Numero WhatsApp</span>
+                  <input id="daily-contact" name="contact" type="tel"
+                    autocomplete="tel" inputmode="tel"
+                    placeholder="+39 333 123 4567" required />
+                </label>
+                <button class="primary" id="daily-advice-button" type="submit">
+                  Analizza oggi
+                </button>
+              </form>
+              <div class="daily-advice-result" id="daily-advice-result"
+                aria-live="polite" hidden>
+                <div>
+                  <span>Operazione consigliata</span>
+                  <strong id="daily-advice-action">—</strong>
+                </div>
+                <p id="daily-advice-copy"></p>
+                <span class="sms-status" id="daily-notification-status"></span>
               </div>
               <div class="investment-dashboard">
                 <article class="performance-chart">

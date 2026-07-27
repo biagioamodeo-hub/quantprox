@@ -1663,6 +1663,107 @@ h2 {
   font-weight: 800;
 }
 
+.daily-advice-form {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 120px minmax(210px, 0.65fr) auto;
+  gap: 16px;
+  align-items: end;
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 17px;
+  background: var(--ink);
+  color: white;
+}
+
+.daily-advice-form > div,
+.daily-advice-form label {
+  display: grid;
+  gap: 5px;
+}
+
+.daily-advice-form strong {
+  font-size: 15px;
+}
+
+.daily-advice-form small,
+.daily-advice-form label > span {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 10px;
+}
+
+.daily-step {
+  color: #54d7a9;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.daily-advice-form input,
+.daily-advice-form select {
+  width: 100%;
+  min-height: 45px;
+  padding: 0 13px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font: inherit;
+}
+
+.daily-advice-form select {
+  color-scheme: dark;
+}
+
+.daily-advice-form input::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.daily-advice-form button {
+  min-height: 45px;
+  white-space: nowrap;
+}
+
+.daily-advice-result {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 15px 18px;
+  border: 1px solid rgba(8, 120, 90, 0.22);
+  border-top: 0;
+  border-radius: 0 0 15px 15px;
+  background: #eef9f4;
+}
+
+.daily-advice-result[hidden] {
+  display: none;
+}
+
+.daily-advice-result div {
+  display: grid;
+  gap: 3px;
+}
+
+.daily-advice-result span,
+.daily-advice-result p {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.daily-advice-result p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.sms-status {
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: white;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .investment-dashboard {
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.8fr);
@@ -1980,6 +2081,15 @@ h2 {
   }
 
   .investment-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .daily-advice-form {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .daily-advice-result {
     grid-template-columns: 1fr;
   }
 
