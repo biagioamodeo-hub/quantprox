@@ -1792,6 +1792,16 @@ h2 {
   color: var(--green);
 }
 
+.sell-alert[data-level="opportunity"] {
+  border-color: rgba(8, 120, 90, 0.45);
+  background: #f4fcf8;
+}
+
+.sell-alert[data-level="opportunity"] .alert-icon {
+  background: var(--green);
+  color: white;
+}
+
 .sell-alert[data-level="warning"] {
   border-color: rgba(240, 120, 60, 0.55);
   background: #fffaf6;

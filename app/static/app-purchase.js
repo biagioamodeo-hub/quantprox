@@ -235,15 +235,20 @@ function renderInvestmentDashboard() {
   $("#position-status").textContent = hasPosition ? "Monitorata" : "In attesa";
 
   const sellSignal = state.decision?.action === "sell";
+  const buyOpportunity = !hasPosition && state.decision?.action === "buy";
   const lossAlert = hasPosition && returnRate <= -5;
   const warning = hasPosition && (sellSignal || lossAlert);
   $("#sell-alert").dataset.level = state.portfolio
     ? warning
       ? "warning"
+      : buyOpportunity
+        ? "opportunity"
       : "clear"
     : "idle";
   $("#sell-alert-title").textContent = warning
     ? "Valuta una possibile vendita"
+    : buyOpportunity
+      ? "Possibile opportunità di acquisto"
     : state.portfolio
       ? "Nessun alert attivo"
       : "Monitoraggio in attesa";
@@ -251,9 +256,11 @@ function renderInvestmentDashboard() {
     ? sellSignal
       ? "La tendenza di mercato è negativa. Rivedi la posizione prima di prendere una decisione."
       : "La perdita della posizione ha raggiunto la soglia prudenziale del 5%."
+    : buyOpportunity
+      ? "La tendenza è positiva e lo strumento non è ancora nel portafoglio. Valuta rischio, prezzo e diversificazione prima di procedere."
     : state.portfolio
       ? "Il sistema continua a controllare segnale di mercato e perdita della posizione."
-      : "Gli alert si attivano dopo la creazione del portafoglio simulato.";
+      : "Gli alert si attivano dopo l’analisi del portafoglio e del mercato.";
   $("#sell-alert-signal").textContent =
     signalLabels[state.decision?.action] || "In attesa";
   $("#sell-alert-return").textContent = hasPosition
