@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="QuantProX Alpha Lab: prova il flusso paper-trading in modo guidato."
+      content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0-rc.1-decimals" />
-    <script src="/lab/app.js?v=1.0.0-rc.1-decimals" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0-rc.1-italian" />
+    <script src="/lab/app.js?v=1.0.0-rc.1-italian" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -31,17 +31,17 @@
             <h1>Dal mercato al P&amp;L,<br />un passo alla volta.</h1>
             <p class="hero-copy">
               Un banco di prova semplice per esplorare il motore decisionale,
-              i controlli rischio e l’esecuzione paper di QuantProX.
+              i controlli rischio e l’esecuzione simulata di QuantProX.
             </p>
           </div>
           <div class="hero-card">
             <div class="pulse">
               <span>Ambiente</span>
-              <strong>Paper trading</strong>
+              <strong>Simulazione di trading</strong>
             </div>
             <p>Nessun ordine reale. Dati dimostrativi, risultati verificabili.</p>
             <label class="api-key-field" for="api-key">
-              <span>Chiave API tenant</span>
+              <span>Chiave API del profilo</span>
               <input
                 id="api-key"
                 name="api-key"
@@ -64,7 +64,7 @@
               </li>
               <li data-step="2">
                 <span>02</span>
-                <div><strong>Decisione</strong><small>Segnale SMA</small></div>
+                <div><strong>Decisione</strong><small>Medie mobili</small></div>
               </li>
               <li data-step="3">
                 <span>03</span>
@@ -72,11 +72,11 @@
               </li>
               <li data-step="4">
                 <span>04</span>
-                <div><strong>Esecuzione</strong><small>Fill paper</small></div>
+                <div><strong>Esecuzione</strong><small>Ordine simulato</small></div>
               </li>
               <li data-step="5">
                 <span>05</span>
-                <div><strong>Valutazione</strong><small>Equity e P&amp;L</small></div>
+                <div><strong>Valutazione</strong><small>Valore e risultato</small></div>
               </li>
             </ol>
           </aside>
@@ -110,9 +110,9 @@
                 <small id="metric-risk">Non valutato</small>
               </article>
               <article class="accent-card">
-                <span>Equity</span>
+                <span>Valore portafoglio</span>
                 <strong id="metric-equity">—</strong>
-                <small id="metric-pnl">P&amp;L —</small>
+                <small id="metric-pnl">Risultato —</small>
               </article>
             </div>
 

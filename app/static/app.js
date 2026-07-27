@@ -12,6 +12,44 @@ const state = {
 };
 
 const $ = (selector) => document.querySelector(selector);
+
+const apiMessageLabels = {
+  "A valid X-API-Key header is required.":
+    "È necessaria una chiave API valida.",
+  "Portfolio not found.": "Portafoglio non trovato.",
+  "Instrument not found.": "Strumento non trovato.",
+  "Decision not found.": "Decisione non trovata.",
+  "Order not found.": "Ordine non trovato.",
+  "Job not found.": "Operazione asincrona non trovata.",
+  "Broker submission not found.": "Invio al broker non trovato.",
+  "Hold decisions cannot create orders.":
+    "Una decisione di attesa non può generare ordini.",
+  "Only open orders can be executed.":
+    "Possono essere eseguiti soltanto gli ordini aperti.",
+  "Only open orders can be cancelled.":
+    "Possono essere annullati soltanto gli ordini aperti.",
+  "Only accepted, unfilled orders can be submitted.":
+    "Possono essere inviati soltanto ordini accettati e non ancora eseguiti.",
+  "Only accepted broker submissions can be cancelled.":
+    "Possono essere annullati soltanto gli invii accettati dal broker.",
+  "Fill quantity exceeds the remaining order.":
+    "La quantità da eseguire supera quella residua dell’ordine.",
+  "Insufficient portfolio cash.": "Liquidità del portafoglio insufficiente.",
+  "Insufficient position quantity.": "Quantità disponibile insufficiente.",
+  "Risk limits are not configured for this portfolio.":
+    "I limiti di rischio non sono configurati per questo portafoglio.",
+  "Order notional exceeds the configured limit.":
+    "Il controvalore dell’ordine supera il limite configurato.",
+  "Projected exposure exceeds the configured limit.":
+    "L’esposizione prevista supera il limite configurato.",
+  "Idempotency-Key was already used with a different payload.":
+    "La chiave di idempotenza è già stata usata con dati differenti.",
+};
+
+function translateApiMessage(message) {
+  return apiMessageLabels[message] || message;
+}
+
 const api = async (path, options = {}) => {
   const apiKey = $("#api-key")?.value.trim();
   const response = await fetch(path, {
@@ -23,7 +61,11 @@ const api = async (path, options = {}) => {
     },
   });
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(body.detail || `Errore API ${response.status}`);
+  if (!response.ok) {
+    throw new Error(
+      translateApiMessage(body.detail) || `Errore API ${response.status}`,
+    );
+  }
   return body;
 };
 
@@ -42,9 +84,9 @@ const signalLabels = {
 };
 
 const signalStatusLabels = {
-  buy: "Trend positivo",
-  sell: "Trend negativo",
-  hold: "Trend neutrale",
+  buy: "Tendenza positiva",
+  sell: "Tendenza negativa",
+  hold: "Tendenza neutrale",
 };
 
 const orderStatusLabels = {
@@ -111,7 +153,7 @@ function render() {
   $("#signal-status").textContent = signalStatusLabels[signal] || "In attesa";
   $("#metric-symbol").textContent = state.instrument?.symbol || "—";
   $("#metric-price").textContent = state.instrument
-    ? `Ultimo close · ${money(120)}`
+    ? `Ultima chiusura · ${money(120)}`
     : "Nessun dato";
   $("#metric-signal").textContent =
     signalLabels[state.decision?.action] || "—";
@@ -124,24 +166,24 @@ function render() {
       }`
     : "—";
   $("#metric-risk").textContent = state.order
-    ? state.order.rejection_reason || "Controllo superato"
+    ? translateApiMessage(state.order.rejection_reason) || "Controllo superato"
     : "Non valutato";
   $("#metric-equity").textContent = state.valuation
     ? money(state.valuation.equity)
     : "—";
   $("#metric-pnl").textContent = state.valuation
-    ? `P&L ${money(
+    ? `Risultato ${money(
         Number(state.valuation.realized_pnl) +
           Number(state.valuation.unrealized_pnl),
       )}`
-    : "P&L —";
+    : "Risultato —";
 
   const actions = [
     ["Crea un ambiente dimostrativo", "Prepara dati, portafoglio e limiti per iniziare il percorso guidato.", "Prepara scenario demo", false],
     ["Calcola il segnale", "Il motore confronta medie mobili a 2 e 3 periodi sulle candele demo.", "Valuta decisione", false],
     ["Trasforma il segnale in ordine", `Quantità 10, prezzo limite ${money(120)}. Il rischio viene controllato prima del salvataggio.`, "Crea ordine", false],
-    ["Esegui in modalità paper", "L’ordine accettato viene riempito una sola volta e aggiorna cassa e posizione.", "Esegui ordine", false],
-    ["Leggi la valutazione", "Calcola equity, esposizione e P&L usando l’ultimo close disponibile.", "Aggiorna valutazione", false],
+    ["Esegui in modalità simulata", "L’ordine accettato viene eseguito una sola volta e aggiorna liquidità e posizione.", "Esegui ordine", false],
+    ["Leggi la valutazione", "Calcola valore del portafoglio, esposizione e risultato usando l’ultima chiusura disponibile.", "Aggiorna valutazione", false],
     ["Scenario completato", "Puoi aggiornare la valutazione o preparare un nuovo scenario demo.", "Aggiorna valutazione", false],
   ][state.step];
 
@@ -182,7 +224,7 @@ async function seedScenario() {
   button.textContent = "Preparazione…";
   try {
     if (!$("#api-key").value.trim()) {
-      throw new Error("Inserisci la chiave API del tenant.");
+      throw new Error("Inserisci la chiave API del profilo.");
     }
     const suffix = String(Date.now()).slice(-6);
     state.instrument = await api("/api/v1/market-data/instruments", {
@@ -280,7 +322,7 @@ async function nextAction() {
       setStep(4);
       addEvent(
         "Ordine eseguito",
-        `Esecuzione paper · controvalore ${money(execution.notional)}`,
+        `Esecuzione simulata · controvalore ${money(execution.notional)}`,
         "ESEGUITO",
       );
     } else {
@@ -288,7 +330,7 @@ async function nextAction() {
         `/api/v1/portfolios/${state.portfolio.id}/valuation?timeframe=1d`,
       );
       setStep(5);
-      addEvent("Portafoglio valutato", `Equity ${money(state.valuation.equity)}`, `P&L ${money(state.valuation.unrealized_pnl)}`);
+      addEvent("Portafoglio valutato", `Valore ${money(state.valuation.equity)}`, `Risultato ${money(state.valuation.unrealized_pnl)}`);
     }
     render();
   } catch (error) {
