@@ -8,7 +8,7 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-purchase" />
+    <link rel="stylesheet" href="/lab/styles.css?v=1.2.0-simple" />
     <script src="/lab/app-purchase.js?v=1.7.0" defer></script>
   </head>
   <body>
@@ -18,6 +18,11 @@
           <span class="brand-mark">Q</span>
           <span>QuantProX</span>
         </a>
+        <nav class="topnav" aria-label="Azioni principali">
+          <a href="#acquisto">Scegli investimento</a>
+          <a href="#segnale">Segnale</a>
+          <a href="#simulazione">Simulazione</a>
+        </nav>
         <div class="status" id="api-status">
           <span class="status-dot"></span>
           <span>Verifica API…</span>
@@ -28,12 +33,29 @@
         <section class="hero navigation-section" id="panoramica"
           data-navigation-section="panoramica">
           <div>
-            <p class="eyebrow">1.1.0-rc.1 · Alpha Lab</p>
-            <h1>Dal mercato al risultato,<br />un passo alla volta.</h1>
+            <p class="eyebrow">QuantProX · Simulazione guidata</p>
+            <h1>Investire, più semplice.</h1>
             <p class="hero-copy">
-              Un banco di prova semplice per esplorare il motore decisionale,
-              i controlli rischio e l’esecuzione simulata di QuantProX.
+              Scegli un obiettivo, controlla il rischio e prova ogni decisione
+              senza usare denaro reale.
             </p>
+            <div class="hero-actions" aria-label="Inizia da qui">
+              <a class="quick-action featured" href="#acquisto">
+                <span>01</span>
+                <strong>Trova un investimento</strong>
+                <small>Confronto guidato e prudenziale</small>
+              </a>
+              <a class="quick-action" href="#segnale">
+                <span>02</span>
+                <strong>Acquista, mantieni o vendi</strong>
+                <small>Segnale spiegato in modo chiaro</small>
+              </a>
+              <a class="quick-action" href="#simulazione">
+                <span>03</span>
+                <strong>Prova la simulazione</strong>
+                <small>Nessun ordine e nessun denaro reale</small>
+              </a>
+            </div>
           </div>
           <div class="hero-card">
             <div class="pulse">
