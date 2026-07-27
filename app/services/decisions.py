@@ -6,7 +6,12 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ConflictError, NotFoundError
 from app.models.decisions import Decision
 from app.repositories.decisions import DecisionRepository
-from app.schemas.decisions import DecisionEvaluate, DecisionOrderCreate, DecisionRead
+from app.schemas.decisions import (
+    DecisionEvaluate,
+    DecisionOrderCreate,
+    DecisionRead,
+    RecommendationRead,
+)
 from app.schemas.orders import OrderCreate, OrderRead
 from app.services.access import TenantAccess
 from app.services.orders import OrderService
@@ -18,14 +23,8 @@ class DecisionService:
         self.order_service = OrderService(session, tenant_id)
         self.access = TenantAccess(session, tenant_id)
 
-    def evaluate(
-        self, payload: DecisionEvaluate, job_id: int | None = None
-    ) -> DecisionRead:
+    def recommend(self, payload: DecisionEvaluate) -> RecommendationRead:
         self.access.require_portfolio(payload.portfolio_id)
-        if job_id is not None:
-            existing = self.repository.get_by_job(job_id)
-            if existing is not None:
-                return DecisionRead.model_validate(existing)
         candles = self.repository.recent_candles(
             payload.instrument_id, payload.timeframe, payload.long_window
         )
@@ -62,13 +61,29 @@ class DecisionService:
             else:
                 rationale = "Short and long moving averages are equal."
 
+        return RecommendationRead(
+            action=cast(Literal["buy", "sell", "hold"], action),
+            short_average=short_average,
+            long_average=long_average,
+            rationale=rationale,
+        )
+
+    def evaluate(
+        self, payload: DecisionEvaluate, job_id: int | None = None
+    ) -> DecisionRead:
+        self.access.require_portfolio(payload.portfolio_id)
+        if job_id is not None:
+            existing = self.repository.get_by_job(job_id)
+            if existing is not None:
+                return DecisionRead.model_validate(existing)
+        recommendation = self.recommend(payload)
         decision = Decision(
             **payload.model_dump(),
             job_id=job_id,
-            short_average=short_average,
-            long_average=long_average,
-            action=action,
-            rationale=rationale,
+            short_average=recommendation.short_average,
+            long_average=recommendation.long_average,
+            action=recommendation.action,
+            rationale=recommendation.rationale,
         )
         return DecisionRead.model_validate(self.repository.add(decision))
 

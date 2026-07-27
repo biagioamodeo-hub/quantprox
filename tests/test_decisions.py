@@ -61,6 +61,28 @@ def test_moving_average_decisions_are_audited() -> None:
         assert decision.status_code == 201
         assert decision.json()["action"] == "buy"
 
+        recommendation = client.post(
+            "/api/v1/decisions/recommend",
+            json={
+                "portfolio_id": portfolio["id"],
+                "instrument_id": instrument["id"],
+                "timeframe": "1d",
+                "short_window": 2,
+                "long_window": 3,
+            },
+        )
+        assert recommendation.status_code == 200
+        assert recommendation.json() == {
+            "action": "buy",
+            "short_average": "115.00000000",
+            "long_average": "110.00000000",
+            "rationale": ("Short moving average is above the long moving average."),
+            "disclaimer": (
+                "Quantitative signal for informational purposes only; "
+                "not financial advice."
+            ),
+        }
+
         hold = client.post(
             "/api/v1/decisions/evaluate",
             json={

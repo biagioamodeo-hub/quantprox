@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0-rc.1
+
+- Add a non-persistent endpoint for `buy`, `sell`, and `hold` recommendations.
+- Return the moving-average inputs, rationale, and an informational disclaimer.
+- Reuse the recommendation calculation for auditable decision evaluations.
+- Promote the tested paper-trading feature set to its first release candidate.
+- Retain the explicit prohibition on live brokerage execution.
+
 ## 1.0.0-beta.5
 
 - Add request IDs, structured access logs, and defensive HTTP headers.
