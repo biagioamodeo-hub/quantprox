@@ -34,11 +34,17 @@ button {
 }
 
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   min-height: 78px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
   border-bottom: 1px solid rgba(20, 32, 29, 0.14);
+  background: rgba(243, 241, 233, 0.88);
+  backdrop-filter: blur(16px);
 }
 
 .brand {
@@ -59,6 +65,43 @@ button {
   border-radius: 10px;
   background: var(--ink);
   color: white;
+}
+
+.main-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.main-navigation a {
+  padding: 9px 11px;
+  border-radius: 9px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 160ms ease,
+    background 160ms ease;
+}
+
+.main-navigation a:hover,
+.main-navigation a:focus-visible {
+  background: rgba(188, 230, 210, 0.28);
+  color: var(--green);
+  outline: none;
+}
+
+.main-navigation a.active {
+  background: var(--ink);
+  color: white;
+}
+
+.navigation-section {
+  scroll-margin-top: 96px;
 }
 
 .status {
@@ -849,6 +892,24 @@ h2 {
 }
 
 @media (max-width: 900px) {
+  .topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 0;
+  }
+
+  .main-navigation {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .main-navigation::-webkit-scrollbar {
+    display: none;
+  }
+
   .hero {
     grid-template-columns: 1fr;
     gap: 36px;
@@ -892,6 +953,10 @@ h2 {
 
   .hero {
     padding: 48px 0;
+  }
+
+  .status {
+    font-size: 11px;
   }
 
   .stage {

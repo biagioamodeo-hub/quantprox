@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-guide" />
-    <script src="/lab/app.js?v=1.1.0-guide" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-menu" />
+    <script src="/lab/app.js?v=1.1.0-menu" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -18,6 +18,13 @@
           <span class="brand-mark">Q</span>
           <span>QuantProX</span>
         </a>
+        <nav class="main-navigation" aria-label="Strumenti QuantProX">
+          <a href="#panoramica" data-nav="panoramica">Inizio</a>
+          <a href="#assistente" data-nav="assistente">Piano guidato</a>
+          <a href="#simulazione" data-nav="simulazione">Simulazione</a>
+          <a href="#attivita" data-nav="attivita">Risultati</a>
+          <a href="#sicurezza" data-nav="sicurezza">Sicurezza</a>
+        </nav>
         <div class="status" id="api-status">
           <span class="status-dot"></span>
           <span>Verifica API…</span>
@@ -25,7 +32,8 @@
       </header>
 
       <main>
-        <section class="hero">
+        <section class="hero navigation-section" id="panoramica"
+          data-navigation-section="panoramica">
           <div>
             <p class="eyebrow">1.1.0-rc.1 · Alpha Lab</p>
             <h1>Dal mercato al risultato,<br />un passo alla volta.</h1>
@@ -67,7 +75,8 @@
           </div>
         </section>
 
-        <section class="guide" aria-labelledby="guide-title">
+        <section class="guide navigation-section" id="assistente"
+          data-navigation-section="assistente" aria-labelledby="guide-title">
           <div class="guide-intro">
             <p class="section-label">Assistente prudenziale</p>
             <h2 id="guide-title">Un piano simulato in quattro risposte.</h2>
@@ -76,7 +85,8 @@
               accettabile. QuantProX seleziona automaticamente un profilo,
               applica costi realistici e verifica il rischio su dati dimostrativi.
             </p>
-            <div class="safety-note">
+            <div class="safety-note navigation-section" id="sicurezza"
+              data-navigation-section="sicurezza">
               <strong>Prima la comprensione, poi la simulazione.</strong>
               <span>
                 Nessun risultato è garantito e nessun ordine viene inviato a un
@@ -150,7 +160,8 @@
           </div>
         </section>
 
-        <section class="workspace" aria-label="Flusso alpha">
+        <section class="workspace navigation-section" id="simulazione"
+          data-navigation-section="simulazione" aria-label="Flusso alpha">
           <aside class="steps">
             <div class="sidebar-settings">
               <p class="section-label">Impostazioni simulazione</p>
@@ -252,7 +263,8 @@
               </div>
             </div>
 
-            <div class="ledger">
+            <div class="ledger navigation-section" id="attivita"
+              data-navigation-section="attivita">
               <div class="ledger-head">
                 <div>
                   <p class="section-label">Registro attività</p>
