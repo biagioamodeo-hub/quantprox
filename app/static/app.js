@@ -10,6 +10,9 @@ const state = {
   cancelled: false,
   orderKey: null,
   executionKey: null,
+  quantity: 10,
+  orderPrice: 120.5,
+  lastPrice: null,
   events: [],
 };
 
@@ -164,7 +167,7 @@ function render() {
   $("#signal-status").textContent = signalStatusLabels[signal] || "In attesa";
   $("#metric-symbol").textContent = state.instrument?.symbol || "—";
   $("#metric-price").textContent = state.instrument
-    ? `Ultima chiusura · ${money(120)}`
+    ? `Ultima chiusura · ${money(state.lastPrice)}`
     : "Nessun dato";
   $("#metric-signal").textContent =
     signalLabels[state.decision?.action] || "—";
@@ -192,7 +195,7 @@ function render() {
   const actions = [
     ["Crea un ambiente dimostrativo", "Prepara dati, portafoglio e limiti per iniziare il percorso guidato.", "Prepara scenario demo", false],
     ["Calcola il segnale", "Il motore confronta medie mobili a 2 e 3 periodi sulle candele demo.", "Valuta decisione", false],
-    ["Trasforma il segnale in ordine", `Quantità 10, prezzo limite ${money(120)}. Il rischio viene controllato prima del salvataggio.`, "Crea ordine", false],
+    ["Trasforma il segnale in ordine", `Quantità ${state.quantity}, prezzo limite ${money(state.orderPrice)}. Il rischio viene controllato prima del salvataggio.`, "Crea ordine", false],
     ["Esegui in modalità simulata", "L’ordine accettato viene eseguito una sola volta e aggiorna liquidità e posizione.", "Esegui ordine", false],
     ["Leggi la valutazione", "Calcola valore del portafoglio, esposizione e risultato usando l’ultima chiusura disponibile.", "Aggiorna valutazione", false],
     ["Scenario completato", "Puoi aggiornare la valutazione o preparare un nuovo scenario demo.", "Aggiorna valutazione", false],
@@ -242,7 +245,7 @@ async function seedScenario() {
     state.instrument = await api("/api/v1/market-data/instruments", {
       method: "POST",
       body: JSON.stringify({
-        symbol: `ALPHA-${suffix}`,
+        symbol: `QPX-${suffix}`,
         exchange: "DEMO",
         currency: "USD",
       }),
@@ -258,7 +261,7 @@ async function seedScenario() {
         max_total_exposure: "10000",
       }),
     });
-    const prices = [100, 110, 120];
+    const prices = [118.42, 119.15, 120.37];
     for (const [index, price] of prices.entries()) {
       const date = new Date(Date.UTC(2026, 0, index + 1)).toISOString();
       await api("/api/v1/market-data/candles", {
@@ -275,6 +278,7 @@ async function seedScenario() {
         }),
       });
     }
+    state.lastPrice = prices[prices.length - 1];
     setStep(1);
     addEvent("Scenario creato", `${state.instrument.symbol} · portafoglio ${state.portfolio.name}`, "PRONTO");
     toast("Scenario demo pronto");
@@ -313,12 +317,15 @@ async function nextAction() {
       state.order = await api(`/api/v1/decisions/${state.decision.id}/orders`, {
         method: "POST",
         headers: { "Idempotency-Key": state.orderKey },
-        body: JSON.stringify({ quantity: "10", limit_price: "120" }),
+        body: JSON.stringify({
+          quantity: String(state.quantity),
+          limit_price: String(state.orderPrice),
+        }),
       });
       setStep(3);
       addEvent(
         "Ordine creato",
-        `10 quote a ${money(120)} · ordine ${
+        `${state.quantity} quote a ${money(state.orderPrice)} · ordine ${
           orderStatusLabels[state.order.status] || state.order.status
         }`,
         `#${state.order.id}`,
@@ -330,10 +337,24 @@ async function nextAction() {
         headers: { "Idempotency-Key": state.executionKey },
       });
       state.order.status = "filled";
+      state.lastPrice = 123.2;
+      await api("/api/v1/market-data/candles", {
+        method: "POST",
+        body: JSON.stringify({
+          instrument_id: state.instrument.id,
+          timeframe: "1d",
+          open_time: new Date(Date.UTC(2026, 0, 4)).toISOString(),
+          open: "120.37",
+          high: "124.10",
+          low: "120.05",
+          close: String(state.lastPrice),
+          volume: "18450",
+        }),
+      });
       setStep(4);
       addEvent(
         "Ordine eseguito",
-        `Esecuzione simulata · controvalore ${money(execution.notional)}`,
+        `Controvalore ${money(execution.notional)} · mercato a ${money(state.lastPrice)}`,
         "ESEGUITO",
       );
     } else {
@@ -362,6 +383,9 @@ function resetView() {
     cancelled: false,
     orderKey: null,
     executionKey: null,
+    quantity: 10,
+    orderPrice: 120.5,
+    lastPrice: null,
     events: [],
   });
   setStep(0);
