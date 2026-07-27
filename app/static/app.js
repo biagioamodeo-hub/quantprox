@@ -15,12 +15,12 @@ const $ = (selector) => document.querySelector(selector);
 const api = async (path, options = {}) => {
   const apiKey = $("#api-key")?.value.trim();
   const response = await fetch(path, {
+    ...options,
     headers: {
       "Content-Type": "application/json",
       ...(apiKey && path.startsWith("/api/") ? { "X-API-Key": apiKey } : {}),
       ...options.headers,
     },
-    ...options,
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(body.detail || `Errore API ${response.status}`);
