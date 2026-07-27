@@ -1041,13 +1041,15 @@ function initializeNavigation() {
 }
 
 function initializeMobileScrollControls() {
-  const sections = [
-    ...document.querySelectorAll("main > .navigation-section"),
-  ];
   const upButton = $("#scroll-up-button");
   const downButton = $("#scroll-down-button");
+  const orderedSections = () =>
+    [...document.querySelectorAll("main > .navigation-section")].sort(
+      (left, right) => left.offsetTop - right.offsetTop,
+    );
 
   const currentSectionIndex = () => {
+    const sections = orderedSections();
     const marker = window.scrollY + window.innerHeight * 0.35;
     let current = 0;
     sections.forEach((section, index) => {
@@ -1057,12 +1059,14 @@ function initializeMobileScrollControls() {
   };
 
   const updateButtons = () => {
+    const sections = orderedSections();
     const current = currentSectionIndex();
     upButton.disabled = current === 0;
     downButton.disabled = current === sections.length - 1;
   };
 
   const move = (direction) => {
+    const sections = orderedSections();
     const target = Math.max(
       0,
       Math.min(sections.length - 1, currentSectionIndex() + direction),

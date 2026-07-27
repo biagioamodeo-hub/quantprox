@@ -33,6 +33,31 @@ button {
   margin: 0 auto;
 }
 
+main {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  order: 0;
+}
+
+.workspace {
+  order: 1;
+}
+
+.action-advisor {
+  order: 2;
+}
+
+.guide {
+  order: 3;
+}
+
+.purchase-guide {
+  order: 4;
+}
+
 .topbar {
   position: sticky;
   top: 0;
@@ -1281,11 +1306,11 @@ h1 {
   display: grid;
   grid-template-columns: 250px 1fr;
   overflow: hidden;
-  margin-bottom: 80px;
-  border: 1px solid var(--line);
+  margin-bottom: 22px;
+  border: 1px solid rgba(8, 120, 90, 0.24);
   border-radius: 28px;
   background: var(--surface);
-  box-shadow: var(--shadow);
+  box-shadow: 0 24px 64px rgba(21, 55, 44, 0.13);
 }
 
 .steps {
