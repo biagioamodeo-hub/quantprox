@@ -18,6 +18,8 @@
 - 1.0.0-beta.3: persistent background jobs and asynchronous decisions.
 - 1.0.0-beta.4: provider contracts and persistent sandbox broker submissions.
 - 1.0.0-beta.5: operational metrics, readiness, rate limiting, and HTTP hardening.
+- 1.0.0-rc.1: non-persistent trading recommendations and release-candidate
+  consolidation for paper trading.
 
 ## Beta roadmap
 

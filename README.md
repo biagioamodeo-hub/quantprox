@@ -2,7 +2,7 @@
 
 QuantProX is a quantitative trading framework with a FastAPI service foundation.
 
-The current release is **1.0.0-beta.5**. It is intended for local development
+The current release is **1.0.0-rc.1**. It is intended for local development
 and paper-trading workflows; it must not be connected to live brokerage
 execution.
 
