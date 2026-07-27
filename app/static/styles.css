@@ -1809,9 +1809,13 @@ h2 {
   background: rgba(240, 120, 60, 0.1);
 }
 
-.accent-card {
+.metric-grid article.accent-card {
   border-color: var(--green) !important;
   background: var(--green);
+  color: white;
+}
+
+.metric-grid article.accent-card strong {
   color: white;
 }
 

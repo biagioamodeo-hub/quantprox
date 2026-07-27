@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.8.0-activity" />
-    <script src="/lab/app-purchase.js?v=2.3.0" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.9.0-autopilot" />
+    <script src="/lab/app-purchase.js?v=2.4.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -42,10 +42,10 @@
               senza usare denaro reale.
             </p>
             <div class="hero-actions" aria-label="Inizia da qui">
-              <a class="quick-action featured" href="#simulazione">
+              <a class="quick-action featured" href="#assistente">
                 <span>01</span>
-                <strong>Apri la simulazione</strong>
-                <small>Portafoglio, segnale e prossima azione</small>
+                <strong>Avvia l’autopilota</strong>
+                <small>Dal capitale al portafoglio simulato</small>
               </a>
               <a class="quick-action" href="#segnale">
                 <span>02</span>
@@ -98,12 +98,12 @@
         <section class="guide navigation-section" id="assistente"
           data-navigation-section="assistente" aria-labelledby="guide-title">
           <div class="guide-intro">
-            <p class="section-label">Assistente prudenziale</p>
-            <h2 id="guide-title">Un piano simulato in quattro risposte.</h2>
+            <p class="section-label">Autopilota simulato</p>
+            <h2 id="guide-title">Tu scegli l’obiettivo. QuantProX fa il resto.</h2>
             <p>
-              Indica soltanto capitale, obiettivo, orizzonte e perdita massima
-              accettabile. QuantProX seleziona automaticamente un profilo,
-              applica costi realistici e verifica il rischio su dati dimostrativi.
+              Indica capitale, obiettivo, orizzonte e perdita massima accettabile.
+              QuantProX crea il profilo, configura il rischio, sceglie la strategia
+              e completa automaticamente una simulazione verificabile.
             </p>
             <div class="safety-note navigation-section" id="sicurezza"
               data-navigation-section="sicurezza">
@@ -147,7 +147,7 @@
               </select>
             </label>
             <button class="primary" id="guide-button" type="submit" disabled>
-              Accedi per creare il piano
+              Accedi per avviare l’autopilota
             </button>
           </form>
           <div class="guide-result" id="guide-result" hidden>
@@ -173,9 +173,6 @@
               <p id="guide-method"></p>
               <ul id="guide-warnings"></ul>
             </details>
-            <button class="primary" id="apply-guide-button" type="button">
-              Usa il piano e avvia la simulazione
-            </button>
             <small class="guide-disclaimer" id="guide-disclaimer"></small>
           </div>
         </section>

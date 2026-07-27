@@ -289,8 +289,8 @@ function render() {
     : "Accedi per iniziare";
   $("#guide-button").disabled = !state.authenticated;
   $("#guide-button").textContent = state.authenticated
-    ? "Crea il piano automatico"
-    : "Accedi per creare il piano";
+    ? "Avvia autopilota simulato"
+    : "Accedi per avviare l’autopilota";
   const signal = state.decision?.action || "pending";
   $("#signal-card").dataset.signal = signal;
   $("#signal-status").textContent = signalStatusLabels[signal] || "In attesa";
@@ -606,7 +606,7 @@ async function createGuidedPlan(event) {
   event.preventDefault();
   const button = $("#guide-button");
   button.disabled = true;
-  button.textContent = "Analisi in corso…";
+  button.textContent = "Autopilota in corso…";
   try {
     const plan = await api("/api/v1/guidance/plan", {
       method: "POST",
@@ -619,7 +619,16 @@ async function createGuidedPlan(event) {
     });
     state.guidedPlan = plan;
     renderGuidedPlan(plan);
-    toast("Piano simulato creato e verificato.");
+    await applyGuidedPlan();
+    await nextAction();
+    if (state.decision?.action !== "hold") {
+      await nextAction();
+      if (state.order?.status === "accepted") {
+        await nextAction();
+        await nextAction();
+      }
+    }
+    toast("Autopilota completato: portafoglio simulato pronto.");
   } catch (error) {
     toast(error.message);
   } finally {
@@ -1332,7 +1341,6 @@ $("#close-activity-button").addEventListener("click", closeActivityLog);
 $("#logout-button").addEventListener("click", logout);
 $("#simulation-currency").addEventListener("change", selectCurrency);
 $("#guide-form").addEventListener("submit", createGuidedPlan);
-$("#apply-guide-button").addEventListener("click", applyGuidedPlan);
 $("#purchase-button").addEventListener("click", checkPurchaseSafety);
 $("#virtual-buy-button").addEventListener("click", buyWithRevolutDemo);
 $("#link-card-button").addEventListener("click", linkRevolutDemoCard);

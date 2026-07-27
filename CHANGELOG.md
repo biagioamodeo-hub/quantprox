@@ -28,6 +28,9 @@
   removing the duplicate simulation menu.
 - Move the activity log into an on-demand dialog and add portfolio charts plus
   automatic buy and sell alerts.
+- Add a one-action simulated autopilot that builds the profile, configures risk,
+  prepares the scenario, evaluates the signal, executes the paper order, and
+  values the resulting portfolio.
 - Retain explicit educational disclaimers and prohibit automatic live orders.
 
 ## 1.0.0
