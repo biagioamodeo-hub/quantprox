@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0-rc.1
+## 1.1.0
 
 - Add a four-answer prudential assistant designed for inexperienced users.
 - Select cautious or balanced beginner profiles automatically from goal,
@@ -13,6 +13,17 @@
   directly to the guided paper-trading scenario.
 - Add a sticky, responsive navigation menu for overview, guided planning,
   simulation, results, and safety.
+- Add a three-step investment wizard with an assisted comparison across
+  equities, bonds, government bonds, crypto assets, ETFs, and funds.
+- Add risk-adjusted illustrative rankings, explicit suitability checks, and
+  currency-aware summaries.
+- Add a portfolio-and-market-driven automatic `buy`, `hold`, or `sell`
+  recommendation that updates during the paper-trading workflow.
+- Add a Revolut Demo account and linked virtual card for simulated purchases
+  without real payment details or money movement.
+- Add a compact Italian interface, quick actions, responsive mobile controls,
+  and collapsible signal warnings.
+- Retain explicit educational disclaimers and prohibit automatic live orders.
 
 ## 1.0.0
 

@@ -22,7 +22,8 @@
   consolidation for paper trading.
 - 1.0.0: stable, authenticated, localized paper-trading workflow with selectable
   currencies and reference exchange rates.
-- 1.1.0-rc.1: automated prudential assistant and cost-aware demonstrative
+- 1.1.0: automated prudential assistant, guided investment comparison,
+  portfolio-aware signals, and cost-aware demonstrative
   backtesting for inexperienced users.
 
 ## Post-1.0 roadmap
