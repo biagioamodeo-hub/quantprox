@@ -4,7 +4,6 @@ import hmac
 import json
 import time
 
-from app.core.accounts import account_exists
 from app.core.config import settings
 
 
@@ -36,10 +35,6 @@ def read_session_token(token: str) -> str | None:
         if int(payload["expires_at"]) <= int(time.time()):
             return None
         tenant_id = str(payload["tenant_id"])
-        return (
-            tenant_id
-            if tenant_id in settings.tenant_api_keys or account_exists(tenant_id)
-            else None
-        )
+        return tenant_id
     except (ValueError, KeyError, TypeError, json.JSONDecodeError):
         return None

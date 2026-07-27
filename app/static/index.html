@@ -19,10 +19,11 @@
           <span>QuantProX</span>
         </a>
         <nav class="topnav" aria-label="Azioni principali">
-          <a href="#simulazione">Simulazione</a>
-          <a class="activity-trigger" href="#attivita">Registro attività</a>
-          <a href="#acquisto">Scegli investimento</a>
-          <a href="#segnale">Segnale</a>
+          <a href="#simulazione">Oggi</a>
+          <a href="#investimenti">Portafoglio</a>
+          <a href="#acquisto">Investi</a>
+          <a class="activity-trigger" href="#attivita">Attività</a>
+          <a href="#account">Account</a>
         </nav>
         <div class="status" id="api-status">
           <span class="status-dot"></span>
@@ -58,7 +59,7 @@
               </a>
             </div>
           </div>
-          <div class="hero-card">
+          <div class="hero-card" id="account">
             <div class="pulse">
               <span>Ambiente</span>
               <strong>Simulazione di trading</strong>
@@ -464,16 +465,6 @@
         <section class="workspace navigation-section" id="simulazione"
           data-navigation-section="simulazione" aria-label="Flusso alpha">
           <aside class="steps">
-            <nav class="main-navigation" aria-label="Strumenti QuantProX">
-              <p class="section-label">Menu strumenti</p>
-              <a href="#panoramica" data-nav="panoramica">Inizio</a>
-              <a href="#assistente" data-nav="assistente">Piano guidato</a>
-              <a href="#acquisto" data-nav="acquisto">Acquisto guidato</a>
-              <a href="#segnale" data-nav="segnale">Segnale operativo</a>
-              <a href="#simulazione" data-nav="simulazione">Simulazione</a>
-              <a class="activity-trigger" href="#attivita">Risultati</a>
-              <a href="#sicurezza" data-nav="sicurezza">Sicurezza</a>
-            </nav>
             <div class="sidebar-settings">
               <p class="section-label">Impostazioni simulazione</p>
               <p class="sidebar-description">
@@ -502,8 +493,8 @@
                 <div><strong>Scenario</strong><small>Dati e limiti</small></div>
               </li>
               <li data-step="2">
-                <span>02</span>
-                <div><strong>Decisione</strong><small>Medie mobili</small></div>
+                  <span>02</span>
+                  <div><strong>Decisione</strong><small>Analisi mercato</small></div>
               </li>
               <li data-step="3">
                 <span>03</span>

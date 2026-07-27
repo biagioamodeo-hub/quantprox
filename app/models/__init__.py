@@ -1,5 +1,6 @@
 """SQLAlchemy ORM models."""
 
+from app.models.accounts import UserAccount
 from app.models.decisions import Decision
 from app.models.executions import Execution
 from app.models.jobs import Job
@@ -19,5 +20,6 @@ __all__ = [
     "Portfolio",
     "Position",
     "RiskLimit",
+    "UserAccount",
 ]
 from app.models.brokers import BrokerSubmission

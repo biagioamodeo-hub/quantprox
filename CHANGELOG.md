@@ -23,6 +23,11 @@
   without real payment details or money movement.
 - Add a compact Italian interface, quick actions, responsive mobile controls,
   and collapsible signal warnings.
+- Persist registered accounts in PostgreSQL with salted password hashes.
+- Simplify navigation to Today, Portfolio, Invest, Activity, and Account,
+  removing the duplicate simulation menu.
+- Move the activity log into an on-demand dialog and add portfolio charts plus
+  automatic buy and sell alerts.
 - Retain explicit educational disclaimers and prohibit automatic live orders.
 
 ## 1.0.0

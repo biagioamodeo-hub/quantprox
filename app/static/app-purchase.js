@@ -338,7 +338,7 @@ function render() {
 
   const actions = [
     ["Crea un ambiente dimostrativo", "Prepara dati, portafoglio e limiti per iniziare il percorso guidato.", "Prepara scenario demo", false],
-    ["Calcola il segnale", `Il motore confronta medie mobili a ${state.shortWindow} e ${state.longWindow} periodi sulle candele demo.`, "Valuta decisione", false],
+    ["Analizza il mercato", "Il sistema confronta andamento recente, portafoglio e limiti di rischio.", "Valuta decisione", false],
     ["Trasforma il segnale in ordine", `Quantità ${state.quantity}, prezzo limite ${money(state.orderPrice)}. Il rischio viene controllato prima del salvataggio.`, "Crea ordine", false],
     ["Esegui in modalità simulata", "L’ordine accettato viene eseguito una sola volta e aggiorna liquidità e posizione.", "Esegui ordine", false],
     ["Leggi la valutazione", "Calcola valore del portafoglio, esposizione e risultato usando l’ultima chiusura disponibile.", "Aggiorna valutazione", false],

@@ -65,9 +65,10 @@ The Revolut Demo account and virtual card allow the recommended category to be
 tested with simulated funds. They do not connect to Revolut, request real card
 details, or move real money.
 
-The sticky Alpha Lab navigation links directly to the overview, guided plan,
-investment wizard, automatic signal, simulation, activity results, and safety
-explanation. Mobile up/down controls move between the main sections.
+The sticky Alpha Lab navigation is organized around five beginner-friendly
+destinations: Today, Portfolio, Invest, Activity, and Account. The activity log
+opens on demand instead of occupying space in the dashboard. Mobile up/down
+controls move between the main sections.
 
 ## Authentication and tenant isolation
 
