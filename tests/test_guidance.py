@@ -174,6 +174,30 @@ def test_purchase_safety_compares_all_six_asset_categories() -> None:
     assert result["ranking"][0]["asset_type"] == "etf"
 
 
+def test_purchase_safety_auto_selects_best_suitable_category() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "auto",
+            "available_capital": "20000",
+            "requested_amount": "3000",
+            "horizon_years": 10,
+            "maximum_acceptable_loss_percent": "20",
+            "emergency_fund_available": True,
+            "market_regime": "bullish",
+            "goal": "growth",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["asset_type"] == "etf"
+    assert result["asset_label"] == "ETF"
+    assert result["outcome"] == "proceed_simulation"
+    assert result["recommended_asset_type"] == "etf"
+    assert "scelta assistita" in result["recommendation_summary"].lower()
+
+
 def test_purchase_safety_can_assess_crypto_without_claiming_safety() -> None:
     client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
     response = client.post(

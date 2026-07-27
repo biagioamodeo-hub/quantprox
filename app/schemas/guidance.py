@@ -64,7 +64,9 @@ class GuidedPlanRead(BaseModel):
 
 
 class PurchaseSafetyCreate(BaseModel):
-    asset_type: Literal["stock", "bond", "government_bond", "crypto", "etf", "fund"]
+    asset_type: Literal[
+        "auto", "stock", "bond", "government_bond", "crypto", "etf", "fund"
+    ]
     available_capital: Decimal = Field(ge=100, le=1000000)
     requested_amount: Decimal = Field(ge=1, le=1000000)
     horizon_years: int = Field(ge=1, le=30)

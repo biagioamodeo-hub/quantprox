@@ -559,6 +559,27 @@ h1 {
   background: white;
 }
 
+.asset-options .assisted-choice {
+  position: relative;
+  grid-column: 1 / -1;
+  border-color: rgba(18, 117, 87, 0.45);
+  background: linear-gradient(135deg, #f0f8f4, #fff);
+}
+
+.asset-options .assisted-choice small {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--green);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .purchase-metrics {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

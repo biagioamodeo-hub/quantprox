@@ -9,7 +9,7 @@
     />
     <title>QuantProX · Alpha Lab</title>
     <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-purchase" />
-    <script src="/lab/app-purchase.js?v=1.5.0" defer></script>
+    <script src="/lab/app-purchase.js?v=1.6.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -176,6 +176,15 @@
             <fieldset>
               <legend>Che cosa vuoi valutare?</legend>
               <div class="asset-options">
+                <label class="assisted-choice">
+                  <input type="radio" name="asset-type" value="auto" checked />
+                  <strong>Scelta assistita</strong>
+                  <span>
+                    Propone automaticamente il miglior equilibrio stimato tra
+                    rischio e rendimento per i dati inseriti
+                  </span>
+                  <small>Consigliata per iniziare</small>
+                </label>
                 <label>
                   <input type="radio" name="asset-type" value="stock" />
                   <strong>Azioni</strong>
@@ -188,7 +197,7 @@
                 </label>
                 <label>
                   <input type="radio" name="asset-type"
-                    value="government_bond" checked />
+                    value="government_bond" />
                   <strong>Titoli di Stato</strong>
                   <span>Rischio Paese, durata e inflazione</span>
                 </label>

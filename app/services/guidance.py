@@ -622,7 +622,16 @@ def _rank_purchase_candidates(
 
 
 def assess_purchase_safety(payload: PurchaseSafetyCreate) -> PurchaseSafetyRead:
-    rule = _PURCHASE_RULES[payload.asset_type]
+    ranking = _rank_purchase_candidates(payload)
+    recommended = next((candidate for candidate in ranking if candidate.suitable), None)
+    selected_asset_type = (
+        recommended.asset_type
+        if payload.asset_type == "auto" and recommended
+        else payload.asset_type
+    )
+    if selected_asset_type == "auto":
+        selected_asset_type = ranking[0].asset_type
+    rule = _PURCHASE_RULES[selected_asset_type]
     allocation = rule.allocation
     prudent_amount = _quantize(payload.available_capital * allocation / Decimal("100"))
     checks = {
@@ -668,11 +677,14 @@ def assess_purchase_safety(payload: PurchaseSafetyCreate) -> PurchaseSafetyRead:
             "strumento specifico prima di qualsiasi decisione."
         )
 
-    ranking = _rank_purchase_candidates(payload)
-    recommended = next((candidate for candidate in ranking if candidate.suitable), None)
     recommendation_summary = (
         (
-            f"Tra le categorie confrontate, {recommended.label} ottiene il "
+            (
+                "La scelta assistita ha selezionato questa categoria. "
+                if payload.asset_type == "auto"
+                else ""
+            )
+            + f"Tra le categorie confrontate, {recommended.label} ottiene il "
             "miglior punteggio corretto per rischio nello scenario indicato. "
             "Il rendimento mostrato è illustrativo e può essere negativo."
         )
@@ -684,7 +696,7 @@ def assess_purchase_safety(payload: PurchaseSafetyCreate) -> PurchaseSafetyRead:
     )
 
     return PurchaseSafetyRead(
-        asset_type=payload.asset_type,
+        asset_type=selected_asset_type,
         asset_label=rule.label,
         outcome=outcome,
         outcome_label=outcome_label,
