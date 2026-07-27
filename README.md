@@ -29,6 +29,25 @@ available reference rate supplied by
 [Frankfurter](https://frankfurter.dev/). Reference rates are cached for 15
 minutes and are not intended to represent tick-by-tick market prices.
 
+### Prudential assistant
+
+Alpha Lab includes an educational four-answer assistant for inexperienced
+users. Starting capital, goal, time horizon, and maximum acceptable temporary
+loss are converted into a cautious or balanced simulation profile. QuantProX
+then:
+
+- backtests a moving-average strategy on a fixed demonstrative price series;
+- includes 0.10% transaction fees and 0.05% simulated slippage;
+- tests rising, falling, and sideways demonstrative market conditions;
+- reports net return, positive-trade rate, worst drawdown, risk score, sample
+  confidence, costs, and maximum exposure;
+- derives order and exposure limits plus a conservative position size;
+- applies those settings directly to the guided paper-trading workflow.
+
+Beginner requests are never assigned the dynamic profile. Results are
+educational simulations, not personalized financial advice, and do not
+guarantee future performance.
+
 ## Authentication and tenant isolation
 
 Every `/api/v1` request requires an `X-API-Key` header. Configure tenant keys

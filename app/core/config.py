@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "QuantProX"
-    app_version: str = "1.0.0"
+    app_version: str = "1.1.0-rc.1"
     environment: str = "local"
     debug: bool = False
     tenant_api_keys: dict[str, str] = {"demo": "dev-api-key"}
