@@ -7,6 +7,7 @@ from app.schemas.decisions import (
     DecisionEvaluate,
     DecisionOrderCreate,
     DecisionRead,
+    RecommendationRead,
 )
 from app.schemas.orders import OrderRead
 from app.services.decisions import DecisionService
@@ -29,6 +30,14 @@ def evaluate_decision(
     service: DecisionService = Depends(get_decision_service),
 ) -> DecisionRead:
     return service.evaluate(payload)
+
+
+@router.post("/recommend", response_model=RecommendationRead)
+def recommend_action(
+    payload: DecisionEvaluate,
+    service: DecisionService = Depends(get_decision_service),
+) -> RecommendationRead:
+    return service.recommend(payload)
 
 
 @router.get("", response_model=list[DecisionRead])

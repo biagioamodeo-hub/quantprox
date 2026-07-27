@@ -189,9 +189,14 @@ and terminal; rejected, filled, and already-cancelled orders cannot be cancelled
 Release 0.6.0 adds an auditable moving-average decision engine. Evaluations
 produce `buy`, `sell`, or `hold` signals without submitting orders:
 
+- `POST` `/api/v1/decisions/recommend` returns a non-persistent trading
+  recommendation with its moving averages, rationale, and disclaimer.
 - `POST` `/api/v1/decisions/evaluate`
 - `GET` `/api/v1/decisions?portfolio_id={portfolio_id}`
 - `POST` `/api/v1/decisions/{decision_id}/orders`
+
+Recommendations are quantitative signals for informational purposes only. They
+do not create orders and are not financial advice.
 
 ## Paper execution API
 

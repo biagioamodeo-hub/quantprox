@@ -30,6 +30,16 @@ class DecisionRead(DecisionEvaluate):
     model_config = ConfigDict(from_attributes=True)
 
 
+class RecommendationRead(BaseModel):
+    action: Literal["buy", "sell", "hold"]
+    short_average: Decimal | None
+    long_average: Decimal | None
+    rationale: str
+    disclaimer: str = (
+        "Quantitative signal for informational purposes only; " "not financial advice."
+    )
+
+
 class DecisionOrderCreate(BaseModel):
     quantity: Decimal = Field(gt=0)
     limit_price: Decimal = Field(gt=0)
