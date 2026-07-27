@@ -8,7 +8,7 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.2.1-mobile" />
+    <link rel="stylesheet" href="/lab/styles.css?v=1.2.2-compact" />
     <script src="/lab/app-purchase.js?v=1.8.0" defer></script>
   </head>
   <body>
@@ -448,9 +448,11 @@
           </form>
           <div class="action-advisor-result" id="action-advisor-result" hidden
             aria-live="polite">
-            <div>
-              <span>Indicazione quantitativa</span>
-              <h3 id="action-signal-label">—</h3>
+            <div class="action-result-summary">
+              <div>
+                <span>Indicazione quantitativa</span>
+                <h3 id="action-signal-label">—</h3>
+              </div>
               <p id="action-signal-rationale"></p>
             </div>
             <dl>
@@ -458,9 +460,14 @@
               <div><dt>Distanza tra le medie</dt><dd id="action-signal-gap">—</dd></div>
               <div><dt>Risultato posizione</dt><dd id="action-position-return">—</dd></div>
             </dl>
-            <strong>Quando rivalutare</strong>
-            <p id="action-next-condition"></p>
-            <ul id="action-signal-warnings"></ul>
+            <div class="action-next-step">
+              <strong>Quando rivalutare</strong>
+              <p id="action-next-condition"></p>
+            </div>
+            <details class="action-warnings">
+              <summary>Limiti e avvertenze</summary>
+              <ul id="action-signal-warnings"></ul>
+            </details>
             <small id="action-signal-disclaimer"></small>
           </div>
         </section>
