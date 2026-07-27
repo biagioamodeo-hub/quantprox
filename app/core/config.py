@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     environment: str = "local"
     debug: bool = False
     tenant_api_keys: dict[str, str] = {"demo": "dev-api-key"}
+    session_secret: str = "local-development-session-secret"
+    session_ttl_seconds: int = 28800
+    session_secure_cookie: bool = False
     job_poll_interval_seconds: float = 1.0
     broker_provider: str = "sandbox"
     rate_limit_enabled: bool = True

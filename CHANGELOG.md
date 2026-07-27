@@ -7,6 +7,8 @@
 - Reuse the recommendation calculation for auditable decision evaluations.
 - Promote the tested paper-trading feature set to its first release candidate.
 - Retain the explicit prohibition on live brokerage execution.
+- Add selectable EUR, USD, GBP, and CHF display currencies to Alpha Lab.
+- Show the latest available reference exchange rate beside the currency selector.
 
 ## 1.0.0-beta.5
 

@@ -14,6 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from starlette.responses import Response
 
 from app.api.router import api_router
+from app.api.routes.auth import router as auth_router
 from app.core.config import settings
 from app.core.exceptions import DomainError
 from app.core.observability import metrics
@@ -27,6 +28,7 @@ request_id_pattern = re.compile(r"^[A-Za-z0-9._-]{1,128}$")
 app = FastAPI(
     title=settings.app_name, version=settings.app_version, debug=settings.debug
 )
+app.include_router(auth_router, prefix="/auth", tags=["authentication"])
 app.include_router(api_router, prefix="/api/v1")
 app.mount(
     "/lab",

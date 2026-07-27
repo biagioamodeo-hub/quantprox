@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="QuantProX Alpha Lab: prova il flusso paper-trading in modo guidato."
+      content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css" />
-    <script src="/lab/app.js" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0-rc.1-fx" />
+    <script src="/lab/app.js?v=1.0.0-rc.1-fx" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -27,35 +27,69 @@
       <main>
         <section class="hero">
           <div>
-            <p class="eyebrow">1.0.0 · Alpha Lab</p>
-            <h1>Dal mercato al P&amp;L,<br />un passo alla volta.</h1>
+            <p class="eyebrow">1.0.0-rc.1 · Alpha Lab</p>
+            <h1>Dal mercato al risultato,<br />un passo alla volta.</h1>
             <p class="hero-copy">
               Un banco di prova semplice per esplorare il motore decisionale,
-              i controlli rischio e l’esecuzione paper di QuantProX.
+              i controlli rischio e l’esecuzione simulata di QuantProX.
             </p>
           </div>
           <div class="hero-card">
             <div class="pulse">
               <span>Ambiente</span>
-              <strong>Paper trading</strong>
+              <strong>Simulazione di trading</strong>
             </div>
             <p>Nessun ordine reale. Dati dimostrativi, risultati verificabili.</p>
-            <label class="api-key-field" for="api-key">
-              <span>Chiave API tenant</span>
-              <input
-                id="api-key"
-                name="api-key"
-                type="password"
-                autocomplete="off"
-                placeholder="X-API-Key"
-              />
-            </label>
-            <button class="primary" id="seed-button">Prepara scenario demo</button>
+            <form class="login-form" id="login-form">
+              <label for="login-profile">
+                <span>Nome profilo</span>
+                <input id="login-profile" name="profile" autocomplete="username"
+                  placeholder="es. demo" required />
+              </label>
+              <label for="login-password">
+                <span>Password</span>
+                <input id="login-password" name="password" type="password"
+                  autocomplete="current-password"
+                  placeholder="Inserisci la password" required />
+              </label>
+              <button class="primary" id="login-button" type="submit">Accedi</button>
+            </form>
+            <div class="session-panel" id="session-panel" hidden>
+              <div>
+                <span>Profilo connesso</span>
+                <strong id="session-profile">—</strong>
+              </div>
+              <button class="ghost" id="logout-button" type="button">Esci</button>
+            </div>
+            <button class="primary" id="seed-button" disabled>
+              Accedi per iniziare
+            </button>
           </div>
         </section>
 
         <section class="workspace" aria-label="Flusso alpha">
           <aside class="steps">
+            <div class="sidebar-settings">
+              <p class="section-label">Impostazioni simulazione</p>
+              <p class="sidebar-description">
+                Scegli la valuta usata per prezzi, ordini e risultato del
+                portafoglio.
+              </p>
+              <label class="currency-field" for="simulation-currency">
+                <span>Valuta</span>
+                <select id="simulation-currency" name="currency">
+                  <option value="EUR">Euro (EUR)</option>
+                  <option value="USD" selected>Dollaro USA (USD)</option>
+                  <option value="GBP">Sterlina britannica (GBP)</option>
+                  <option value="CHF">Franco svizzero (CHF)</option>
+                </select>
+              </label>
+              <div class="exchange-rate" aria-live="polite">
+                <span>Cambio di riferimento</span>
+                <strong id="exchange-rate-value">Accedi per visualizzarlo</strong>
+                <small id="exchange-rate-meta">Ultimo dato disponibile</small>
+              </div>
+            </div>
             <p class="section-label">Percorso guidato</p>
             <ol>
               <li class="active" data-step="1">
@@ -64,7 +98,7 @@
               </li>
               <li data-step="2">
                 <span>02</span>
-                <div><strong>Decisione</strong><small>Segnale SMA</small></div>
+                <div><strong>Decisione</strong><small>Medie mobili</small></div>
               </li>
               <li data-step="3">
                 <span>03</span>
@@ -72,11 +106,11 @@
               </li>
               <li data-step="4">
                 <span>04</span>
-                <div><strong>Esecuzione</strong><small>Fill paper</small></div>
+                <div><strong>Esecuzione</strong><small>Ordine simulato</small></div>
               </li>
               <li data-step="5">
                 <span>05</span>
-                <div><strong>Valutazione</strong><small>Equity e P&amp;L</small></div>
+                <div><strong>Valutazione</strong><small>Valore e risultato</small></div>
               </li>
             </ol>
           </aside>
@@ -96,8 +130,11 @@
                 <strong id="metric-symbol">—</strong>
                 <small id="metric-price">Nessun dato</small>
               </article>
-              <article>
-                <span>Segnale</span>
+              <article class="signal-card" id="signal-card" data-signal="pending">
+                <div class="metric-heading">
+                  <span>Segnale</span>
+                  <span class="signal-status" id="signal-status">In attesa</span>
+                </div>
                 <strong id="metric-signal">—</strong>
                 <small id="metric-rationale">In attesa</small>
               </article>
@@ -107,9 +144,9 @@
                 <small id="metric-risk">Non valutato</small>
               </article>
               <article class="accent-card">
-                <span>Equity</span>
+                <span>Valore portafoglio</span>
                 <strong id="metric-equity">—</strong>
-                <small id="metric-pnl">P&amp;L —</small>
+                <small id="metric-pnl">Risultato —</small>
               </article>
             </div>
 
@@ -118,8 +155,8 @@
                 <p class="section-label">Prossima azione</p>
                 <h3 id="action-title">Crea un ambiente dimostrativo</h3>
                 <p id="action-copy">
-                  Genereremo uno strumento, tre candele crescenti, un portafoglio
-                  da 10.000 USD e limiti rischio prudenti.
+                  Genereremo prezzi di mercato realistici, un portafoglio da
+                  10.000,00 USD e un ordine simulato con risultato misurabile.
                 </p>
               </div>
               <div class="action-buttons">

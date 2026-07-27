@@ -1,18 +1,34 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
 from app.schemas.market_data import (
     CandleCreate,
     CandleRead,
+    ExchangeRateRead,
     InstrumentCreate,
     InstrumentRead,
 )
+from app.services.exchange_rates import get_exchange_rate
 from app.services.market_data import MarketDataService
 
 router = APIRouter()
+
+
+@router.get("/exchange-rate", response_model=ExchangeRateRead)
+def read_exchange_rate(
+    base: str = Query(min_length=3, max_length=3),
+    quote: str = Query(min_length=3, max_length=3),
+) -> ExchangeRateRead:
+    try:
+        return get_exchange_rate(base, quote)
+    except Exception as exception:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Exchange-rate data is temporarily unavailable.",
+        ) from exception
 
 
 def get_market_data_service(
