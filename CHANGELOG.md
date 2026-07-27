@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0-rc.1
+## 1.0.0
 
 - Add a non-persistent endpoint for `buy`, `sell`, and `hold` recommendations.
 - Return the moving-average inputs, rationale, and an informational disclaimer.
@@ -9,6 +9,10 @@
 - Retain the explicit prohibition on live brokerage execution.
 - Add selectable EUR, USD, GBP, and CHF display currencies to Alpha Lab.
 - Show the latest available reference exchange rate beside the currency selector.
+- Add secure Alpha Lab login, a fully localized interface, and a guided
+  end-to-end paper-trading simulation.
+- Publish the first stable paper-trading release after cross-version CI and
+  interface validation.
 
 ## 1.0.0-beta.5
 
