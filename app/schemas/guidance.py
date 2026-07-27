@@ -64,20 +64,32 @@ class GuidedPlanRead(BaseModel):
 
 
 class PurchaseSafetyCreate(BaseModel):
-    asset_type: Literal["stock", "bond", "government_bond"]
+    asset_type: Literal["stock", "bond", "government_bond", "crypto", "etf", "fund"]
     available_capital: Decimal = Field(ge=100, le=1000000)
     requested_amount: Decimal = Field(ge=1, le=1000000)
     horizon_years: int = Field(ge=1, le=30)
     maximum_acceptable_loss_percent: Decimal = Field(ge=1, le=40)
     emergency_fund_available: bool
+    market_regime: Literal["bullish", "neutral", "bearish"] = "neutral"
+    goal: Literal["preservation", "income", "growth"] = "growth"
+
+
+class PurchaseCandidate(BaseModel):
+    asset_type: Literal["stock", "bond", "government_bond", "crypto", "etf", "fund"]
+    label: str
+    suitable: bool
+    estimated_return_percent: Decimal
+    risk_level: Literal["contenuto", "medio", "elevato", "molto elevato"]
+    score: int = Field(ge=0, le=100)
+    rationale: str
 
 
 class PurchaseSafetyRead(BaseModel):
-    asset_type: Literal["stock", "bond", "government_bond"]
+    asset_type: Literal["stock", "bond", "government_bond", "crypto", "etf", "fund"]
     asset_label: str
     outcome: Literal["proceed_simulation", "reduce_amount", "not_suitable"]
     outcome_label: str
-    risk_level: Literal["contenuto", "medio", "elevato"]
+    risk_level: Literal["contenuto", "medio", "elevato", "molto elevato"]
     max_allocation_percent: Decimal
     prudent_amount: Decimal
     requested_amount: Decimal
@@ -86,6 +98,10 @@ class PurchaseSafetyRead(BaseModel):
     reasons: list[str]
     checklist: list[str]
     warning: str
+    recommended_asset_type: str | None
+    recommended_asset_label: str | None
+    recommendation_summary: str
+    ranking: list[PurchaseCandidate]
     disclaimer: str = (
         "Valutazione educativa e prudenziale: non garantisce la sicurezza "
         "dell'investimento e non sostituisce una consulenza finanziaria autorizzata."

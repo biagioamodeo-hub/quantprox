@@ -535,6 +535,26 @@ function renderPurchaseSafety(result) {
   $("#purchase-checklist").innerHTML = result.checklist
     .map((item) => `<li>${item}</li>`)
     .join("");
+  $("#purchase-recommendation").textContent =
+    result.recommended_asset_label || "Nessuna categoria compatibile";
+  $("#purchase-recommendation-summary").textContent =
+    result.recommendation_summary;
+  $("#purchase-ranking").innerHTML = result.ranking
+    .map(
+      (candidate, index) => `
+        <li class="${candidate.suitable ? "" : "unsuitable"}">
+          <span class="rank-position">${index + 1}</span>
+          <div>
+            <strong>${candidate.label}</strong>
+            <small>${candidate.rationale}</small>
+          </div>
+          <div class="rank-score">
+            <strong>${candidate.score}/100</strong>
+            <span>${percent(candidate.estimated_return_percent)}</span>
+          </div>
+        </li>`,
+    )
+    .join("");
   $("#purchase-disclaimer").textContent = result.disclaimer;
 }
 
@@ -556,6 +576,8 @@ async function checkPurchaseSafety(event) {
         horizon_years: Number($("#purchase-horizon").value),
         maximum_acceptable_loss_percent: $("#purchase-loss").value,
         emergency_fund_available: $("#purchase-emergency").checked,
+        market_regime: $("#purchase-market").value,
+        goal: $("#purchase-goal").value,
       }),
     });
     renderPurchaseSafety(result);

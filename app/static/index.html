@@ -9,7 +9,7 @@
     />
     <title>QuantProX · Alpha Lab</title>
     <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-purchase" />
-    <script src="/lab/app-purchase.js?v=1.1.1" defer></script>
+    <script src="/lab/app-purchase.js?v=1.2.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -161,9 +161,9 @@
               <h2 id="purchase-title">Prima controlla, poi simula.</h2>
             </div>
             <p>
-              Valuta automaticamente importo, orizzonte e tolleranza alle perdite
-              per azioni, obbligazioni o titoli di Stato. Il controllo non rende
-              un investimento privo di rischio.
+              Confronta automaticamente azioni, obbligazioni, titoli di Stato,
+              crypto, ETF e fondi usando importo, obiettivo, orizzonte, rischio
+              accettato e fase di mercato. Nessuna stima garantisce un rendimento.
             </p>
           </div>
           <form class="purchase-form" id="purchase-form">
@@ -185,6 +185,21 @@
                     value="government_bond" checked />
                   <strong>Titoli di Stato</strong>
                   <span>Rischio Paese, durata e inflazione</span>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type" value="crypto" />
+                  <strong>Crypto</strong>
+                  <span>Oscillazioni e rischio molto elevati</span>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type" value="etf" />
+                  <strong>ETF</strong>
+                  <span>Diversificazione tramite un paniere</span>
+                </label>
+                <label>
+                  <input type="radio" name="asset-type" value="fund" />
+                  <strong>Fondi</strong>
+                  <span>Gestione professionale con costi</span>
                 </label>
               </div>
             </fieldset>
@@ -217,6 +232,22 @@
                   <option value="20">20%</option>
                 </select>
               </label>
+              <label>
+                <span>Obiettivo</span>
+                <select id="purchase-goal">
+                  <option value="preservation">Protezione del capitale</option>
+                  <option value="income">Entrate periodiche</option>
+                  <option value="growth" selected>Crescita del capitale</option>
+                </select>
+              </label>
+              <label>
+                <span>Fase di mercato osservata</span>
+                <select id="purchase-market">
+                  <option value="bullish">Rialzista</option>
+                  <option value="neutral" selected>Stabile / incerta</option>
+                  <option value="bearish">Ribassista</option>
+                </select>
+              </label>
             </div>
             <label class="emergency-check">
               <input id="purchase-emergency" type="checkbox" checked />
@@ -241,6 +272,18 @@
             </div>
             <p class="purchase-warning" id="purchase-warning"></p>
             <ul id="purchase-reasons"></ul>
+            <div class="recommendation">
+              <span>Scelta suggerita dal confronto</span>
+              <h4 id="purchase-recommendation">—</h4>
+              <p id="purchase-recommendation-summary"></p>
+            </div>
+            <div class="ranking">
+              <div class="ranking-head">
+                <strong>Confronto delle categorie</strong>
+                <span>Stima illustrativa corretta per rischio</span>
+              </div>
+              <ol id="purchase-ranking"></ol>
+            </div>
             <details>
               <summary>Controlli da fare sullo strumento</summary>
               <ul id="purchase-checklist"></ul>

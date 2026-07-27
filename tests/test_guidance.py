@@ -142,3 +142,54 @@ def test_purchase_safety_recommends_reducing_excess_amount() -> None:
     result = response.json()
     assert result["outcome"] == "reduce_amount"
     assert result["prudent_amount"] == "2000.00"
+
+
+def test_purchase_safety_compares_all_six_asset_categories() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "etf",
+            "available_capital": "20000",
+            "requested_amount": "3000",
+            "horizon_years": 10,
+            "maximum_acceptable_loss_percent": "20",
+            "emergency_fund_available": True,
+            "market_regime": "bullish",
+            "goal": "growth",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert len(result["ranking"]) == 6
+    assert {candidate["asset_type"] for candidate in result["ranking"]} == {
+        "stock",
+        "bond",
+        "government_bond",
+        "crypto",
+        "etf",
+        "fund",
+    }
+    assert result["recommended_asset_type"] == "etf"
+    assert result["ranking"][0]["asset_type"] == "etf"
+
+
+def test_purchase_safety_can_assess_crypto_without_claiming_safety() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/purchase-safety",
+        json={
+            "asset_type": "crypto",
+            "available_capital": "10000",
+            "requested_amount": "200",
+            "horizon_years": 10,
+            "maximum_acceptable_loss_percent": "35",
+            "emergency_fund_available": True,
+            "market_regime": "neutral",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["risk_level"] == "molto elevato"
+    assert result["max_allocation_percent"] == "3"
+    assert "non garantisce" in result["disclaimer"]

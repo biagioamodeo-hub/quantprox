@@ -8,6 +8,7 @@ from app.schemas.guidance import (
     GuidedPlanRead,
     GuidedRiskProfile,
     GuidedStrategy,
+    PurchaseCandidate,
     PurchaseSafetyCreate,
     PurchaseSafetyRead,
 )
@@ -445,18 +446,21 @@ def create_guided_plan(payload: GuidedPlanCreate) -> GuidedPlanRead:
 @dataclass(frozen=True)
 class _PurchaseRule:
     label: str
-    risk: Literal["contenuto", "medio", "elevato"]
+    risk: Literal["contenuto", "medio", "elevato", "molto elevato"]
+    risk_points: int
     allocation: Decimal
     minimum_horizon: int
     minimum_tolerance: Decimal
     warning: str
     checklist: list[str]
+    expected_returns: tuple[Decimal, Decimal, Decimal]
 
 
 _PURCHASE_RULES: dict[str, _PurchaseRule] = {
     "stock": _PurchaseRule(
         label="Azioni",
         risk="elevato",
+        risk_points=70,
         allocation=Decimal("10"),
         minimum_horizon=7,
         minimum_tolerance=Decimal("15"),
@@ -469,10 +473,12 @@ _PURCHASE_RULES: dict[str, _PurchaseRule] = {
             "Controlla costi, liquidità e concentrazione geografica o settoriale.",
             "Usa soltanto capitale non necessario nel medio-lungo periodo.",
         ],
+        expected_returns=(Decimal("9"), Decimal("6"), Decimal("-8")),
     ),
     "bond": _PurchaseRule(
         label="Obbligazioni",
         risk="medio",
+        risk_points=38,
         allocation=Decimal("20"),
         minimum_horizon=3,
         minimum_tolerance=Decimal("8"),
@@ -485,10 +491,12 @@ _PURCHASE_RULES: dict[str, _PurchaseRule] = {
             "Diversifica tra emittenti e scadenze.",
             "Confronta rendimento netto, costi e rischio di rimborso anticipato.",
         ],
+        expected_returns=(Decimal("4"), Decimal("3"), Decimal("2")),
     ),
     "government_bond": _PurchaseRule(
         label="Titoli di Stato",
         risk="contenuto",
+        risk_points=24,
         allocation=Decimal("30"),
         minimum_horizon=2,
         minimum_tolerance=Decimal("5"),
@@ -501,8 +509,116 @@ _PURCHASE_RULES: dict[str, _PurchaseRule] = {
             "Valuta rischio Paese, inflazione e tassazione applicabile.",
             "Diversifica per scadenza e non concentrare tutto su un solo emittente.",
         ],
+        expected_returns=(Decimal("3"), Decimal("2.5"), Decimal("2")),
+    ),
+    "crypto": _PurchaseRule(
+        label="Crypto",
+        risk="molto elevato",
+        risk_points=95,
+        allocation=Decimal("3"),
+        minimum_horizon=8,
+        minimum_tolerance=Decimal("30"),
+        warning=(
+            "Le crypto possono perdere rapidamente gran parte del valore e "
+            "presentano rischi tecnologici, normativi, di custodia e liquidità."
+        ),
+        checklist=[
+            "Limita l'esposizione a una quota marginale del portafoglio.",
+            "Verifica custodia, piattaforma, liquidità e rischio di controparte.",
+            "Non usare leva finanziaria o denaro necessario per altre spese.",
+        ],
+        expected_returns=(Decimal("16"), Decimal("5"), Decimal("-25")),
+    ),
+    "etf": _PurchaseRule(
+        label="ETF",
+        risk="medio",
+        risk_points=52,
+        allocation=Decimal("25"),
+        minimum_horizon=5,
+        minimum_tolerance=Decimal("10"),
+        warning=(
+            "Gli ETF seguono il mercato sottostante: diversificano, ma possono "
+            "comunque perdere valore e presentare rischio valutario e di replica."
+        ),
+        checklist=[
+            "Controlla indice, costi annui, dimensione e metodo di replica.",
+            "Preferisci esposizioni ampie e coerenti con l'orizzonte.",
+            "Verifica valuta, fiscalità e concentrazione del paniere.",
+        ],
+        expected_returns=(Decimal("8"), Decimal("5.5"), Decimal("-6")),
+    ),
+    "fund": _PurchaseRule(
+        label="Fondi",
+        risk="medio",
+        risk_points=48,
+        allocation=Decimal("20"),
+        minimum_horizon=5,
+        minimum_tolerance=Decimal("10"),
+        warning=(
+            "I fondi possono perdere valore; costi, strategia del gestore e "
+            "composizione incidono sensibilmente sul risultato."
+        ),
+        checklist=[
+            "Confronta costi di ingresso, gestione, uscita e benchmark.",
+            "Verifica composizione, stile di gestione e storico coerente.",
+            "Controlla sovrapposizioni con gli altri investimenti.",
+        ],
+        expected_returns=(Decimal("7"), Decimal("4.5"), Decimal("-5")),
     ),
 }
+
+
+def _rank_purchase_candidates(
+    payload: PurchaseSafetyCreate,
+) -> list[PurchaseCandidate]:
+    regime_index = {"bullish": 0, "neutral": 1, "bearish": 2}[payload.market_regime]
+    goal_bonus = {
+        "preservation": {"government_bond": 18, "bond": 12},
+        "income": {"bond": 14, "government_bond": 12, "fund": 5},
+        "growth": {"etf": 14, "stock": 10, "crypto": 2},
+    }[payload.goal]
+    candidates: list[PurchaseCandidate] = []
+    for asset_type, rule in _PURCHASE_RULES.items():
+        suitable = (
+            payload.emergency_fund_available
+            and payload.horizon_years >= rule.minimum_horizon
+            and payload.maximum_acceptable_loss_percent >= rule.minimum_tolerance
+        )
+        expected_return = rule.expected_returns[regime_index]
+        tolerance_gap = max(
+            Decimal("0"),
+            rule.minimum_tolerance - payload.maximum_acceptable_loss_percent,
+        )
+        raw_score = (
+            Decimal("55")
+            + expected_return * Decimal("2")
+            - Decimal(rule.risk_points) / Decimal("3")
+            - tolerance_gap * Decimal("2")
+            + Decimal(goal_bonus.get(asset_type, 0))
+        )
+        score = max(0, min(100, int(raw_score)))
+        rationale = (
+            f"Rendimento annuo illustrativo {expected_return}% nello scenario "
+            f"{payload.market_regime}; rischio {rule.risk}."
+        )
+        if not suitable:
+            rationale += " Non compatibile con tutti i limiti inseriti."
+        candidates.append(
+            PurchaseCandidate(
+                asset_type=asset_type,
+                label=rule.label,
+                suitable=suitable,
+                estimated_return_percent=expected_return,
+                risk_level=rule.risk,
+                score=score,
+                rationale=rationale,
+            )
+        )
+    return sorted(
+        candidates,
+        key=lambda candidate: (candidate.suitable, candidate.score),
+        reverse=True,
+    )
 
 
 def assess_purchase_safety(payload: PurchaseSafetyCreate) -> PurchaseSafetyRead:
@@ -552,6 +668,21 @@ def assess_purchase_safety(payload: PurchaseSafetyCreate) -> PurchaseSafetyRead:
             "strumento specifico prima di qualsiasi decisione."
         )
 
+    ranking = _rank_purchase_candidates(payload)
+    recommended = next((candidate for candidate in ranking if candidate.suitable), None)
+    recommendation_summary = (
+        (
+            f"Tra le categorie confrontate, {recommended.label} ottiene il "
+            "miglior punteggio corretto per rischio nello scenario indicato. "
+            "Il rendimento mostrato è illustrativo e può essere negativo."
+        )
+        if recommended
+        else (
+            "Nessuna categoria supera i controlli minimi con i dati inseriti. "
+            "Rivedi riserva, orizzonte o tolleranza prima di simulare."
+        )
+    )
+
     return PurchaseSafetyRead(
         asset_type=payload.asset_type,
         asset_label=rule.label,
@@ -566,4 +697,8 @@ def assess_purchase_safety(payload: PurchaseSafetyCreate) -> PurchaseSafetyRead:
         reasons=reasons,
         checklist=rule.checklist,
         warning=rule.warning,
+        recommended_asset_type=recommended.asset_type if recommended else None,
+        recommended_asset_label=recommended.label if recommended else None,
+        recommendation_summary=recommendation_summary,
+        ranking=ranking,
     )

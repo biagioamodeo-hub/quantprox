@@ -477,6 +477,89 @@ h1 {
   font-weight: 700;
 }
 
+.recommendation {
+  margin: 22px 0;
+  padding: 18px;
+  border-left: 4px solid var(--green);
+  background: white;
+}
+
+.recommendation > span,
+.ranking-head span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.recommendation h4 {
+  margin: 5px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.recommendation p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.ranking {
+  margin: 22px 0;
+}
+
+.ranking-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+#purchase-ranking {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#purchase-ranking li {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+
+#purchase-ranking li.unsuitable {
+  opacity: 0.58;
+}
+
+.rank-position {
+  color: var(--green);
+  font-weight: 800;
+}
+
+#purchase-ranking small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.rank-score {
+  display: grid;
+  justify-items: end;
+}
+
+.rank-score span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .guide-result-head {
   display: flex;
   align-items: start;
