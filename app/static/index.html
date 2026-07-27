@@ -9,7 +9,7 @@
     />
     <title>QuantProX · Alpha Lab</title>
     <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-purchase" />
-    <script src="/lab/app-purchase.js?v=1.6.0" defer></script>
+    <script src="/lab/app-purchase.js?v=1.7.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -373,6 +373,76 @@
           </div>
         </section>
 
+        <section class="action-advisor navigation-section" id="segnale"
+          data-navigation-section="segnale" aria-labelledby="action-advisor-title">
+          <div class="purchase-heading">
+            <div>
+              <p class="section-label">Assistente segnali</p>
+              <h2 id="action-advisor-title">Acquistare, mantenere o vendere?</h2>
+            </div>
+            <p>
+              Inserisci i dati più recenti dello strumento. Il modulo confronta
+              tendenza e limite di perdita, ma non invia ordini e non garantisce
+              il risultato.
+            </p>
+          </div>
+          <form class="action-advisor-form" id="action-advisor-form">
+            <label class="ownership-check">
+              <input id="signal-owned" type="checkbox" />
+              <span>Possiedo già questo strumento</span>
+            </label>
+            <div class="purchase-inputs">
+              <label>
+                <span>Prezzo attuale</span>
+                <input id="signal-current-price" type="number" min="0.01"
+                  step="0.01" value="105" required />
+              </label>
+              <label>
+                <span>Prezzo medio di acquisto</span>
+                <input id="signal-entry-price" type="number" min="0.01"
+                  step="0.01" value="100" disabled />
+              </label>
+              <label>
+                <span>Media breve</span>
+                <input id="signal-short-average" type="number" min="0.01"
+                  step="0.01" value="104" required />
+              </label>
+              <label>
+                <span>Media lunga</span>
+                <input id="signal-long-average" type="number" min="0.01"
+                  step="0.01" value="100" required />
+              </label>
+              <label>
+                <span>Perdita massima accettata</span>
+                <select id="signal-maximum-loss">
+                  <option value="5">5%</option>
+                  <option value="10" selected>10%</option>
+                  <option value="15">15%</option>
+                  <option value="20">20%</option>
+                </select>
+              </label>
+            </div>
+            <button class="primary" type="submit">Calcola il segnale</button>
+          </form>
+          <div class="action-advisor-result" id="action-advisor-result" hidden
+            aria-live="polite">
+            <div>
+              <span>Indicazione quantitativa</span>
+              <h3 id="action-signal-label">—</h3>
+              <p id="action-signal-rationale"></p>
+            </div>
+            <dl>
+              <div><dt>Forza del segnale</dt><dd id="action-signal-confidence">—</dd></div>
+              <div><dt>Distanza tra le medie</dt><dd id="action-signal-gap">—</dd></div>
+              <div><dt>Risultato posizione</dt><dd id="action-position-return">—</dd></div>
+            </dl>
+            <strong>Quando rivalutare</strong>
+            <p id="action-next-condition"></p>
+            <ul id="action-signal-warnings"></ul>
+            <small id="action-signal-disclaimer"></small>
+          </div>
+        </section>
+
         <section class="workspace navigation-section" id="simulazione"
           data-navigation-section="simulazione" aria-label="Flusso alpha">
           <aside class="steps">
@@ -381,6 +451,7 @@
               <a href="#panoramica" data-nav="panoramica">Inizio</a>
               <a href="#assistente" data-nav="assistente">Piano guidato</a>
               <a href="#acquisto" data-nav="acquisto">Acquisto guidato</a>
+              <a href="#segnale" data-nav="segnale">Segnale operativo</a>
               <a href="#simulazione" data-nav="simulazione">Simulazione</a>
               <a href="#attivita" data-nav="attivita">Risultati</a>
               <a href="#sicurezza" data-nav="sicurezza">Sicurezza</a>

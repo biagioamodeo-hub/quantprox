@@ -108,3 +108,28 @@ class PurchaseSafetyRead(BaseModel):
         "Valutazione educativa e prudenziale: non garantisce la sicurezza "
         "dell'investimento e non sostituisce una consulenza finanziaria autorizzata."
     )
+
+
+class ActionSignalCreate(BaseModel):
+    owns_instrument: bool = False
+    current_price: Decimal = Field(gt=0, le=10000000)
+    average_purchase_price: Decimal | None = Field(default=None, gt=0, le=10000000)
+    short_average: Decimal = Field(gt=0, le=10000000)
+    long_average: Decimal = Field(gt=0, le=10000000)
+    maximum_loss_percent: Decimal = Field(default=Decimal("10"), ge=1, le=40)
+
+
+class ActionSignalRead(BaseModel):
+    action: Literal["buy", "hold", "sell"]
+    action_label: str
+    confidence_score: int = Field(ge=0, le=100)
+    trend: Literal["positive", "neutral", "negative"]
+    trend_gap_percent: Decimal
+    position_return_percent: Decimal | None
+    rationale: str
+    next_condition: str
+    warnings: list[str]
+    disclaimer: str = (
+        "Segnale quantitativo educativo basato esclusivamente sui dati inseriti; "
+        "non costituisce consulenza finanziaria e non garantisce risultati."
+    )

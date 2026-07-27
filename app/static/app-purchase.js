@@ -676,6 +676,57 @@ async function checkPurchaseSafety(event) {
   }
 }
 
+function toggleSignalEntryPrice() {
+  $("#signal-entry-price").disabled = !$("#signal-owned").checked;
+}
+
+async function calculateActionSignal(event) {
+  event.preventDefault();
+  const ownsInstrument = $("#signal-owned").checked;
+  const button = $("#action-advisor-form button[type='submit']");
+  button.disabled = true;
+  button.textContent = "Analisi in corso…";
+  try {
+    const result = await api("/api/v1/guidance/action-signal", {
+      method: "POST",
+      body: JSON.stringify({
+        owns_instrument: ownsInstrument,
+        current_price: $("#signal-current-price").value,
+        average_purchase_price: ownsInstrument
+          ? $("#signal-entry-price").value
+          : null,
+        short_average: $("#signal-short-average").value,
+        long_average: $("#signal-long-average").value,
+        maximum_loss_percent: $("#signal-maximum-loss").value,
+      }),
+    });
+    const panel = $("#action-advisor-result");
+    panel.hidden = false;
+    panel.dataset.action = result.action;
+    $("#action-signal-label").textContent = result.action_label;
+    $("#action-signal-rationale").textContent = result.rationale;
+    $("#action-signal-confidence").textContent =
+      `${result.confidence_score}/100`;
+    $("#action-signal-gap").textContent =
+      percent(result.trend_gap_percent);
+    $("#action-position-return").textContent =
+      result.position_return_percent === null
+        ? "Nessuna posizione"
+        : percent(result.position_return_percent);
+    $("#action-next-condition").textContent = result.next_condition;
+    $("#action-signal-warnings").innerHTML = result.warnings
+      .map((warning) => `<li>${warning}</li>`)
+      .join("");
+    $("#action-signal-disclaimer").textContent = result.disclaimer;
+    toast(`Segnale calcolato: ${result.action_label}.`);
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Calcola il segnale";
+  }
+}
+
 async function buyWithRevolutDemo() {
   const assessment = state.purchaseAssessment;
   if (!assessment || assessment.outcome !== "proceed_simulation") {
@@ -953,7 +1004,10 @@ $("#virtual-buy-button").addEventListener("click", buyWithRevolutDemo);
 $("#link-card-button").addEventListener("click", linkRevolutDemoCard);
 $("#wizard-next").addEventListener("click", nextPurchaseWizardStep);
 $("#wizard-back").addEventListener("click", previousPurchaseWizardStep);
+$("#signal-owned").addEventListener("change", toggleSignalEntryPrice);
+$("#action-advisor-form").addEventListener("submit", calculateActionSignal);
 setPurchaseWizardStep(1);
+toggleSignalEntryPrice();
 initializeNavigation();
 checkHealth();
 checkSession();

@@ -580,6 +580,78 @@ h1 {
   text-transform: uppercase;
 }
 
+.action-advisor {
+  margin: 28px 0;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #fffdf8;
+}
+
+.action-advisor-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.ownership-check {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-weight: 700;
+}
+
+.action-advisor-result {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+  padding: 24px;
+  border-left: 6px solid #9b8c72;
+  border-radius: 16px;
+  background: white;
+}
+
+.action-advisor-result[data-action="buy"] {
+  border-left-color: var(--green);
+}
+
+.action-advisor-result[data-action="sell"] {
+  border-left-color: #a83f36;
+}
+
+.action-advisor-result h3 {
+  margin: 5px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 34px;
+}
+
+.action-advisor-result dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0;
+}
+
+.action-advisor-result dl div {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border-radius: 11px;
+  background: var(--soft);
+}
+
+.action-advisor-result dt,
+.action-advisor-result > div > span,
+.action-advisor-result small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.action-advisor-result dd {
+  margin: 0;
+  font-weight: 800;
+}
+
 .purchase-metrics {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

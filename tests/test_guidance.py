@@ -217,3 +217,61 @@ def test_purchase_safety_can_assess_crypto_without_claiming_safety() -> None:
     assert result["risk_level"] == "molto elevato"
     assert result["max_allocation_percent"] == "3"
     assert "non garantisce" in result["disclaimer"]
+
+
+def test_action_signal_recommends_buy_for_confirmed_positive_trend() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/action-signal",
+        json={
+            "owns_instrument": False,
+            "current_price": "105",
+            "short_average": "104",
+            "long_average": "100",
+            "maximum_loss_percent": "10",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["action"] == "buy"
+    assert result["action_label"] == "ACQUISTA"
+    assert result["trend"] == "positive"
+
+
+def test_action_signal_recommends_hold_for_uncertain_trend() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/action-signal",
+        json={
+            "owns_instrument": True,
+            "current_price": "101",
+            "average_purchase_price": "100",
+            "short_average": "100.4",
+            "long_average": "100",
+            "maximum_loss_percent": "10",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["action"] == "hold"
+    assert result["action_label"] == "MANTIENI"
+
+
+def test_action_signal_recommends_sell_when_loss_limit_is_reached() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/guidance/action-signal",
+        json={
+            "owns_instrument": True,
+            "current_price": "88",
+            "average_purchase_price": "100",
+            "short_average": "98",
+            "long_average": "100",
+            "maximum_loss_percent": "10",
+        },
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["action"] == "sell"
+    assert result["action_label"] == "VENDI"
+    assert result["position_return_percent"] == "-12.00"

@@ -3,6 +3,8 @@ from decimal import ROUND_DOWN, Decimal
 from typing import Literal
 
 from app.schemas.guidance import (
+    ActionSignalCreate,
+    ActionSignalRead,
     GuidedBacktest,
     GuidedPlanCreate,
     GuidedPlanRead,
@@ -713,4 +715,89 @@ def assess_purchase_safety(payload: PurchaseSafetyCreate) -> PurchaseSafetyRead:
         recommended_asset_label=recommended.label if recommended else None,
         recommendation_summary=recommendation_summary,
         ranking=ranking,
+    )
+
+
+def assess_action_signal(payload: ActionSignalCreate) -> ActionSignalRead:
+    trend_gap = _quantize(
+        (payload.short_average - payload.long_average)
+        / payload.long_average
+        * Decimal("100")
+    )
+    position_return = (
+        _quantize(
+            (payload.current_price - payload.average_purchase_price)
+            / payload.average_purchase_price
+            * Decimal("100")
+        )
+        if payload.owns_instrument and payload.average_purchase_price
+        else None
+    )
+    stop_triggered = (
+        position_return is not None and position_return <= -payload.maximum_loss_percent
+    )
+
+    if payload.owns_instrument and (stop_triggered or trend_gap <= Decimal("-1")):
+        action = "sell"
+        action_label = "VENDI"
+        trend = "negative"
+        rationale = (
+            "La perdita ha raggiunto il limite indicato."
+            if stop_triggered
+            else "La media breve è almeno l'1% sotto la media lunga."
+        )
+        next_condition = (
+            "Rivaluta solo dopo che la media breve sarà tornata stabilmente "
+            "sopra quella lunga."
+        )
+    elif (
+        not payload.owns_instrument
+        and trend_gap >= Decimal("1")
+        and payload.current_price >= payload.short_average
+    ):
+        action = "buy"
+        action_label = "ACQUISTA"
+        trend = "positive"
+        rationale = (
+            "La media breve è almeno l'1% sopra la media lunga e il prezzo "
+            "conferma la tendenza."
+        )
+        next_condition = (
+            "Mantieni prudenza se il prezzo torna sotto la media breve; "
+            "interrompi la valutazione se la tendenza si inverte."
+        )
+    else:
+        action = "hold"
+        action_label = "MANTIENI" if payload.owns_instrument else "ATTENDI"
+        trend = (
+            "positive"
+            if trend_gap >= Decimal("1")
+            else "negative" if trend_gap <= Decimal("-1") else "neutral"
+        )
+        rationale = (
+            "La posizione è positiva, ma il segnale non suggerisce di aumentarla."
+            if payload.owns_instrument and trend == "positive"
+            else "Le condizioni non confermano ancora un ingresso o un'uscita."
+        )
+        next_condition = (
+            "Acquista solo con media breve almeno l'1% sopra quella lunga e "
+            "prezzo sopra la media breve; vendi se la tendenza si inverte o "
+            "viene raggiunto il limite di perdita."
+        )
+
+    confidence = min(95, 50 + int(abs(trend_gap) * Decimal("8")))
+    return ActionSignalRead(
+        action=action,
+        action_label=action_label,
+        confidence_score=confidence,
+        trend=trend,
+        trend_gap_percent=trend_gap,
+        position_return_percent=position_return,
+        rationale=rationale,
+        next_condition=next_condition,
+        warnings=[
+            "Il segnale dipende dalla qualità e dall'aggiornamento dei dati inseriti.",
+            "Medie mobili e prezzi non considerano tutte le notizie o i rischi.",
+            "Prima di operare verifica costi, liquidità e diversificazione.",
+        ],
     )
