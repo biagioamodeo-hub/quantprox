@@ -4,8 +4,8 @@ import hmac
 import json
 import time
 
-from app.core.config import settings
 from app.core.accounts import account_exists
+from app.core.config import settings
 
 
 def create_session_token(tenant_id: str) -> str:

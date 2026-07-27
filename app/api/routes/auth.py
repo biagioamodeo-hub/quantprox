@@ -37,7 +37,9 @@ def login(payload: LoginRequest, response: Response) -> SessionRead:
     return SessionRead(authenticated=True, profile=payload.profile)
 
 
-@router.post("/register", response_model=SessionRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register", response_model=SessionRead, status_code=status.HTTP_201_CREATED
+)
 def register(payload: RegisterRequest, response: Response) -> SessionRead:
     if payload.profile in settings.tenant_api_keys:
         raise HTTPException(
