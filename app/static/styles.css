@@ -334,6 +334,108 @@ h1 {
   border: 0;
 }
 
+.wizard-progress {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.wizard-progress li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(20, 32, 29, 0.05);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wizard-progress li span {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: white;
+}
+
+.wizard-progress li.active {
+  background: rgba(188, 230, 210, 0.24);
+  color: var(--green);
+}
+
+.wizard-progress li.done span {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+
+.wizard-step[hidden] {
+  display: none;
+}
+
+.wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.wizard-actions .primary {
+  margin-left: auto;
+}
+
+.wizard-review {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 253, 247, 0.7);
+}
+
+.wizard-review > span,
+.wizard-review dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.wizard-review h3 {
+  margin: 5px 0 18px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.wizard-review dl {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 0;
+}
+
+.wizard-review dl div {
+  padding: 10px;
+  border-radius: 9px;
+  background: white;
+}
+
+.wizard-review dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.wizard-review p {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .purchase-form legend {
   margin-bottom: 10px;
   color: var(--muted);
@@ -1371,6 +1473,14 @@ h2 {
   .purchase-inputs,
   .purchase-metrics,
   .virtual-account-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .wizard-progress {
+    grid-template-columns: 1fr;
+  }
+
+  .wizard-review dl {
     grid-template-columns: 1fr;
   }
 

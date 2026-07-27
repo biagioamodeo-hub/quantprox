@@ -9,7 +9,7 @@
     />
     <title>QuantProX · Alpha Lab</title>
     <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-purchase" />
-    <script src="/lab/app-purchase.js?v=1.4.0" defer></script>
+    <script src="/lab/app-purchase.js?v=1.5.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -167,6 +167,12 @@
             </p>
           </div>
           <form class="purchase-form" id="purchase-form">
+            <ol class="wizard-progress" aria-label="Avanzamento configurazione">
+              <li class="active" data-wizard-indicator="1"><span>1</span>Scelta</li>
+              <li data-wizard-indicator="2"><span>2</span>Configurazione</li>
+              <li data-wizard-indicator="3"><span>3</span>Riepilogo</li>
+            </ol>
+            <section class="wizard-step active" data-wizard-step="1">
             <fieldset>
               <legend>Che cosa vuoi valutare?</legend>
               <div class="asset-options">
@@ -203,6 +209,8 @@
                 </label>
               </div>
             </fieldset>
+            </section>
+            <section class="wizard-step" data-wizard-step="2" hidden>
             <div class="purchase-inputs">
               <label>
                 <span>Capitale disponibile</span>
@@ -253,9 +261,29 @@
               <input id="purchase-emergency" type="checkbox" checked />
               <span>Ho già una riserva separata per spese ed emergenze.</span>
             </label>
+            </section>
+            <section class="wizard-step" data-wizard-step="3" hidden>
+              <div class="wizard-review">
+                <span>Controlla prima di procedere</span>
+                <h3 id="wizard-review-title">—</h3>
+                <dl id="wizard-review-details"></dl>
+                <p>
+                  La verifica confronterà tutte le categorie e applicherà i
+                  limiti prudenziali prima di abilitare il conto virtuale.
+                </p>
+              </div>
             <button class="primary" id="purchase-button" type="button">
               Verifica prima dell’acquisto
             </button>
+            </section>
+            <div class="wizard-actions">
+              <button class="ghost" id="wizard-back" type="button" hidden>
+                Indietro
+              </button>
+              <button class="primary" id="wizard-next" type="button">
+                Continua
+              </button>
+            </div>
           </form>
           <div class="purchase-result" id="purchase-result" hidden
             aria-live="polite">

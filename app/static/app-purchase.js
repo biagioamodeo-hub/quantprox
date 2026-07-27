@@ -6,6 +6,7 @@ const state = {
   guidedPlan: null,
   purchaseAssessment: null,
   virtualCard: null,
+  purchaseWizardStep: 1,
   startingCapital: 10000,
   shortWindow: 2,
   longWindow: 3,
@@ -521,6 +522,70 @@ async function applyGuidedPlan() {
   await seedScenario();
 }
 
+function updatePurchaseReview() {
+  const selectedAsset = document.querySelector(
+    'input[name="asset-type"]:checked',
+  );
+  const assetLabel = selectedAsset
+    ?.closest("label")
+    ?.querySelector("strong")?.textContent;
+  $("#wizard-review-title").textContent =
+    `${assetLabel} · ${money($("#purchase-amount").value)}`;
+  const details = [
+    ["Capitale disponibile", money($("#purchase-capital").value)],
+    [
+      "Orizzonte",
+      $("#purchase-horizon").selectedOptions[0].textContent,
+    ],
+    [
+      "Perdita tollerabile",
+      $("#purchase-loss").selectedOptions[0].textContent,
+    ],
+    ["Obiettivo", $("#purchase-goal").selectedOptions[0].textContent],
+    ["Mercato", $("#purchase-market").selectedOptions[0].textContent],
+    [
+      "Riserva d’emergenza",
+      $("#purchase-emergency").checked ? "Disponibile" : "Non disponibile",
+    ],
+  ];
+  $("#wizard-review-details").innerHTML = details
+    .map(([term, value]) => `<div><dt>${term}</dt><dd>${value}</dd></div>`)
+    .join("");
+}
+
+function setPurchaseWizardStep(step) {
+  state.purchaseWizardStep = Math.max(1, Math.min(3, step));
+  document.querySelectorAll("[data-wizard-step]").forEach((panel) => {
+    const panelStep = Number(panel.dataset.wizardStep);
+    panel.hidden = panelStep !== state.purchaseWizardStep;
+    panel.classList.toggle("active", panelStep === state.purchaseWizardStep);
+  });
+  document.querySelectorAll("[data-wizard-indicator]").forEach((indicator) => {
+    const indicatorStep = Number(indicator.dataset.wizardIndicator);
+    indicator.classList.toggle("active", indicatorStep === state.purchaseWizardStep);
+    indicator.classList.toggle("done", indicatorStep < state.purchaseWizardStep);
+  });
+  $("#wizard-back").hidden = state.purchaseWizardStep === 1;
+  $("#wizard-next").hidden = state.purchaseWizardStep === 3;
+  if (state.purchaseWizardStep === 3) updatePurchaseReview();
+}
+
+function nextPurchaseWizardStep() {
+  if (state.purchaseWizardStep === 2) {
+    const capital = Number($("#purchase-capital").value);
+    const amount = Number($("#purchase-amount").value);
+    if (!capital || !amount || capital < 100 || amount < 1) {
+      toast("Inserisci capitale e importo validi.");
+      return;
+    }
+  }
+  setPurchaseWizardStep(state.purchaseWizardStep + 1);
+}
+
+function previousPurchaseWizardStep() {
+  setPurchaseWizardStep(state.purchaseWizardStep - 1);
+}
+
 function renderPurchaseSafety(result) {
   state.purchaseAssessment = result;
   const panel = $("#purchase-result");
@@ -886,6 +951,9 @@ $("#apply-guide-button").addEventListener("click", applyGuidedPlan);
 $("#purchase-button").addEventListener("click", checkPurchaseSafety);
 $("#virtual-buy-button").addEventListener("click", buyWithRevolutDemo);
 $("#link-card-button").addEventListener("click", linkRevolutDemoCard);
+$("#wizard-next").addEventListener("click", nextPurchaseWizardStep);
+$("#wizard-back").addEventListener("click", previousPurchaseWizardStep);
+setPurchaseWizardStep(1);
 initializeNavigation();
 checkHealth();
 checkSession();
