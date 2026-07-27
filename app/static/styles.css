@@ -298,6 +298,29 @@ h1 {
   background: #e8eee8;
 }
 
+.sidebar-settings {
+  margin: -10px -6px 30px;
+  padding: 18px;
+  border: 1px solid rgba(13, 107, 80, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 253, 247, 0.68);
+}
+
+.sidebar-description {
+  margin: 9px 0 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sidebar-settings .currency-field {
+  margin-bottom: 0;
+}
+
+.sidebar-settings .currency-field select {
+  width: 100%;
+}
+
 .steps ol {
   display: grid;
   gap: 7px;
