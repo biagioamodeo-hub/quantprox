@@ -42,3 +42,24 @@ class RevolutDemoPurchaseRead(BaseModel):
         "Operazione esclusivamente virtuale: non è collegata a Revolut, "
         "non trasferisce denaro e non acquista strumenti reali."
     )
+
+
+class RevolutDemoCardCreate(BaseModel):
+    account_label: str = Field(default="Revolut Demo", min_length=1, max_length=64)
+    virtual_balance: Decimal = Field(ge=100, le=1000000)
+    currency: str = Field(default="EUR", min_length=3, max_length=3)
+
+
+class RevolutDemoCardRead(BaseModel):
+    provider: Literal["revolut_demo"] = "revolut_demo"
+    card_id: str
+    account_label: str
+    masked_number: str
+    network: Literal["VISA"] = "VISA"
+    linked: Literal[True] = True
+    spending_limit: Decimal
+    currency: str
+    disclaimer: str = (
+        "Carta esclusivamente virtuale e dimostrativa; non è una carta Revolut "
+        "reale e non può effettuare pagamenti."
+    )

@@ -13,6 +13,8 @@ from app.models.brokers import BrokerSubmission
 from app.repositories.brokers import BrokerRepository
 from app.schemas.brokers import (
     BrokerSubmissionRead,
+    RevolutDemoCardCreate,
+    RevolutDemoCardRead,
     RevolutDemoPurchaseCreate,
     RevolutDemoPurchaseRead,
 )
@@ -50,6 +52,24 @@ def create_revolut_demo_purchase(
         remaining_balance=(payload.virtual_balance - total).quantize(Decimal("0.01")),
         currency=payload.currency.upper(),
         executed_at=datetime.now(UTC),
+    )
+
+
+def create_revolut_demo_card(
+    payload: RevolutDemoCardCreate,
+) -> RevolutDemoCardRead:
+    fingerprint = (
+        f"{payload.account_label}:{payload.virtual_balance}:"
+        f"{payload.currency.upper()}"
+    )
+    card_uuid = uuid5(NAMESPACE_URL, f"quantprox:revolut-demo-card:{fingerprint}")
+    digits = str(card_uuid.int).zfill(16)[-4:]
+    return RevolutDemoCardRead(
+        card_id=f"RVC-{str(card_uuid)[:8].upper()}",
+        account_label=payload.account_label,
+        masked_number=f"•••• •••• •••• {digits}",
+        spending_limit=payload.virtual_balance.quantize(Decimal("0.01")),
+        currency=payload.currency.upper(),
     )
 
 

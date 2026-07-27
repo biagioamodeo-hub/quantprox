@@ -601,6 +601,44 @@ h1 {
   line-height: 1.55;
 }
 
+.virtual-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.28);
+  border-radius: 13px;
+}
+
+.virtual-card > div {
+  display: grid;
+  gap: 4px;
+}
+
+.virtual-card span,
+.virtual-card small {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 11px;
+}
+
+.virtual-card strong {
+  font-size: 17px;
+  letter-spacing: 0.08em;
+}
+
+.virtual-card.linked {
+  border-style: solid;
+  border-color: rgba(188, 230, 210, 0.55);
+  background: rgba(188, 230, 210, 0.08);
+}
+
+.virtual-card .ghost {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 .virtual-account-preview {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

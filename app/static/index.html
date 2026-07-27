@@ -9,7 +9,7 @@
     />
     <title>QuantProX · Alpha Lab</title>
     <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-purchase" />
-    <script src="/lab/app-purchase.js?v=1.3.0" defer></script>
+    <script src="/lab/app-purchase.js?v=1.4.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -296,6 +296,18 @@
                 Prova l’acquisto suggerito usando il capitale virtuale. Nessun
                 collegamento a Revolut e nessun movimento di denaro reale.
               </p>
+              <div class="virtual-card" id="virtual-card">
+                <div>
+                  <span>Carta collegata</span>
+                  <strong id="virtual-card-number">Nessuna carta</strong>
+                  <small id="virtual-card-meta">
+                    Genera una carta demo per abilitare gli acquisti.
+                  </small>
+                </div>
+                <button class="ghost" id="link-card-button" type="button">
+                  Collega carta virtuale
+                </button>
+              </div>
               <div class="virtual-account-preview">
                 <div><span>Saldo iniziale</span><strong id="virtual-balance">—</strong></div>
                 <div><span>Acquisto</span><strong id="virtual-purchase">—</strong></div>

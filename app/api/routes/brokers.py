@@ -5,10 +5,16 @@ from app.db.session import get_db_session
 from app.dependencies.auth import get_current_tenant
 from app.schemas.brokers import (
     BrokerSubmissionRead,
+    RevolutDemoCardCreate,
+    RevolutDemoCardRead,
     RevolutDemoPurchaseCreate,
     RevolutDemoPurchaseRead,
 )
-from app.services.brokers import BrokerService, create_revolut_demo_purchase
+from app.services.brokers import (
+    BrokerService,
+    create_revolut_demo_card,
+    create_revolut_demo_purchase,
+)
 
 router = APIRouter()
 
@@ -63,3 +69,14 @@ def purchase_with_revolut_demo(
     payload: RevolutDemoPurchaseCreate,
 ) -> RevolutDemoPurchaseRead:
     return create_revolut_demo_purchase(payload)
+
+
+@router.post(
+    "/revolut-demo/cards",
+    response_model=RevolutDemoCardRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def link_revolut_demo_card(
+    payload: RevolutDemoCardCreate,
+) -> RevolutDemoCardRead:
+    return create_revolut_demo_card(payload)

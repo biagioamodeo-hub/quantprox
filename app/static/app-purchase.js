@@ -5,6 +5,7 @@ const state = {
   currency: "USD",
   guidedPlan: null,
   purchaseAssessment: null,
+  virtualCard: null,
   startingCapital: 10000,
   shortWindow: 2,
   longWindow: 3,
@@ -564,11 +565,17 @@ function renderPurchaseSafety(result) {
   $("#virtual-purchase").textContent = money($("#purchase-amount").value);
   $("#virtual-confirmation").checked = false;
   $("#virtual-receipt").hidden = true;
+  state.virtualCard = null;
+  $("#virtual-card").classList.remove("linked");
+  $("#virtual-card-number").textContent = "Nessuna carta";
+  $("#virtual-card-meta").textContent =
+    "Genera una carta demo per abilitare gli acquisti.";
+  $("#link-card-button").textContent = "Collega carta virtuale";
   $("#virtual-buy-button").disabled =
-    result.outcome !== "proceed_simulation";
+    true;
   $("#virtual-buy-button").textContent =
     result.outcome === "proceed_simulation"
-      ? "Acquista con Revolut Demo"
+      ? "Collega prima la carta"
       : "Completa prima i controlli";
 }
 
@@ -610,6 +617,10 @@ async function buyWithRevolutDemo() {
     toast("Completa prima i controlli prudenziali.");
     return;
   }
+  if (!state.virtualCard?.linked) {
+    toast("Collega prima la carta virtuale al conto demo.");
+    return;
+  }
   if (!$("#virtual-confirmation").checked) {
     toast("Conferma che l’operazione è esclusivamente virtuale.");
     return;
@@ -640,6 +651,42 @@ async function buyWithRevolutDemo() {
   } finally {
     button.disabled = false;
     button.textContent = "Acquista con Revolut Demo";
+  }
+}
+
+async function linkRevolutDemoCard() {
+  const assessment = state.purchaseAssessment;
+  if (!assessment || assessment.outcome !== "proceed_simulation") {
+    toast("Completa prima i controlli prudenziali.");
+    return;
+  }
+  const button = $("#link-card-button");
+  button.disabled = true;
+  button.textContent = "Collegamento…";
+  try {
+    state.virtualCard = await api("/api/v1/brokers/revolut-demo/cards", {
+      method: "POST",
+      body: JSON.stringify({
+        account_label: "Revolut Demo",
+        virtual_balance: $("#purchase-capital").value,
+        currency: state.currency,
+      }),
+    });
+    $("#virtual-card").classList.add("linked");
+    $("#virtual-card-number").textContent = state.virtualCard.masked_number;
+    $("#virtual-card-meta").textContent =
+      `${state.virtualCard.network} · limite ${money(
+        state.virtualCard.spending_limit,
+      )}`;
+    button.textContent = "Carta collegata";
+    $("#virtual-buy-button").disabled = false;
+    $("#virtual-buy-button").textContent = "Acquista con Revolut Demo";
+    toast("Carta virtuale collegata al conto demo.");
+  } catch (error) {
+    toast(error.message);
+    button.textContent = "Collega carta virtuale";
+  } finally {
+    button.disabled = false;
   }
 }
 
@@ -838,6 +885,7 @@ $("#guide-form").addEventListener("submit", createGuidedPlan);
 $("#apply-guide-button").addEventListener("click", applyGuidedPlan);
 $("#purchase-button").addEventListener("click", checkPurchaseSafety);
 $("#virtual-buy-button").addEventListener("click", buyWithRevolutDemo);
+$("#link-card-button").addEventListener("click", linkRevolutDemoCard);
 initializeNavigation();
 checkHealth();
 checkSession();

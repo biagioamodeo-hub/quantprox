@@ -127,3 +127,22 @@ def test_revolut_demo_rejects_insufficient_virtual_balance() -> None:
         },
     )
     assert response.status_code == 409
+
+
+def test_revolut_demo_card_is_linked_without_real_card_data() -> None:
+    client = TestClient(app, headers={"X-API-Key": "dev-api-key"})
+    response = client.post(
+        "/api/v1/brokers/revolut-demo/cards",
+        json={
+            "account_label": "Revolut Demo",
+            "virtual_balance": "10000",
+            "currency": "EUR",
+        },
+    )
+    assert response.status_code == 201
+    card = response.json()
+    assert card["linked"] is True
+    assert card["network"] == "VISA"
+    assert card["masked_number"].startswith("•••• •••• •••• ")
+    assert card["spending_limit"] == "10000.00"
+    assert "non è una carta Revolut reale" in card["disclaimer"]
