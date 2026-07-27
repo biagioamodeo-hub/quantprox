@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.5.1-notifications" />
-    <script src="/lab/app-purchase.js?v=2.1.1" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.6.0-account" />
+    <script src="/lab/app-purchase.js?v=2.2.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -77,6 +77,9 @@
                   placeholder="Inserisci la password" required />
               </label>
               <button class="primary" id="login-button" type="submit">Accedi</button>
+              <button class="account-link" id="open-register-button" type="button">
+                Crea un nuovo account
+              </button>
             </form>
             <div class="session-panel" id="session-panel" hidden>
               <div>
@@ -700,6 +703,82 @@
         </section>
       </main>
     </div>
+
+    <dialog class="account-dialog" id="account-dialog"
+      aria-labelledby="account-dialog-title">
+      <form class="account-form" id="register-form">
+        <div class="account-dialog-head">
+          <div>
+            <p class="section-label">Nuovo account</p>
+            <h2 id="account-dialog-title">Crea il tuo profilo</h2>
+          </div>
+          <button class="dialog-close" id="close-register-button" type="button"
+            aria-label="Chiudi registrazione">×</button>
+        </div>
+        <p class="account-intro">
+          Inserisci solo i dati essenziali. Potrai completare le preferenze
+          finanziarie nel percorso guidato.
+        </p>
+        <div class="account-fields">
+          <label>
+            <span>Nome e cognome</span>
+            <input id="register-full-name" autocomplete="name"
+              placeholder="Mario Rossi" required minlength="2" />
+          </label>
+          <label>
+            <span>Nome profilo</span>
+            <input id="register-profile" autocomplete="username"
+              placeholder="mario.rossi" required minlength="3"
+              pattern="[a-zA-Z0-9._-]+" />
+          </label>
+          <label>
+            <span>Email</span>
+            <input id="register-email" type="email" autocomplete="email"
+              placeholder="mario@esempio.it" required />
+          </label>
+          <label>
+            <span>Cellulare <small>facoltativo</small></span>
+            <input id="register-phone" type="tel" autocomplete="tel"
+              inputmode="tel" placeholder="+39 333 123 4567" />
+          </label>
+          <label>
+            <span>Valuta preferita</span>
+            <select id="register-currency">
+              <option value="EUR">Euro (EUR)</option>
+              <option value="USD">Dollaro USA (USD)</option>
+              <option value="GBP">Sterlina britannica (GBP)</option>
+              <option value="CHF">Franco svizzero (CHF)</option>
+            </select>
+          </label>
+          <span class="account-security-note">
+            La password deve contenere almeno 10 caratteri.
+          </span>
+          <label>
+            <span>Password</span>
+            <input id="register-password" type="password"
+              autocomplete="new-password" required minlength="10" />
+          </label>
+          <label>
+            <span>Conferma password</span>
+            <input id="register-password-confirmation" type="password"
+              autocomplete="new-password" required minlength="10" />
+          </label>
+        </div>
+        <label class="account-consent">
+          <input id="register-terms" type="checkbox" required />
+          <span>
+            Accetto termini e informativa privacy e comprendo che QuantProX
+            utilizza dati dimostrativi e non garantisce risultati finanziari.
+          </span>
+        </label>
+        <div class="account-actions">
+          <button class="ghost" id="cancel-register-button" type="button">Annulla</button>
+          <button class="primary" id="register-button" type="submit">
+            Crea account
+          </button>
+        </div>
+      </form>
+    </dialog>
 
     <nav class="mobile-scroll-controls" aria-label="Scorri tra le sezioni">
       <button id="scroll-up-button" type="button" aria-label="Sezione precedente"

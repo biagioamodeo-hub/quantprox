@@ -32,6 +32,11 @@ const $ = (selector) => document.querySelector(selector);
 
 const apiMessageLabels = {
   "Invalid profile or password.": "Nome profilo o password non validi.",
+  "Account already exists.": "Esiste già un account con questo nome profilo.",
+  "Passwords do not match.": "Le password non coincidono.",
+  "Terms and privacy policy must be accepted.":
+    "È necessario accettare termini e informativa privacy.",
+  "A valid email address is required.": "Inserisci un indirizzo email valido.",
   "Exchange-rate data is temporarily unavailable.":
     "Cambio temporaneamente non disponibile.",
   "A valid X-API-Key header is required.":
@@ -1104,6 +1109,52 @@ async function login(event) {
   }
 }
 
+function closeRegistration() {
+  $("#account-dialog").close();
+}
+
+async function registerAccount(event) {
+  event.preventDefault();
+  const password = $("#register-password").value;
+  const passwordConfirmation = $("#register-password-confirmation").value;
+  if (password !== passwordConfirmation) {
+    toast("Le password non coincidono.");
+    return;
+  }
+  const button = $("#register-button");
+  button.disabled = true;
+  button.textContent = "Creazione…";
+  try {
+    const preferredCurrency = $("#register-currency").value;
+    const session = await api("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({
+        profile: $("#register-profile").value.trim(),
+        full_name: $("#register-full-name").value.trim(),
+        email: $("#register-email").value.trim(),
+        phone: $("#register-phone").value.trim() || null,
+        preferred_currency: preferredCurrency,
+        password,
+        password_confirmation: passwordConfirmation,
+        accepted_terms: $("#register-terms").checked,
+      }),
+    });
+    state.authenticated = session.authenticated;
+    state.profile = session.profile;
+    state.currency = preferredCurrency;
+    $("#register-form").reset();
+    closeRegistration();
+    await refreshExchangeRate();
+    render();
+    toast(`Account ${session.profile} creato correttamente.`);
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Crea account";
+  }
+}
+
 async function logout() {
   await api("/auth/logout", { method: "POST" });
   resetView();
@@ -1259,6 +1310,12 @@ $("#action-button").addEventListener("click", nextAction);
 $("#reset-button").addEventListener("click", resetView);
 $("#cancel-button").addEventListener("click", cancelOrder);
 $("#login-form").addEventListener("submit", login);
+$("#open-register-button").addEventListener("click", () =>
+  $("#account-dialog").showModal(),
+);
+$("#close-register-button").addEventListener("click", closeRegistration);
+$("#cancel-register-button").addEventListener("click", closeRegistration);
+$("#register-form").addEventListener("submit", registerAccount);
 $("#logout-button").addEventListener("click", logout);
 $("#simulation-currency").addEventListener("change", selectCurrency);
 $("#guide-form").addEventListener("submit", createGuidedPlan);

@@ -2,10 +2,11 @@ from hmac import compare_digest
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
+from app.core.accounts import authenticate_account, register_account
 from app.core.config import settings
 from app.core.sessions import create_session_token
 from app.dependencies.auth import get_current_tenant
-from app.schemas.auth import LoginRequest, SessionRead
+from app.schemas.auth import LoginRequest, RegisterRequest, SessionRead
 
 router = APIRouter()
 SESSION_COOKIE = "quantprox_session"
@@ -14,8 +15,11 @@ SESSION_COOKIE = "quantprox_session"
 @router.post("/login", response_model=SessionRead)
 def login(payload: LoginRequest, response: Response) -> SessionRead:
     expected_password = settings.tenant_api_keys.get(payload.profile)
-    if expected_password is None or not compare_digest(
+    configured_account = expected_password is not None and compare_digest(
         payload.password, expected_password
+    )
+    if not configured_account and not authenticate_account(
+        payload.profile, payload.password
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -31,6 +35,39 @@ def login(payload: LoginRequest, response: Response) -> SessionRead:
         path="/",
     )
     return SessionRead(authenticated=True, profile=payload.profile)
+
+
+@router.post("/register", response_model=SessionRead, status_code=status.HTTP_201_CREATED)
+def register(payload: RegisterRequest, response: Response) -> SessionRead:
+    if payload.profile in settings.tenant_api_keys:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Account already exists.",
+        )
+    try:
+        account = register_account(
+            profile=payload.profile,
+            full_name=payload.full_name,
+            email=str(payload.email),
+            phone=payload.phone,
+            preferred_currency=payload.preferred_currency,
+            password=payload.password,
+        )
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error
+    response.set_cookie(
+        key=SESSION_COOKIE,
+        value=create_session_token(account.profile),
+        max_age=settings.session_ttl_seconds,
+        httponly=True,
+        secure=settings.session_secure_cookie,
+        samesite="strict",
+        path="/",
+    )
+    return SessionRead(authenticated=True, profile=account.profile)
 
 
 @router.get("/session", response_model=SessionRead)
