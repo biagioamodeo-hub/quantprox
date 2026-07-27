@@ -1,6 +1,7 @@
 const state = {
   authenticated: false,
   profile: null,
+  currency: "USD",
   step: 0,
   instrument: null,
   portfolio: null,
@@ -77,7 +78,7 @@ const api = async (path, options = {}) => {
 const money = (value) =>
   new Intl.NumberFormat("it-IT", {
     style: "currency",
-    currency: "USD",
+    currency: state.currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(Number(value));
@@ -156,6 +157,8 @@ function render() {
   $("#login-form").hidden = state.authenticated;
   $("#session-panel").hidden = !state.authenticated;
   $("#session-profile").textContent = state.profile || "—";
+  $("#simulation-currency").value = state.currency;
+  $("#simulation-currency").disabled = state.step > 0;
   $("#seed-button").disabled = !state.authenticated;
   $("#seed-button").textContent = state.authenticated
     ? state.step === 0
@@ -247,12 +250,16 @@ async function seedScenario() {
       body: JSON.stringify({
         symbol: `QPX-${suffix}`,
         exchange: "DEMO",
-        currency: "USD",
+        currency: state.currency,
       }),
     });
     state.portfolio = await api("/api/v1/portfolios", {
       method: "POST",
-      body: JSON.stringify({ name: `Alpha Lab ${suffix}`, cash_balance: "10000" }),
+      body: JSON.stringify({
+        name: `Alpha Lab ${suffix}`,
+        base_currency: state.currency,
+        cash_balance: "10000",
+      }),
     });
     await api(`/api/v1/risk/limits/${state.portfolio.id}`, {
       method: "PUT",
@@ -474,11 +481,18 @@ async function logout() {
   toast("Sessione terminata.");
 }
 
+function selectCurrency(event) {
+  state.currency = event.target.value;
+  render();
+  toast(`Valuta impostata su ${state.currency}.`);
+}
+
 $("#seed-button").addEventListener("click", seedScenario);
 $("#action-button").addEventListener("click", nextAction);
 $("#reset-button").addEventListener("click", resetView);
 $("#cancel-button").addEventListener("click", cancelOrder);
 $("#login-form").addEventListener("submit", login);
 $("#logout-button").addEventListener("click", logout);
+$("#simulation-currency").addEventListener("change", selectCurrency);
 checkHealth();
 checkSession();

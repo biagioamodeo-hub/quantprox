@@ -8,8 +8,8 @@
       content="QuantProX Alpha Lab: prova il flusso di trading simulato in modo guidato."
     />
     <title>QuantProX · Alpha Lab</title>
-    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0-rc.1-realistic" />
-    <script src="/lab/app.js?v=1.0.0-rc.1-realistic" defer></script>
+    <link rel="stylesheet" href="/lab/styles.css?v=1.0.0-rc.1-currency" />
+    <script src="/lab/app.js?v=1.0.0-rc.1-currency" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -61,6 +61,15 @@
               </div>
               <button class="ghost" id="logout-button" type="button">Esci</button>
             </div>
+            <label class="currency-field" for="simulation-currency">
+              <span>Valuta della simulazione</span>
+              <select id="simulation-currency" name="currency">
+                <option value="EUR">Euro (EUR)</option>
+                <option value="USD" selected>Dollaro USA (USD)</option>
+                <option value="GBP">Sterlina britannica (GBP)</option>
+                <option value="CHF">Franco svizzero (CHF)</option>
+              </select>
+            </label>
             <button class="primary" id="seed-button" disabled>
               Accedi per iniziare
             </button>
