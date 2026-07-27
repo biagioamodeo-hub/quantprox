@@ -9,7 +9,7 @@
     />
     <title>QuantProX · Alpha Lab</title>
     <link rel="stylesheet" href="/lab/styles.css?v=1.2.2-compact" />
-    <script src="/lab/app-purchase.js?v=1.8.0" defer></script>
+    <script src="/lab/app-purchase.js?v=1.9.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -403,49 +403,34 @@
               <h2 id="action-advisor-title">Acquistare, mantenere o vendere?</h2>
             </div>
             <p>
-              Inserisci i dati più recenti dello strumento. Il modulo confronta
-              tendenza e limite di perdita, ma non invia ordini e non garantisce
-              il risultato.
+              Il consiglio usa automaticamente il portafoglio collegato e le
+              quotazioni disponibili. Si aggiorna durante la simulazione, senza
+              chiederti di inserire medie o prezzi.
             </p>
           </div>
-          <form class="action-advisor-form" id="action-advisor-form">
-            <label class="ownership-check">
-              <input id="signal-owned" type="checkbox" />
-              <span>Possiedo già questo strumento</span>
-            </label>
-            <div class="purchase-inputs">
-              <label>
-                <span>Prezzo attuale</span>
-                <input id="signal-current-price" type="number" min="0.01"
-                  step="0.01" value="105" required />
-              </label>
-              <label>
-                <span>Prezzo medio di acquisto</span>
-                <input id="signal-entry-price" type="number" min="0.01"
-                  step="0.01" value="100" disabled />
-              </label>
-              <label>
-                <span>Media breve</span>
-                <input id="signal-short-average" type="number" min="0.01"
-                  step="0.01" value="104" required />
-              </label>
-              <label>
-                <span>Media lunga</span>
-                <input id="signal-long-average" type="number" min="0.01"
-                  step="0.01" value="100" required />
-              </label>
-              <label>
-                <span>Perdita massima accettata</span>
-                <select id="signal-maximum-loss">
-                  <option value="5">5%</option>
-                  <option value="10" selected>10%</option>
-                  <option value="15">15%</option>
-                  <option value="20">20%</option>
-                </select>
-              </label>
+          <div class="automatic-advice-source">
+            <div>
+              <span>Portafoglio</span>
+              <strong id="advice-portfolio-status">Da preparare</strong>
             </div>
-            <button class="primary" type="submit">Calcola il segnale</button>
-          </form>
+            <div>
+              <span>Mercato</span>
+              <strong id="advice-market-status">Dati non disponibili</strong>
+            </div>
+            <div>
+              <span>Aggiornamento</span>
+              <strong>Automatico</strong>
+            </div>
+            <button class="ghost" id="refresh-advice-button" type="button" disabled>
+              Aggiorna analisi
+            </button>
+          </div>
+          <div class="automatic-advice-empty" id="automatic-advice-empty">
+            <strong>Prepara lo scenario per ricevere il consiglio.</strong>
+            <span>
+              QuantProX analizzerà portafoglio, posizione e andamento del mercato.
+            </span>
+          </div>
           <div class="action-advisor-result" id="action-advisor-result" hidden
             aria-live="polite">
             <div class="action-result-summary">
@@ -456,9 +441,9 @@
               <p id="action-signal-rationale"></p>
             </div>
             <dl>
-              <div><dt>Forza del segnale</dt><dd id="action-signal-confidence">—</dd></div>
+              <div><dt>Affidabilità tecnica</dt><dd id="action-signal-confidence">—</dd></div>
               <div><dt>Distanza tra le medie</dt><dd id="action-signal-gap">—</dd></div>
-              <div><dt>Risultato posizione</dt><dd id="action-position-return">—</dd></div>
+              <div><dt>Posizione in portafoglio</dt><dd id="action-position-return">—</dd></div>
             </dl>
             <div class="action-next-step">
               <strong>Quando rivalutare</strong>

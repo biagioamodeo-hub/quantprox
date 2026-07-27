@@ -677,6 +677,58 @@ h1 {
   margin-top: 22px;
 }
 
+.automatic-advice-source {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 10px;
+  align-items: stretch;
+  margin-top: 20px;
+}
+
+.automatic-advice-source > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbfdfc;
+}
+
+.automatic-advice-source span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.automatic-advice-source strong {
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.automatic-advice-source button {
+  min-height: 100%;
+}
+
+.automatic-advice-empty {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 18px;
+  border: 1px dashed rgba(8, 120, 90, 0.35);
+  border-radius: 14px;
+  background: rgba(201, 240, 222, 0.16);
+}
+
+.automatic-advice-empty[hidden] {
+  display: none;
+}
+
+.automatic-advice-empty span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .ownership-check {
   display: flex;
   gap: 10px;
@@ -1657,6 +1709,10 @@ h2 {
     display: flex;
   }
 
+  .automatic-advice-source {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .topbar {
     flex-wrap: wrap;
     gap: 10px;
@@ -1775,6 +1831,10 @@ h2 {
   .action-next-step {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .automatic-advice-source {
+    grid-template-columns: 1fr;
   }
 
   .metric-grid {

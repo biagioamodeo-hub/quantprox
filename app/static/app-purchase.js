@@ -5,6 +5,7 @@ const state = {
   currency: "USD",
   guidedPlan: null,
   purchaseAssessment: null,
+  portfolioAdvice: null,
   virtualCard: null,
   purchaseWizardStep: 1,
   startingCapital: 10000,
@@ -218,6 +219,18 @@ function render() {
           Number(state.valuation.unrealized_pnl),
       )}`
     : "Risultato —";
+  $("#advice-portfolio-status").textContent = state.portfolio
+    ? state.portfolio.name
+    : "Da preparare";
+  $("#advice-market-status").textContent = state.instrument
+    ? `${state.instrument.symbol} · ${money(state.lastPrice)}`
+    : "Dati non disponibili";
+  $("#refresh-advice-button").disabled =
+    !state.portfolio || !state.instrument;
+  if (!state.portfolioAdvice) {
+    $("#automatic-advice-empty").hidden = false;
+    $("#action-advisor-result").hidden = true;
+  }
 
   const actions = [
     ["Crea un ambiente dimostrativo", "Prepara dati, portafoglio e limiti per iniziare il percorso guidato.", "Prepara scenario demo", false],
@@ -326,10 +339,14 @@ async function seedScenario() {
       `${state.instrument.symbol} · ${state.guidedPlan?.profile.label || "profilo demo"} · ${money(state.startingCapital)}`,
       "PRONTO",
     );
+    await updateAutomaticPortfolioAdvice();
     toast("Scenario demo pronto");
   } catch (error) {
     toast(error.message);
   } finally {
+    if (state.portfolio && state.instrument) {
+      await updateAutomaticPortfolioAdvice();
+    }
     render();
   }
 }
@@ -428,6 +445,7 @@ function resetView() {
     decision: null,
     order: null,
     valuation: null,
+    portfolioAdvice: null,
     cancelled: false,
     orderKey: null,
     executionKey: null,
@@ -676,54 +694,86 @@ async function checkPurchaseSafety(event) {
   }
 }
 
-function toggleSignalEntryPrice() {
-  $("#signal-entry-price").disabled = !$("#signal-owned").checked;
-}
-
-async function calculateActionSignal(event) {
-  event.preventDefault();
-  const ownsInstrument = $("#signal-owned").checked;
-  const button = $("#action-advisor-form button[type='submit']");
+async function updateAutomaticPortfolioAdvice() {
+  if (!state.portfolio || !state.instrument) return;
+  const button = $("#refresh-advice-button");
   button.disabled = true;
-  button.textContent = "Analisi in corso…";
+  button.textContent = "Aggiornamento…";
   try {
-    const result = await api("/api/v1/guidance/action-signal", {
+    const recommendation = await api("/api/v1/decisions/recommend", {
       method: "POST",
       body: JSON.stringify({
-        owns_instrument: ownsInstrument,
-        current_price: $("#signal-current-price").value,
-        average_purchase_price: ownsInstrument
-          ? $("#signal-entry-price").value
-          : null,
-        short_average: $("#signal-short-average").value,
-        long_average: $("#signal-long-average").value,
-        maximum_loss_percent: $("#signal-maximum-loss").value,
+        portfolio_id: state.portfolio.id,
+        instrument_id: state.instrument.id,
+        timeframe: "1d",
+        short_window: state.shortWindow,
+        long_window: state.longWindow,
       }),
     });
+    const ownsInstrument = state.order?.status === "filled";
+    const action =
+      ownsInstrument && recommendation.action === "buy"
+        ? "hold"
+        : recommendation.action;
+    const actionLabel =
+      action === "buy"
+        ? "ACQUISTA"
+        : action === "sell"
+          ? ownsInstrument
+            ? "VENDI"
+            : "ATTENDI"
+          : ownsInstrument
+            ? "MANTIENI"
+            : "ATTENDI";
+    const shortAverage = Number(recommendation.short_average);
+    const longAverage = Number(recommendation.long_average);
+    const gap =
+      longAverage > 0
+        ? ((shortAverage - longAverage) / longAverage) * 100
+        : 0;
+    state.portfolioAdvice = {
+      ...recommendation,
+      action,
+      actionLabel,
+      gap,
+      ownsInstrument,
+      confidence: Math.min(95, 50 + Math.round(Math.abs(gap) * 8)),
+    };
     const panel = $("#action-advisor-result");
     panel.hidden = false;
-    panel.dataset.action = result.action;
-    $("#action-signal-label").textContent = result.action_label;
-    $("#action-signal-rationale").textContent = result.rationale;
+    panel.dataset.action = action;
+    $("#automatic-advice-empty").hidden = true;
+    $("#action-signal-label").textContent = actionLabel;
+    $("#action-signal-rationale").textContent =
+      ownsInstrument && recommendation.action === "buy"
+        ? "La tendenza resta positiva e la posizione è già presente: il sistema consiglia di mantenerla senza aumentarla automaticamente."
+        : translateRationale(recommendation.rationale);
     $("#action-signal-confidence").textContent =
-      `${result.confidence_score}/100`;
-    $("#action-signal-gap").textContent =
-      percent(result.trend_gap_percent);
+      `${state.portfolioAdvice.confidence}/100`;
+    $("#action-signal-gap").textContent = percent(gap);
     $("#action-position-return").textContent =
-      result.position_return_percent === null
-        ? "Nessuna posizione"
-        : percent(result.position_return_percent);
-    $("#action-next-condition").textContent = result.next_condition;
-    $("#action-signal-warnings").innerHTML = result.warnings
+      ownsInstrument ? "Presente" : "Non presente";
+    $("#action-next-condition").textContent =
+      action === "buy"
+        ? "Rivaluta se la media breve torna sotto quella lunga."
+        : action === "sell"
+          ? "Rivaluta dopo una nuova conferma positiva del mercato."
+          : "Mantieni finché portafoglio e tendenza restano compatibili.";
+    const warnings = [
+      "Il consiglio usa soltanto i dati presenti nel portafoglio e nel mercato collegato.",
+      "Le medie mobili non includono tutte le notizie o i rischi dello strumento.",
+      "Nessun ordine viene inviato automaticamente.",
+    ];
+    $("#action-signal-warnings").innerHTML = warnings
       .map((warning) => `<li>${warning}</li>`)
       .join("");
-    $("#action-signal-disclaimer").textContent = result.disclaimer;
-    toast(`Segnale calcolato: ${result.action_label}.`);
+    $("#action-signal-disclaimer").textContent =
+      "Consiglio quantitativo educativo: non garantisce risultati e non sostituisce una consulenza finanziaria autorizzata.";
   } catch (error) {
     toast(error.message);
   } finally {
     button.disabled = false;
-    button.textContent = "Calcola il segnale";
+    button.textContent = "Aggiorna analisi";
   }
 }
 
@@ -1040,10 +1090,11 @@ $("#virtual-buy-button").addEventListener("click", buyWithRevolutDemo);
 $("#link-card-button").addEventListener("click", linkRevolutDemoCard);
 $("#wizard-next").addEventListener("click", nextPurchaseWizardStep);
 $("#wizard-back").addEventListener("click", previousPurchaseWizardStep);
-$("#signal-owned").addEventListener("change", toggleSignalEntryPrice);
-$("#action-advisor-form").addEventListener("submit", calculateActionSignal);
+$("#refresh-advice-button").addEventListener(
+  "click",
+  updateAutomaticPortfolioAdvice,
+);
 setPurchaseWizardStep(1);
-toggleSignalEntryPrice();
 initializeNavigation();
 initializeMobileScrollControls();
 checkHealth();
