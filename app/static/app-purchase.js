@@ -4,6 +4,7 @@ const state = {
   profile: null,
   currency: "USD",
   guidedPlan: null,
+  purchaseAssessment: null,
   startingCapital: 10000,
   shortWindow: 2,
   longWindow: 3,
@@ -51,6 +52,8 @@ const apiMessageLabels = {
   "Fill quantity exceeds the remaining order.":
     "La quantità da eseguire supera quella residua dell’ordine.",
   "Insufficient portfolio cash.": "Liquidità del portafoglio insufficiente.",
+  "Insufficient virtual balance for amount and simulated fee.":
+    "Saldo virtuale insufficiente per importo e commissione simulata.",
   "Insufficient position quantity.": "Quantità disponibile insufficiente.",
   "Risk limits are not configured for this portfolio.":
     "I limiti di rischio non sono configurati per questo portafoglio.",
@@ -518,6 +521,7 @@ async function applyGuidedPlan() {
 }
 
 function renderPurchaseSafety(result) {
+  state.purchaseAssessment = result;
   const panel = $("#purchase-result");
   panel.hidden = false;
   panel.dataset.outcome = result.outcome;
@@ -556,6 +560,16 @@ function renderPurchaseSafety(result) {
     )
     .join("");
   $("#purchase-disclaimer").textContent = result.disclaimer;
+  $("#virtual-balance").textContent = money($("#purchase-capital").value);
+  $("#virtual-purchase").textContent = money($("#purchase-amount").value);
+  $("#virtual-confirmation").checked = false;
+  $("#virtual-receipt").hidden = true;
+  $("#virtual-buy-button").disabled =
+    result.outcome !== "proceed_simulation";
+  $("#virtual-buy-button").textContent =
+    result.outcome === "proceed_simulation"
+      ? "Acquista con Revolut Demo"
+      : "Completa prima i controlli";
 }
 
 async function checkPurchaseSafety(event) {
@@ -587,6 +601,45 @@ async function checkPurchaseSafety(event) {
   } finally {
     button.disabled = false;
     button.textContent = "Verifica prima dell’acquisto";
+  }
+}
+
+async function buyWithRevolutDemo() {
+  const assessment = state.purchaseAssessment;
+  if (!assessment || assessment.outcome !== "proceed_simulation") {
+    toast("Completa prima i controlli prudenziali.");
+    return;
+  }
+  if (!$("#virtual-confirmation").checked) {
+    toast("Conferma che l’operazione è esclusivamente virtuale.");
+    return;
+  }
+  const button = $("#virtual-buy-button");
+  button.disabled = true;
+  button.textContent = "Acquisto virtuale…";
+  try {
+    const receipt = await api("/api/v1/brokers/revolut-demo/purchases", {
+      method: "POST",
+      body: JSON.stringify({
+        asset_type: assessment.recommended_asset_type || assessment.asset_type,
+        asset_label: assessment.recommended_asset_label || assessment.asset_label,
+        virtual_balance: $("#purchase-capital").value,
+        amount: $("#purchase-amount").value,
+        currency: state.currency,
+      }),
+    });
+    $("#virtual-receipt").hidden = false;
+    $("#virtual-reference").textContent = receipt.reference;
+    $("#virtual-summary").textContent =
+      `${receipt.asset_label}: addebito virtuale ${money(receipt.total_debit)}; ` +
+      `saldo residuo ${money(receipt.remaining_balance)}.`;
+    $("#virtual-disclaimer").textContent = receipt.disclaimer;
+    toast("Acquisto virtuale completato.");
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Acquista con Revolut Demo";
   }
 }
 
@@ -784,6 +837,7 @@ $("#simulation-currency").addEventListener("change", selectCurrency);
 $("#guide-form").addEventListener("submit", createGuidedPlan);
 $("#apply-guide-button").addEventListener("click", applyGuidedPlan);
 $("#purchase-button").addEventListener("click", checkPurchaseSafety);
+$("#virtual-buy-button").addEventListener("click", buyWithRevolutDemo);
 initializeNavigation();
 checkHealth();
 checkSession();

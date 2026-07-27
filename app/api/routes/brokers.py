@@ -3,8 +3,12 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
 from app.dependencies.auth import get_current_tenant
-from app.schemas.brokers import BrokerSubmissionRead
-from app.services.brokers import BrokerService
+from app.schemas.brokers import (
+    BrokerSubmissionRead,
+    RevolutDemoPurchaseCreate,
+    RevolutDemoPurchaseRead,
+)
+from app.services.brokers import BrokerService, create_revolut_demo_purchase
 
 router = APIRouter()
 
@@ -48,3 +52,14 @@ def cancel_order(
     service: BrokerService = Depends(get_broker_service),
 ) -> BrokerSubmissionRead:
     return service.cancel(order_id)
+
+
+@router.post(
+    "/revolut-demo/purchases",
+    response_model=RevolutDemoPurchaseRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def purchase_with_revolut_demo(
+    payload: RevolutDemoPurchaseCreate,
+) -> RevolutDemoPurchaseRead:
+    return create_revolut_demo_purchase(payload)

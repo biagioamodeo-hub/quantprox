@@ -560,6 +560,97 @@ h1 {
   font-size: 12px;
 }
 
+.virtual-account {
+  margin: 24px 0;
+  padding: 22px;
+  border-radius: 16px;
+  background: #18231f;
+  color: white;
+}
+
+.virtual-account-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.virtual-account-head span,
+.virtual-account > p,
+.virtual-account-preview span,
+.virtual-receipt small {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+}
+
+.virtual-account h4 {
+  margin: 4px 0 0;
+  font-size: 24px;
+}
+
+.demo-badge {
+  align-self: start;
+  padding: 6px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.virtual-account > p {
+  max-width: 680px;
+  line-height: 1.55;
+}
+
+.virtual-account-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.virtual-account-preview div {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.confirmation-check {
+  display: flex;
+  gap: 9px;
+  margin: 15px 0;
+  font-size: 12px;
+}
+
+.confirmation-check input {
+  accent-color: var(--mint);
+}
+
+.virtual-account .primary {
+  background: white;
+  color: var(--ink);
+}
+
+.virtual-receipt {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 15px;
+  border: 1px solid rgba(188, 230, 210, 0.35);
+  border-radius: 12px;
+  background: rgba(188, 230, 210, 0.1);
+}
+
+.virtual-receipt[hidden] {
+  display: none;
+}
+
+.virtual-receipt p {
+  margin: 0;
+  font-size: 13px;
+}
+
 .guide-result-head {
   display: flex;
   align-items: start;
@@ -1240,7 +1331,8 @@ h2 {
 
   .asset-options,
   .purchase-inputs,
-  .purchase-metrics {
+  .purchase-metrics,
+  .virtual-account-preview {
     grid-template-columns: 1fr;
   }
 

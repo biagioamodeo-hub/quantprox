@@ -9,7 +9,7 @@
     />
     <title>QuantProX · Alpha Lab</title>
     <link rel="stylesheet" href="/lab/styles.css?v=1.1.0-purchase" />
-    <script src="/lab/app-purchase.js?v=1.2.0" defer></script>
+    <script src="/lab/app-purchase.js?v=1.3.0" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -283,6 +283,38 @@
                 <span>Stima illustrativa corretta per rischio</span>
               </div>
               <ol id="purchase-ranking"></ol>
+            </div>
+            <div class="virtual-account">
+              <div class="virtual-account-head">
+                <div>
+                  <span>Conto virtuale</span>
+                  <h4>Revolut Demo</h4>
+                </div>
+                <span class="demo-badge">SOLO SIMULAZIONE</span>
+              </div>
+              <p>
+                Prova l’acquisto suggerito usando il capitale virtuale. Nessun
+                collegamento a Revolut e nessun movimento di denaro reale.
+              </p>
+              <div class="virtual-account-preview">
+                <div><span>Saldo iniziale</span><strong id="virtual-balance">—</strong></div>
+                <div><span>Acquisto</span><strong id="virtual-purchase">—</strong></div>
+                <div><span>Commissione simulata</span><strong>0,25%</strong></div>
+              </div>
+              <label class="confirmation-check">
+                <input id="virtual-confirmation" type="checkbox" />
+                <span>Confermo di aver compreso che l’operazione è virtuale.</span>
+              </label>
+              <button class="primary" id="virtual-buy-button" type="button">
+                Acquista con Revolut Demo
+              </button>
+              <div class="virtual-receipt" id="virtual-receipt" hidden
+                aria-live="polite">
+                <strong>Acquisto virtuale completato</strong>
+                <span id="virtual-reference">—</span>
+                <p id="virtual-summary"></p>
+                <small id="virtual-disclaimer"></small>
+              </div>
             </div>
             <details>
               <summary>Controlli da fare sullo strumento</summary>
